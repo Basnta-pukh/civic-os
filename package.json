@@ -1,0 +1,9 @@
+{
+  "name": "civic-os",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@12.3.4",
+  "scripts": {
+    "dev": "node dev-server.mjs"
+  }
+}
