@@ -335,6 +335,9 @@ const state = {
   joinedMissions: new Set(),
   supported: new Set(),
   openIssueId: null,
+  civicAiOpen: false,
+  civicAiContext: null,
+  civicAiMessages: [],
 };
 
 const $ = (selector, root = document) => root.querySelector(selector);
@@ -1423,6 +1426,246 @@ function toggleMission(id) {
   renderMissions();
 }
 
+// ================= CIVIC AI =================
+
+function getCivicAiContext() {
+  if (state.openIssueId) {
+    const issue = issues.find((item) => item.id === state.openIssueId);
+
+    if (issue) {
+      return {
+        title: issue.title,
+        category: issue.category,
+        description: issue.description,
+        priority: issue.priority,
+        status: issue.status,
+        location: issue.location,
+      };
+    }
+  }
+
+  if (state.draft) {
+    return {
+      title: state.draft.description?.slice(0, 60) || "Current civic report",
+      category: state.draft.category || "other",
+      description: state.draft.description || "",
+      location: state.draft.location || "",
+    };
+  }
+
+  return null;
+}
+
+function openCivicAi(context = null) {
+  state.civicAiOpen = true;
+  state.civicAiContext = context || getCivicAiContext();
+
+  const panel = document.getElementById("civicAiPanel");
+  const fab = document.getElementById("civicAiFab");
+
+  if (!panel || !fab) return;
+
+  panel.classList.add("is-open");
+  panel.setAttribute("aria-hidden", "false");
+  fab.setAttribute("aria-expanded", "true");
+
+  if (typeof lucide !== "undefined") {
+    lucide.createIcons();
+  }
+
+  const input = document.getElementById("civicAiInput");
+  if (input) {
+    setTimeout(() => input.focus(), 100);
+  }
+}
+
+function closeCivicAi() {
+  state.civicAiOpen = false;
+
+  const panel = document.getElementById("civicAiPanel");
+  const fab = document.getElementById("civicAiFab");
+
+  if (!panel || !fab) return;
+
+  panel.classList.remove("is-open");
+  panel.setAttribute("aria-hidden", "true");
+  fab.setAttribute("aria-expanded", "false");
+}
+
+function addCivicAiMessage(role, text) {
+  const container = document.getElementById("civicAiMessages");
+
+  if (!container) return;
+
+  state.civicAiMessages.push({
+    role,
+    text,
+  });
+
+  const message = document.createElement("div");
+  message.className = `civic-ai-message ${role}`;
+
+  if (role === "ai") {
+    message.innerHTML = `
+      <div class="civic-ai-message-avatar">
+        <i data-lucide="sparkles"></i>
+      </div>
+      <div class="civic-ai-bubble">
+        ${text}
+      </div>
+    `;
+  } else {
+    message.innerHTML = `
+      <div class="civic-ai-bubble">
+        ${text}
+      </div>
+    `;
+  }
+
+  container.appendChild(message);
+  container.scrollTop = container.scrollHeight;
+
+  if (typeof lucide !== "undefined") {
+    lucide.createIcons();
+  }
+}
+
+function civicAiText(value) {
+  return String(value || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+function generateCivicAiResponse(prompt) {
+  const question = prompt.toLowerCase();
+  const context = state.civicAiContext || getCivicAiContext();
+
+  const category = context?.category || "other";
+  const description = context?.description || "";
+
+  let response = "";
+
+  if (
+    question.includes("caus") ||
+    question.includes("why") ||
+    question.includes("problem")
+  ) {
+    const causes = {
+      roads:
+        "Possible causes include poor drainage, road wear, overloaded traffic, weak maintenance, or construction damage.",
+      garbage:
+        "Possible causes include irregular collection, insufficient bins, illegal dumping, poor waste segregation, or limited collection capacity.",
+      streetlights:
+        "Possible causes include damaged equipment, electrical faults, aging infrastructure, or delayed maintenance.",
+      water:
+        "Possible causes include pipe damage, leakage, low supply capacity, contamination, or infrastructure maintenance issues.",
+      health:
+        "Possible causes may include sanitation problems, environmental conditions, service gaps, or limited access to public-health facilities.",
+      education:
+        "Possible causes may include infrastructure gaps, limited resources, overcrowding, maintenance issues, or access problems.",
+      environment:
+        "Possible causes may include waste accumulation, pollution, land-use changes, drainage problems, or environmental damage.",
+      safety:
+        "Possible causes may include poor lighting, damaged infrastructure, unsafe road conditions, insufficient signage, or limited monitoring.",
+      other:
+        "The exact cause depends on the situation. Useful possibilities can usually be identified by examining the location, timing, visible conditions, and available evidence.",
+    };
+
+    response = `
+      <strong>Possible causes</strong>
+      <p>${causes[category] || causes.other}</p>
+      <p>I would treat these as possibilities, not confirmed causes. Photos, location details and repeated reports can help determine what is actually happening.</p>
+    `;
+  } else if (
+    question.includes("prevent") ||
+    question.includes("avoid") ||
+    question.includes("solution")
+  ) {
+    const prevention = {
+      roads:
+        "Regular road inspections, drainage maintenance, timely repairs and better reporting of damaged sections can help prevent recurring problems.",
+      garbage:
+        "Regular collection, adequate bins, waste segregation, public awareness and monitoring of dumping hotspots can reduce the problem.",
+      streetlights:
+        "Routine inspections, faster fault reporting and preventive maintenance can reduce prolonged streetlight outages.",
+      water:
+        "Regular infrastructure inspections, leak detection, maintenance and water-quality monitoring can help prevent recurring issues.",
+      health:
+        "Focus on sanitation, clean surroundings, public-health monitoring and timely reporting. Health-related concerns should be handled by qualified authorities or professionals.",
+      education:
+        "Regular maintenance, infrastructure checks, resource planning and clear reporting channels can help prevent recurring education-related problems.",
+      environment:
+        "Monitoring, waste management, protection of vulnerable areas and early reporting can help reduce environmental damage.",
+      safety:
+        "Better lighting, infrastructure maintenance, visible warnings and timely reporting can help reduce safety risks.",
+      other:
+        "Prevention depends on the specific problem. First identify the likely cause, then target maintenance, monitoring, infrastructure or public awareness accordingly.",
+    };
+
+    response = `
+      <strong>Possible prevention</strong>
+      <p>${prevention[category] || prevention.other}</p>
+    `;
+  } else if (
+    question.includes("evidence") ||
+    question.includes("measure") ||
+    question.includes("proof") ||
+    question.includes("collect")
+  ) {
+    response = `
+      <strong>Useful evidence</strong>
+      <p>For a strong civic report, consider collecting:</p>
+      <ul>
+        <li>Clear photos or videos</li>
+        <li>Exact location</li>
+        <li>Date and approximate time</li>
+        <li>How often the problem occurs</li>
+        <li>Visible impact on people or infrastructure</li>
+        <li>Measurements when they can be collected safely</li>
+      </ul>
+      <p>Multiple independent reports from the same area can also strengthen the signal that an issue needs attention.</p>
+    `;
+  } else if (
+    question.includes("department") ||
+    question.includes("authority") ||
+    question.includes("who should")
+  ) {
+    const departments = {
+      roads: "Public Works / Roads and infrastructure authority",
+      garbage: "Municipal waste-management authority",
+      streetlights: "Municipal electrical or street-lighting department",
+      water: "Water-supply / Public Health Engineering authority",
+      health: "Public-health or health department",
+      education: "Education department or local education authority",
+      environment: "Environment / pollution-control authority",
+      safety: "Local administration, public-safety or relevant emergency authority",
+      other: "The responsible authority depends on the location and type of issue.",
+    };
+
+    response = `
+      <strong>Likely responsible authority</strong>
+      <p>${departments[category] || departments.other}.</p>
+      <p>Civic OS can use the report category and location to help route an issue to the appropriate authority.</p>
+    `;
+  } else {
+    response = `
+      <strong>Here's how I can help</strong>
+      <p>I can help you understand this civic problem, explore possible causes, suggest prevention ideas, identify useful evidence, and think about the likely responsible authority.</p>
+      ${
+        description
+          ? `<p><strong>Current context:</strong> ${civicAiText(description.slice(0, 180))}</p>`
+          : ""
+      }
+      <p>Try asking: <em>"What could be causing this?"</em>, <em>"How can it be prevented?"</em>, or <em>"What evidence should I collect?"</em></p>
+    `;
+  }
+
+  return response;
+}
+
 /* ---------- 11. Init ---------- */
 
 function bindEvents() {
@@ -1539,6 +1782,57 @@ function bindEvents() {
   });
   dialog.addEventListener("close", () => {
     state.openIssueId = null;
+  });
+    // Civic AI
+  const civicAiFab = document.getElementById("civicAiFab");
+  const closeCivicAiButton = document.getElementById("closeCivicAi");
+  const civicAiForm = document.getElementById("civicAiForm");
+  const civicAiInput = document.getElementById("civicAiInput");
+
+  if (civicAiFab) {
+    civicAiFab.addEventListener("click", () => {
+      openCivicAi();
+    });
+  }
+
+  if (closeCivicAiButton) {
+    closeCivicAiButton.addEventListener("click", () => {
+      closeCivicAi();
+    });
+  }
+
+  if (civicAiForm && civicAiInput) {
+    civicAiForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+
+      const prompt = civicAiInput.value.trim();
+
+      if (!prompt) return;
+
+      addCivicAiMessage("user", civicAiText(prompt));
+
+      civicAiInput.value = "";
+
+      setTimeout(() => {
+        const response = generateCivicAiResponse(prompt);
+        addCivicAiMessage("ai", response);
+      }, 350);
+    });
+  }
+
+  document.querySelectorAll(".ai-suggestion").forEach((button) => {
+    button.addEventListener("click", () => {
+      const prompt = button.dataset.aiPrompt;
+
+      if (!prompt) return;
+
+      addCivicAiMessage("user", civicAiText(prompt));
+
+      setTimeout(() => {
+        const response = generateCivicAiResponse(prompt);
+        addCivicAiMessage("ai", response);
+      }, 350);
+    });
   });
 }
 
