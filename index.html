@@ -395,6 +395,92 @@
   </dialog>
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <!-- ================= CIVIC AI ================= -->
+
+<button
+type=“button”
+class=“civic-ai-fab”
+id=“civicAiFab”
+aria-label=“Open Civic AI”
+aria-controls=“civicAiPanel”
+aria-expanded=“false”
+
+<span class="civic-ai-fab-icon">
+  <i data-lucide="sparkles"></i>
+</span>
+<span class="civic-ai-fab-text">Civic AI</span>
+  </button>
+  <aside
+    id="civicAiPanel"
+    class="civic-ai-panel"
+    aria-label="Civic AI Assistant"
+    aria-hidden="true"
+  >
+    <div class="civic-ai-header">
+      <div class="civic-ai-heading">
+        <div class="civic-ai-avatar">
+          <i data-lucide="sparkles"></i>
+        </div>
+        <div>
+          <strong>Civic AI</strong>
+          <span>Understand. Act. Resolve.</span>
+        </div>
+      </div>
+  <button
+    type="button"
+    class="icon-btn"
+    id="closeCivicAi"
+    aria-label="Close Civic AI"
+  >
+    <i data-lucide="x"></i>
+  </button>
+</div>
+<div class="civic-ai-context" id="civicAiContext">
+  <i data-lucide="info"></i>
+  <span>Ask Civic AI about a civic problem, its possible causes, prevention, evidence and next steps.</span>
+</div>
+<div class="civic-ai-messages" id="civicAiMessages" aria-live="polite">
+  <div class="civic-ai-message ai">
+    <div class="civic-ai-message-avatar">
+      <i data-lucide="sparkles"></i>
+    </div>
+    <div class="civic-ai-bubble">
+      <strong>Hi! I'm Civic AI.</strong>
+      <p>
+        I can help you understand civic problems, think about possible causes,
+        collect useful evidence and identify practical next steps.
+      </p>
+    </div>
+  </div>
+</div>
+<div class="civic-ai-suggestions" id="civicAiSuggestions">
+  <button type="button" class="ai-suggestion" data-ai-prompt="What could be causing this problem?">
+    Possible causes
+  </button>
+  <button type="button" class="ai-suggestion" data-ai-prompt="How can this problem be prevented?">
+    Prevention
+  </button>
+  <button type="button" class="ai-suggestion" data-ai-prompt="What evidence or measurements should I collect?">
+    Evidence
+  </button>
+  <button type="button" class="ai-suggestion" data-ai-prompt="Which department should handle this problem?">
+    Responsible department
+  </button>
+</div>
+<form class="civic-ai-input" id="civicAiForm">
+  <label for="civicAiInput" class="sr-only">Ask Civic AI</label>
+  <input
+    id="civicAiInput"
+    type="text"
+    autocomplete="off"
+    maxlength="500"
+    placeholder="Ask Civic AI..."
+  />
+  <button type="submit" class="civic-ai-send" aria-label="Send message">
+    <i data-lucide="arrow-up"></i>
+  </button>
+</form>
+  </aside>
 
   <script src="https://unpkg.com/lucide@1.51.0/dist/umd/lucide.min.js" defer></script>
   <script src="script.js" defer></script>
