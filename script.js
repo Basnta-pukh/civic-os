@@ -1783,6 +1783,40 @@ function bindEvents() {
   dialog.addEventListener("close", () => {
     state.openIssueId = null;
   });
+   // Civic AI file upload
+const civicAiFileInput = document.getElementById("civicAiFileInput");
+const civicAiFilePreview = document.getElementById("civicAiFilePreview");
+
+if (civicAiFileInput && civicAiFilePreview) {
+  civicAiFileInput.addEventListener("change", () => {
+    const file = civicAiFileInput.files[0];
+
+    if (!file) return;
+
+    civicAiFilePreview.innerHTML = `
+      <div class="civic-ai-file">
+        <i data-lucide="file"></i>
+        <span>${civicAiText(file.name)}</span>
+        <button type="button" id="removeCivicAiFile" aria-label="Remove file">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+    `;
+
+    if (typeof lucide !== "undefined") {
+      lucide.createIcons();
+    }
+
+    const removeButton = document.getElementById("removeCivicAiFile");
+
+    if (removeButton) {
+      removeButton.addEventListener("click", () => {
+        civicAiFileInput.value = "";
+        civicAiFilePreview.innerHTML = "";
+      });
+    }
+  });
+}
     // Civic AI
   const civicAiFab = document.getElementById("civicAiFab");
   const closeCivicAiButton = document.getElementById("closeCivicAi");
