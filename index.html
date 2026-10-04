@@ -468,6 +468,26 @@
     Responsible department
   </button>
 </div>
+  <div class="civic-ai-attachments" id="civicAiAttachments">
+
+  <label class="civic-ai-upload" for="civicAiFileInput">
+    <i data-lucide="paperclip"></i>
+    <span>Attach photo or file</span>
+  </label>
+
+  <input
+    type="file"
+    id="civicAiFileInput"
+    accept="image/*,.pdf,.txt"
+    hidden
+  />
+
+  <div
+    id="civicAiFilePreview"
+    class="civic-ai-file-preview"
+  ></div>
+
+</div>  
 <form class="civic-ai-input" id="civicAiForm">
   <label for="civicAiInput" class="sr-only">Ask Civic AI</label>
   <input
