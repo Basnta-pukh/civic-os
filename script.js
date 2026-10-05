@@ -1793,16 +1793,34 @@ if (civicAiFileInput && civicAiFilePreview) {
 
     if (!file) return;
 
-    civicAiFilePreview.innerHTML = `
-      <div class="civic-ai-file">
-        <i data-lucide="file"></i>
-        <span>${civicAiText(file.name)}</span>
-        <button type="button" id="removeCivicAiFile" aria-label="Remove file">
-          <i data-lucide="x"></i>
-        </button>
-      </div>
-    `;
+    const isImage = file.type.startsWith("image/");
+const previewUrl = isImage ? URL.createObjectURL(file) : "";
 
+civicAiFilePreview.innerHTML = `
+  <div class="civic-ai-file">
+
+    ${
+      isImage
+        ? `<img
+            src="${previewUrl}"
+            class="civic-ai-file-image"
+            alt="Uploaded civic evidence"
+          />`
+        : `<i data-lucide="file"></i>`
+    }
+
+    <span>${civicAiText(file.name)}</span>
+
+    <button
+      type="button"
+      id="removeCivicAiFile"
+      aria-label="Remove file"
+    >
+      <i data-lucide="x"></i>
+    </button>
+
+  </div>
+`;
     if (typeof lucide !== "undefined") {
       lucide.createIcons();
     }
