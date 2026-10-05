@@ -1745,6 +1745,58 @@ const category = detectedCategory;
       <p>${departments[category] || departments.other}.</p>
       <p>Civic OS can use the report category and location to help route an issue to the appropriate authority.</p>
     `;
+    } else if (detectedCategory) {
+    const detectedResponses = {
+      roads: `
+        <strong>Road issue detected</strong>
+        <p>This sounds like a road or infrastructure problem.</p>
+        <p><strong>Possible next step:</strong> Record the exact location and take a clear photo of the pothole. Civic OS can use this information to help route the report to the appropriate road authority.</p>
+      `,
+
+      garbage: `
+        <strong>Waste issue detected</strong>
+        <p>This sounds like a garbage or waste-management problem.</p>
+        <p><strong>Possible next step:</strong> Record the location, take a clear photo and note whether the waste is regularly accumulating.</p>
+      `,
+
+      streetlights: `
+        <strong>Streetlight issue detected</strong>
+        <p>This sounds like a street-lighting problem.</p>
+        <p><strong>Possible next step:</strong> Record the location and, if possible, note when the lights stop working.</p>
+      `,
+
+      water: `
+        <strong>Water issue detected</strong>
+        <p>This sounds like a water-supply or infrastructure problem.</p>
+        <p><strong>Possible next step:</strong> Record the location, describe the issue and note how frequently it occurs.</p>
+      `,
+
+      education: `
+        <strong>Education issue detected</strong>
+        <p>This sounds like an education or school-infrastructure concern.</p>
+        <p><strong>Possible next step:</strong> Describe the specific problem and identify the affected facility or location.</p>
+      `,
+
+      health: `
+        <strong>Public health issue detected</strong>
+        <p>This sounds like a public-health or sanitation concern.</p>
+        <p><strong>Possible next step:</strong> Document the location and describe the issue clearly. Health concerns should be handled by the appropriate authority or qualified professional.</p>
+      `,
+
+      environment: `
+        <strong>Environmental issue detected</strong>
+        <p>This sounds like an environmental concern.</p>
+        <p><strong>Possible next step:</strong> Record the location, visible impact and supporting evidence such as photos.</p>
+      `,
+
+      safety: `
+        <strong>Safety issue detected</strong>
+        <p>This sounds like a public-safety concern.</p>
+        <p><strong>Possible next step:</strong> Record the location and describe the visible hazard clearly. For immediate danger, contact the appropriate emergency service.</p>
+      `,
+    };
+    response = detectedResponses[detectedCategory];
+
   } else {
     response = `
       <strong>Here's how I can help</strong>
