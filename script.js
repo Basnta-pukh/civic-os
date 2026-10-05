@@ -1637,7 +1637,7 @@ function generateCivicAiResponse(prompt) {
   const context = state.civicAiContext || getCivicAiContext();
   const description = context?.description || "";
 const detectedCategory =
-  detectCivicCategory(prompt) || context?.category || "other";
+  detectCivicCategory(prompt) || context?.category || null;
 
 const category = detectedCategory;
    console.log("Civic AI detected category:", category);
