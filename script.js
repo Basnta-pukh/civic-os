@@ -1640,6 +1640,7 @@ const detectedCategory =
   detectCivicCategory(prompt) || context?.category || "other";
 
 const category = detectedCategory;
+   console.log("Civic AI detected category:", category);
   let response = "";
 
   if (
