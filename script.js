@@ -1857,13 +1857,23 @@ civicAiFilePreview.innerHTML = `
     civicAiForm.addEventListener("submit", (event) => {
       event.preventDefault();
 
-      const prompt = civicAiInput.value.trim();
+   const prompt = civicAiInput.value.trim();
+const fileInput = document.getElementById("civicAiFileInput");
+const file = fileInput?.files[0];
 
-      if (!prompt) return;
+if (!prompt && !file) return;
 
-      addCivicAiMessage("user", civicAiText(prompt));
+if (file) {
+  addCivicAiMessage(
+    "user",
+    `${civicAiText(prompt || "Please check this file.")}<br>
+     <small>📎 Attached: ${civicAiText(file.name)}</small>`
+  );
+} else {
+  addCivicAiMessage("user", civicAiText(prompt));
+}
+  civicAiInput.value = "";
 
-      civicAiInput.value = "";
 
       setTimeout(() => {
         const response = generateCivicAiResponse(prompt);
