@@ -1538,14 +1538,108 @@ function civicAiText(value) {
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
 }
+function detectCivicCategory(text) {
+  const question = String(text || "").toLowerCase();
+
+  const keywords = {
+    roads: [
+      "road",
+      "pothole",
+      "street",
+      "traffic",
+      "bridge",
+      "footpath",
+      "sidewalk",
+      "road damage",
+    ],
+
+    garbage: [
+      "garbage",
+      "trash",
+      "waste",
+      "dump",
+      "dumping",
+      "litter",
+      "rubbish",
+      "dirty",
+    ],
+
+    streetlights: [
+      "streetlight",
+      "street light",
+      "lamp",
+      "lights are off",
+      "dark street",
+      "dark road",
+    ],
+
+    water: [
+      "water",
+      "pipeline",
+      "pipe",
+      "leak",
+      "leaking",
+      "water supply",
+      "drinking water",
+      "flood",
+    ],
+
+    health: [
+      "hospital",
+      "clinic",
+      "health",
+      "medicine",
+      "sanitation",
+      "disease",
+    ],
+
+    education: [
+      "school",
+      "college",
+      "classroom",
+      "teacher",
+      "education",
+      "student",
+    ],
+
+    environment: [
+      "pollution",
+      "environment",
+      "river",
+      "lake",
+      "forest",
+      "tree",
+      "air quality",
+    ],
+
+    safety: [
+      "unsafe",
+      "danger",
+      "accident",
+      "crime",
+      "security",
+      "hazard",
+      "warning",
+    ],
+  };
+
+  for (const [category, words] of Object.entries(keywords)) {
+    if (words.some((word) => question.includes(word))) {
+      return category;
+    }
+  }
+
+  return null;
+}
 
 function generateCivicAiResponse(prompt) {
   const question = prompt.toLowerCase();
   const context = state.civicAiContext || getCivicAiContext();
-
-  const category = context?.category || "other";
   const description = context?.description || "";
+const detectedCategory =
+  detectCivicCategory(prompt) || context?.category || "other";
 
+const category = detectedCategory;
   let response = "";
 
   if (
