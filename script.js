@@ -6057,7 +6057,30 @@ function bindEvents() {
         return;
       }
 
+      const civicActionCard =
+        event.target.closest(
+          "[data-civic-action]"
+        );
 
+      if (civicActionCard) {
+        openCivicAction(
+          civicActionCard.dataset.civicAction
+        );
+
+        return;
+      }
+
+
+      const createActionButton =
+        event.target.closest(
+          "#createActionBtn"
+        );
+
+      if (createActionButton) {
+        openCreateActivity();
+
+        return;
+      }
       const actionBtn =
         event.target.closest(
           "[data-action]"
@@ -6924,7 +6947,232 @@ function bindEvents() {
 
   }
 }
+/* =========================================================
+   CIVIC ACTION DETAILS
+   ========================================================= */
 
+const civicActionData = {
+
+  flood: {
+    title: "Flood Preparedness & Awareness Drive",
+    icon: "waves",
+    location: "Imphal",
+    date: "12 October 2026",
+    time: "9:00 AM – 12:00 PM",
+    organizer: "Local Youth Civic Group",
+    participants: 24,
+    description:
+      "A community-led awareness activity focused on helping residents understand flood preparedness, emergency planning and basic safety measures.",
+    support:
+      "Government support requested for awareness materials and coordination."
+  },
+
+  cleanup: {
+    title: "Community Clean-Up Drive",
+    icon: "sparkles",
+    location: "Khurai",
+    date: "10 October 2026",
+    time: "7:00 AM – 10:00 AM",
+    organizer: "Khurai Community Volunteers",
+    participants: 18,
+    description:
+      "Residents and volunteers will work together to clean a shared public area and improve the surrounding neighbourhood.",
+    support:
+      "Government support requested for waste collection after the activity."
+  },
+
+  planting: {
+    title: "Tree Plantation & Green Space Drive",
+    icon: "trees",
+    location: "Lamphel",
+    date: "18 October 2026",
+    time: "8:00 AM – 11:00 AM",
+    organizer: "Green Manipur Community",
+    participants: 31,
+    description:
+      "A community activity to plant trees and improve a shared green space while encouraging residents to take part in local environmental action.",
+    support:
+      "Government support requested for saplings, equipment and coordination."
+  }
+
+};
+
+
+function openCivicAction(actionId) {
+
+  const action =
+    civicActionData[actionId];
+
+  if (!action) {
+    return;
+  }
+
+  const detail =
+    document.getElementById(
+      "actionDetailContent"
+    );
+
+  if (!detail) {
+    return;
+  }
+
+
+  detail.innerHTML = `
+
+    <div class="action-detail-content">
+
+      <div class="action-detail-icon">
+        <i data-lucide="${action.icon}"></i>
+      </div>
+
+      <p class="kicker">
+        Civic Action
+      </p>
+
+      <h2
+        id="actionDetailTitle"
+        class="screen-title"
+      >
+        ${action.title}
+      </h2>
+
+      <p class="screen-sub">
+        ${action.description}
+      </p>
+
+
+      <div class="action-detail-info">
+
+        <div>
+          <strong>Location</strong>
+          <span>${action.location}</span>
+        </div>
+
+        <div>
+          <strong>Date</strong>
+          <span>${action.date}</span>
+        </div>
+
+        <div>
+          <strong>Time</strong>
+          <span>${action.time}</span>
+        </div>
+
+        <div>
+          <strong>Organizer</strong>
+          <span>${action.organizer}</span>
+        </div>
+
+        <div>
+          <strong>Participants</strong>
+          <span id="actionParticipantCount">
+            ${action.participants}
+          </span>
+        </div>
+
+      </div>
+
+
+      <div class="action-support">
+
+        <strong>Support Needed</strong>
+
+        <p>
+          ${action.support}
+        </p>
+
+      </div>
+
+
+      <button
+        type="button"
+        class="btn btn-primary btn-lg btn-block"
+        id="joinCivicActionBtn"
+        onclick="joinCivicAction('${actionId}')"
+      >
+
+        <i data-lucide="user-plus"></i>
+
+        Join Activity
+
+      </button>
+
+    </div>
+
+  `;
+
+
+  showScreen(
+    "actionDetailScreen"
+  );
+
+
+  refreshIcons();
+
+}
+
+
+function joinCivicAction(actionId) {
+
+  const action =
+    civicActionData[actionId];
+
+  if (!action) {
+    return;
+  }
+
+
+  action.participants += 1;
+
+
+  const count =
+    document.getElementById(
+      "actionParticipantCount"
+    );
+
+  if (count) {
+    count.textContent =
+      action.participants;
+  }
+
+
+  const button =
+    document.getElementById(
+      "joinCivicActionBtn"
+    );
+
+  if (button) {
+
+    button.disabled = true;
+
+    button.innerHTML = `
+      <i data-lucide="check"></i>
+      Joined Activity
+    `;
+
+    refreshIcons();
+
+  }
+
+
+  toast(
+    "You joined this civic activity!"
+  );
+
+}
+
+
+/* =========================================================
+   CREATE ACTIVITY SCREEN
+   ========================================================= */
+
+function openCreateActivity() {
+
+  showScreen(
+    "createActivityScreen"
+  );
+
+}
 
 /* =========================================================
    13. INIT
