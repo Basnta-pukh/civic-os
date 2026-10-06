@@ -1549,89 +1549,227 @@
 
 
     <!-- ================= CIVIC ACTIONS ================= -->
+<!-- ================= CIVIC ACTIONS ================= -->
+
+<section
+  id="actionsScreen"
+  class="screen"
+  aria-labelledby="actionsScreenTitle"
+>
+
+  <div class="container">
+
+    <header class="screen-head">
+
+      <p class="kicker">
+        Connect
+      </p>
+
+      <h2
+        id="actionsScreenTitle"
+        class="screen-title"
+      >
+        Civic Actions
+      </h2>
+
+      <p class="screen-sub">
+        Start or join community activities.
+        Government support can be requested when needed.
+      </p>
+
+    </header>
+
+
+    <div class="hero-actions">
+
+      <button
+        type="button"
+        class="btn btn-primary btn-lg"
+        id="createActionBtn"
+      >
+
+        <i data-lucide="circle-plus"></i>
+
+        Create an Activity
+
+      </button>
+
+    </div>
+
 
     <section
-      id="actionsScreen"
-      class="screen"
-      aria-labelledby="actionsScreenTitle"
+      class="block"
+      aria-labelledby="activeActionsTitle"
     >
 
-      <div class="container">
+      <div class="block-head">
 
-        <header class="screen-head">
+        <div>
 
           <p class="kicker">
-            Connect
+            Community
           </p>
 
-          <h2
-            id="actionsScreenTitle"
-            class="screen-title"
+          <h3
+            id="activeActionsTitle"
+            class="block-title"
           >
-            Civic Actions
-          </h2>
-
-
-          <p class="screen-sub">
-            Start or join community activities.
-            Government support can be requested when needed.
-          </p>
-
-        </header>
-
-
-        <div class="hero-actions">
-
-          <button
-            type="button"
-            class="btn btn-primary btn-lg"
-            id="createActionBtn"
-          >
-
-            <i data-lucide="circle-plus"></i>
-
-            Create an Activity
-
-          </button>
+            Active Activities
+          </h3>
 
         </div>
 
+      </div>
 
-        <section
-          class="block"
-          aria-labelledby="activeActionsTitle"
+
+      <div
+        class="action-list"
+        id="civicActionsList"
+      >
+
+
+        <!-- ACTIVITY 1 -->
+
+        <button
+          type="button"
+          class="action-card glass civic-action-card"
+          onclick="openCivicAction('flood')"
         >
 
-          <div class="block-head">
+          <span class="action-icon">
+            <i data-lucide="waves"></i>
+          </span>
 
-            <div>
+          <span class="action-text">
 
-              <p class="kicker">
-                Community
-              </p>
+            <span class="action-title">
+              Flood Preparedness &amp; Awareness Drive
+            </span>
 
-              <h3
-                id="activeActionsTitle"
-                class="block-title"
-              >
-                Active Activities
-              </h3>
+            <span class="action-desc">
+              Help residents learn basic flood preparedness
+              and emergency safety measures.
+            </span>
 
-            </div>
+            <span class="action-meta">
+              <span>
+                <i data-lucide="map-pin"></i>
+                Imphal
+              </span>
 
-          </div>
+              <span>
+                <i data-lucide="users"></i>
+                24 joined
+              </span>
+            </span>
+
+          </span>
+
+          <i
+            data-lucide="arrow-up-right"
+            class="action-arrow"
+          ></i>
+
+        </button>
 
 
-          <div
-            class="action-list"
-            id="civicActionsList"
-          ></div>
+        <!-- ACTIVITY 2 -->
 
-        </section>
+        <button
+          type="button"
+          class="action-card glass civic-action-card"
+          onclick="openCivicAction('cleanup')"
+        >
+
+          <span class="action-icon">
+            <i data-lucide="sparkles"></i>
+          </span>
+
+          <span class="action-text">
+
+            <span class="action-title">
+              Community Clean-Up Drive
+            </span>
+
+            <span class="action-desc">
+              Volunteers come together to clean a shared
+              public area and improve the neighbourhood.
+            </span>
+
+            <span class="action-meta">
+              <span>
+                <i data-lucide="map-pin"></i>
+                Khurai
+              </span>
+
+              <span>
+                <i data-lucide="users"></i>
+                18 joined
+              </span>
+            </span>
+
+          </span>
+
+          <i
+            data-lucide="arrow-up-right"
+            class="action-arrow"
+          ></i>
+
+        </button>
+
+
+        <!-- ACTIVITY 3 -->
+
+        <button
+          type="button"
+          class="action-card glass civic-action-card"
+          onclick="openCivicAction('planting')"
+        >
+
+          <span class="action-icon">
+            <i data-lucide="trees"></i>
+          </span>
+
+          <span class="action-text">
+
+            <span class="action-title">
+              Tree Plantation &amp; Green Space Drive
+            </span>
+
+            <span class="action-desc">
+              Help create greener community spaces through
+              a local tree plantation activity.
+            </span>
+
+            <span class="action-meta">
+              <span>
+                <i data-lucide="map-pin"></i>
+                Lamphel
+              </span>
+
+              <span>
+                <i data-lucide="users"></i>
+                31 joined
+              </span>
+            </span>
+
+          </span>
+
+          <i
+            data-lucide="arrow-up-right"
+            class="action-arrow"
+          ></i>
+
+        </button>
+
 
       </div>
 
     </section>
+
+  </div>
+
+</section>
 
 
     <!-- ================= DASHBOARD ================= -->
