@@ -3575,13 +3575,16 @@ transition: none;
     0 25px 70px rgba(0,0,0,0.35);
 }
 
-
-/* HERO IMAGE */
+/* =====================================================
+   HERO IMAGES — DIFFERENT IMAGE FOR EACH ACTIVITY
+   ===================================================== */
 
 .action-detail-content::before {
   content: "";
   display: block;
+
   height: 230px;
+
   margin: 0 -22px 24px;
 
   background:
@@ -3591,10 +3594,34 @@ transition: none;
       rgba(5,12,10,0.25) 55%,
       rgba(5,12,10,0.95) 100%
     ),
-    url("https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=1200&q=85")
+    var(--action-image)
     center / cover no-repeat;
 
   border-radius: 28px 28px 0 0;
+}
+
+
+/* FLOOD */
+
+.action-detail-content.action-flood {
+  --action-image:
+    url("https://images.unsplash.com/photo-1547683905-f686c993aae5?auto=format&fit=crop&w=1200&q=85");
+}
+
+
+/* CLEAN-UP DRIVE */
+
+.action-detail-content.action-cleanup {
+  --action-image:
+    url("https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&w=1200&q=85");
+}
+
+
+/* TREE PLANTATION */
+
+.action-detail-content.action-planting {
+  --action-image:
+    url("https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=1200&q=85");
 }
 
 
