@@ -3937,3 +3937,239 @@ transition: none;
     min-height: 58px;
   }
 }
+/* =====================================================
+   CIVIC ACTIONS — PREMIUM ACTIVITY CARDS
+   ===================================================== */
+
+#civicActionsList {
+  display: grid;
+  gap: 14px;
+}
+
+.civic-action-card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+
+  width: 100%;
+  min-height: 105px;
+
+  padding: 17px;
+
+  text-align: left;
+
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 22px;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(19,35,30,0.88),
+      rgba(9,20,17,0.96)
+    );
+
+  box-shadow:
+    0 12px 35px rgba(0,0,0,0.18);
+
+  overflow: hidden;
+
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    background 0.2s ease;
+}
+
+.civic-action-card::after {
+  content: "";
+
+  position: absolute;
+  right: -45px;
+  top: -45px;
+
+  width: 120px;
+  height: 120px;
+
+  border-radius: 50%;
+
+  background: rgba(62,224,143,0.06);
+}
+
+.civic-action-card:hover {
+  transform: translateY(-2px);
+
+  border-color: rgba(62,224,143,0.28);
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(22,43,36,0.95),
+      rgba(9,23,18,0.98)
+    );
+}
+
+.civic-action-card:active {
+  transform: scale(0.985);
+}
+
+
+/* ICON */
+
+.civic-action-card .action-icon {
+  position: relative;
+  z-index: 2;
+
+  flex: 0 0 52px;
+
+  width: 52px;
+  height: 52px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 17px;
+
+  background: rgba(62,224,143,0.11);
+
+  border: 1px solid rgba(62,224,143,0.16);
+
+  color: #3ee08f;
+}
+
+.civic-action-card .action-icon svg {
+  width: 23px;
+  height: 23px;
+}
+
+
+/* TEXT */
+
+.civic-action-card .action-text {
+  position: relative;
+  z-index: 2;
+
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  flex: 1;
+}
+
+.civic-action-card .action-title {
+  display: block;
+
+  color: #f1f7f4;
+
+  font-size: 15px;
+  font-weight: 750;
+
+  line-height: 1.25;
+}
+
+.civic-action-card .action-desc {
+  display: block;
+
+  color: #8fa29b;
+
+  font-size: 12.5px;
+
+  line-height: 1.45;
+}
+
+
+/* META */
+
+.civic-action-card .action-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+
+  margin-top: 2px;
+
+  color: #71847d;
+
+  font-size: 11px;
+}
+
+.civic-action-card .action-meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.civic-action-card .action-meta svg {
+  width: 12px;
+  height: 12px;
+
+  color: #3ee08f;
+}
+
+
+/* ARROW */
+
+.civic-action-card .action-arrow {
+  position: relative;
+  z-index: 2;
+
+  flex: 0 0 auto;
+
+  width: 18px;
+  height: 18px;
+
+  color: #647770;
+
+  transition:
+    transform 0.2s ease,
+    color 0.2s ease;
+}
+
+.civic-action-card:hover .action-arrow {
+  transform: translate(2px, -2px);
+
+  color: #3ee08f;
+}
+
+
+/* MOBILE */
+
+@media (max-width: 600px) {
+
+  #civicActionsList {
+    gap: 12px;
+  }
+
+  .civic-action-card {
+    min-height: 100px;
+
+    padding: 15px;
+
+    gap: 12px;
+
+    border-radius: 20px;
+  }
+
+  .civic-action-card .action-icon {
+    flex-basis: 48px;
+
+    width: 48px;
+    height: 48px;
+
+    border-radius: 15px;
+  }
+
+  .civic-action-card .action-title {
+    font-size: 14px;
+  }
+
+  .civic-action-card .action-desc {
+    font-size: 12px;
+  }
+
+  .civic-action-card .action-meta {
+    font-size: 10.5px;
+  }
+}
+
