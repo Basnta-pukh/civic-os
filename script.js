@@ -977,7 +977,9 @@ const state = {
 
   civicAiContext: null,
 
-  civicAiMessages: []
+  civicAiMessages: [],
+
+  civicActionId: null
 };
 
 const $ = (
@@ -1436,6 +1438,10 @@ function renderScreen(id) {
 
   if (id === "communityScreen") {
     renderCommunity();
+  }
+
+  if (id === "actionsScreen") {
+    renderCivicActions();
   }
 
   refreshIcons();
@@ -7006,6 +7012,8 @@ function openCivicAction(actionId) {
   if (!action) {
     return;
   }
+
+  state.civicActionId = actionId;
 
   const detail =
     document.getElementById(
