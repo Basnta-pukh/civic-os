@@ -3497,4 +3497,236 @@ transition: none;
   }
 
 }
+/* =====================================================
+   CIVIC ACTIONS — DEMO ACTIVITIES
+   ===================================================== */
 
+.civic-action-card {
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    background 0.2s ease;
+}
+
+.civic-action-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(62, 224, 143, 0.35);
+}
+
+.civic-action-card:active {
+  transform: scale(0.99);
+}
+
+
+/* Activity metadata */
+
+.action-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 8px;
+  font-size: 12px;
+  color: var(--text-muted, #8f9994);
+}
+
+.action-meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.action-meta svg {
+  width: 13px;
+  height: 13px;
+}
+
+
+/* =====================================================
+   ACTIVITY DETAILS
+   ===================================================== */
+
+.action-detail-content {
+  padding: 28px;
+}
+
+.action-detail-icon {
+  width: 58px;
+  height: 58px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin-bottom: 18px;
+
+  border-radius: 16px;
+
+  background: rgba(62, 224, 143, 0.12);
+  color: #3ee08f;
+
+  border: 1px solid rgba(62, 224, 143, 0.2);
+}
+
+.action-detail-icon svg {
+  width: 28px;
+  height: 28px;
+}
+
+
+.action-detail-info {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+
+  margin-top: 24px;
+}
+
+
+.action-info-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  padding: 15px;
+
+  border-radius: 14px;
+}
+
+
+.action-info-card > svg {
+  width: 20px;
+  height: 20px;
+
+  flex-shrink: 0;
+
+  color: #3ee08f;
+}
+
+
+.action-info-card div {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+
+.action-info-card strong {
+  font-size: 12px;
+  color: var(--text-muted, #8f9994);
+}
+
+
+.action-info-card span {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+
+/* =====================================================
+   GOVERNMENT SUPPORT
+   ===================================================== */
+
+.action-support-card {
+  margin-top: 16px;
+  padding: 18px;
+
+  border-radius: 16px;
+
+  border-color: rgba(62, 224, 143, 0.18);
+}
+
+
+.action-support-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  font-weight: 700;
+  font-size: 14px;
+
+  color: #3ee08f;
+}
+
+
+.action-support-title svg {
+  width: 18px;
+  height: 18px;
+}
+
+
+.action-support-card p {
+  margin: 8px 0 0;
+
+  color: var(--text-muted, #8f9994);
+
+  line-height: 1.6;
+  font-size: 14px;
+}
+
+
+/* =====================================================
+   ORGANIZER
+   ===================================================== */
+
+.action-organizer {
+  margin: 18px 0;
+
+  padding: 14px 0;
+
+  color: var(--text-muted, #8f9994);
+
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+
+  font-size: 13px;
+}
+
+
+.action-organizer span {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+
+.action-organizer strong {
+  color: #ffffff;
+  font-size: 12px;
+}
+
+
+/* =====================================================
+   MOBILE
+   ===================================================== */
+
+@media (max-width: 600px) {
+
+  .action-detail-content {
+    padding: 20px;
+  }
+
+
+  .action-detail-info {
+    grid-template-columns: 1fr;
+  }
+
+
+  .action-detail-content .screen-title {
+    font-size: clamp(26px, 8vw, 36px);
+  }
+
+
+  .civic-action-card {
+    padding: 16px;
+  }
+
+
+  .action-meta {
+    gap: 8px;
+  }
+
+}
