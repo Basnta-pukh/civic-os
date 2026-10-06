@@ -7163,6 +7163,138 @@ function joinCivicAction(actionId) {
 
 
 /* =========================================================
+   CIVIC ACTIONS RENDERING
+   ========================================================= */
+
+function renderCivicActions() {
+  const list = document.getElementById("civicActionsList");
+  if (!list) return;
+
+  if (!Array.isArray(window.civicUserActivities)) {
+    window.civicUserActivities = [];
+  }
+
+  const builtInActions = [
+    {
+      id: "flood",
+      title: "Flood Preparedness & Awareness Drive",
+      icon: "waves",
+      location: "Imphal",
+      participants: 24,
+      description: "Help residents learn basic flood preparedness and emergency safety measures."
+    },
+    {
+      id: "cleanup",
+      title: "Community Clean-Up Drive",
+      icon: "sparkles",
+      location: "Khurai",
+      participants: 18,
+      description: "Volunteers come together to clean a shared public area and improve the neighbourhood."
+    },
+    {
+      id: "planting",
+      title: "Tree Plantation & Green Space Drive",
+      icon: "trees",
+      location: "Lamphel",
+      participants: 31,
+      description: "Help create greener community spaces through a local tree plantation activity."
+    }
+  ];
+
+  const userActions = window.civicUserActivities.map((activity) => {
+    civicActionData[activity.id] = activity;
+    return activity;
+  });
+
+  const builtInMarkup = builtInActions.map((item) => {
+    const action = civicActionData[item.id];
+
+    return `
+      <button
+        type="button"
+        class="action-card glass civic-action-card"
+        data-civic-action="${item.id}"
+      >
+        <span class="action-icon">
+          <i data-lucide="${item.icon}"></i>
+        </span>
+
+        <span class="action-text">
+          <span class="action-title">${escapeHtml(item.title)}</span>
+
+          <span class="action-desc">
+            ${escapeHtml(item.description)}
+          </span>
+
+          <span class="action-meta">
+            <span>
+              <i data-lucide="map-pin"></i>
+              ${escapeHtml(action.location)}
+            </span>
+
+            <span>
+              <i data-lucide="users"></i>
+              ${action.participants} joined
+            </span>
+          </span>
+        </span>
+
+        <i
+          data-lucide="arrow-up-right"
+          class="action-arrow"
+        ></i>
+      </button>
+    `;
+  }).join("");
+
+  const userMarkup = userActions.map((activity) => `
+    <button
+      type="button"
+      class="action-card glass civic-action-card user-civic-action-card"
+      data-civic-action="${activity.id}"
+    >
+      <span class="action-icon">
+        <i data-lucide="${activity.icon || "megaphone"}"></i>
+      </span>
+
+      <span class="action-text">
+        <span class="action-title">
+          ${escapeHtml(activity.title)}
+        </span>
+
+        <span class="action-desc">
+          ${escapeHtml(activity.description)}
+        </span>
+
+        <span class="action-meta">
+          <span>
+            <i data-lucide="map-pin"></i>
+            ${escapeHtml(activity.location)}
+          </span>
+
+          <span>
+            <i data-lucide="users"></i>
+            ${Number(activity.participants) || 0} expected
+          </span>
+        </span>
+      </span>
+
+      <i
+        data-lucide="arrow-up-right"
+        class="action-arrow"
+      ></i>
+    </button>
+  `).join("");
+
+  list.innerHTML =
+    builtInMarkup +
+    userMarkup;
+
+  refreshIcons();
+}
+
+
+/* =========================================================
    CREATE ACTIVITY SCREEN
    ========================================================= */
 
@@ -7192,6 +7324,8 @@ function init() {
   renderSkillPicker();
 
   bindEvents();
+
+  renderCivicActions();
 
   showScreen(
     screenFromHash(),
