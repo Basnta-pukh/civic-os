@@ -6760,6 +6760,165 @@ function bindEvents() {
         );
       }
     );
+  /* =======================================================
+     CREATE CIVIC ACTIVITY
+     ======================================================= */
+
+  const createActivityForm =
+    document.getElementById(
+      "createActivityForm"
+    );
+
+  if (createActivityForm) {
+
+    createActivityForm.addEventListener(
+      "submit",
+      (event) => {
+
+        event.preventDefault();
+
+        const title =
+          document.getElementById(
+            "activityTitle"
+          )?.value.trim();
+
+        const type =
+          document.getElementById(
+            "activityType"
+          )?.value;
+
+        const participants =
+          document.getElementById(
+            "activityParticipants"
+          )?.value;
+
+        const location =
+          document.getElementById(
+            "activityLocation"
+          )?.value.trim();
+
+        const date =
+          document.getElementById(
+            "activityDate"
+          )?.value;
+
+        const time =
+          document.getElementById(
+            "activityTime"
+          )?.value;
+
+        const description =
+          document.getElementById(
+            "activityDescription"
+          )?.value.trim();
+
+        const support =
+          document.getElementById(
+            "activitySupport"
+          )?.value.trim();
+
+
+        if (
+          !title ||
+          !type ||
+          !participants ||
+          !location ||
+          !date ||
+          !time ||
+          !description
+        ) {
+          toast(
+            "Please complete all required fields."
+          );
+
+          return;
+        }
+
+
+        const newActivity = {
+
+          id:
+            "activity-" +
+            Date.now(),
+
+          title,
+
+          type,
+
+          participants:
+            Number(participants),
+
+          location,
+
+          date,
+
+          time,
+
+          description,
+
+          support:
+            support ||
+            "No additional support requested.",
+
+          organizer:
+            "Community Member",
+
+          icon:
+            type === "Clean-up"
+              ? "sparkles"
+              : type === "Tree planting"
+              ? "trees"
+              : type === "Flood preparedness"
+              ? "waves"
+              : type === "Community support"
+              ? "users"
+              : "megaphone"
+        };
+
+
+        if (
+          !Array.isArray(
+            window.civicUserActivities
+          )
+        ) {
+
+          window.civicUserActivities =
+            [];
+
+        }
+
+
+        window.civicUserActivities.push(
+          newActivity
+        );
+
+
+        createActivityForm.reset();
+
+
+        toast(
+          "Activity created successfully!"
+        );
+
+
+        showScreen(
+          "actionsScreen"
+        );
+
+
+        if (
+          typeof renderCivicActions ===
+          "function"
+        ) {
+
+          renderCivicActions();
+
+        }
+
+      }
+    );
+
+  }
 }
 
 
