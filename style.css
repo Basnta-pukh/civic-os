@@ -3498,7 +3498,7 @@ transition: none;
 
 }
 /* =====================================================
-   CIVIC ACTIONS — DEMO ACTIVITIES
+   CIVIC OS — PREMIUM CIVIC ACTION DETAILS
    ===================================================== */
 
 .civic-action-card {
@@ -3506,10 +3506,7 @@ transition: none;
   text-align: left;
   cursor: pointer;
   border: 1px solid rgba(255, 255, 255, 0.08);
-  transition:
-    transform 0.2s ease,
-    border-color 0.2s ease,
-    background 0.2s ease;
+  transition: transform 0.2s ease, border-color 0.2s ease;
 }
 
 .civic-action-card:hover {
@@ -3520,9 +3517,6 @@ transition: none;
 .civic-action-card:active {
   transform: scale(0.99);
 }
-
-
-/* Activity metadata */
 
 .action-meta {
   display: flex;
@@ -3546,125 +3540,203 @@ transition: none;
 
 
 /* =====================================================
-   ACTIVITY DETAILS
+   DETAIL PAGE
    ===================================================== */
 
-.action-detail-content {
-  padding: 28px;
+#actionDetailScreen .container.narrow {
+  max-width: 920px;
+  padding-bottom: 120px;
 }
 
+#actionDetailScreen .link-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 18px 0 18px !important;
+  color: #aab8b3;
+}
+
+
+/* MAIN DETAIL CARD */
+
+.action-detail-content {
+  position: relative;
+  overflow: hidden;
+  padding: 0 22px 28px;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 28px;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(8, 20, 16, 0.72),
+      rgba(5, 12, 10, 0.96)
+    );
+  box-shadow:
+    0 25px 70px rgba(0,0,0,0.35);
+}
+
+
+/* HERO IMAGE */
+
+.action-detail-content::before {
+  content: "";
+  display: block;
+  height: 230px;
+  margin: 0 -22px 24px;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(0,0,0,0.05) 15%,
+      rgba(5,12,10,0.25) 55%,
+      rgba(5,12,10,0.95) 100%
+    ),
+    url("https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=1200&q=85")
+    center / cover no-repeat;
+
+  border-radius: 28px 28px 0 0;
+}
+
+
+/* ICON */
+
 .action-detail-icon {
-  width: 58px;
-  height: 58px;
+  position: relative;
+  z-index: 2;
+
+  width: 64px;
+  height: 64px;
 
   display: flex;
   align-items: center;
   justify-content: center;
 
+  margin-top: -58px;
   margin-bottom: 18px;
 
-  border-radius: 16px;
+  border-radius: 20px;
 
-  background: rgba(62, 224, 143, 0.12);
+  background: rgba(6, 30, 22, 0.92);
+  border: 1px solid rgba(62,224,143,0.35);
+
   color: #3ee08f;
 
-  border: 1px solid rgba(62, 224, 143, 0.2);
+  box-shadow:
+    0 12px 30px rgba(0,0,0,0.35);
 }
 
 .action-detail-icon svg {
-  width: 28px;
-  height: 28px;
+  width: 31px;
+  height: 31px;
 }
 
 
-.action-detail-info {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
+/* KICKER */
 
-  margin-top: 24px;
-}
-
-
-.action-info-card {
-  display: flex;
+.action-detail-content > .kicker {
+  display: inline-flex;
   align-items: center;
-  gap: 12px;
 
-  padding: 15px;
+  padding: 7px 12px;
 
-  border-radius: 14px;
-}
+  margin-bottom: 12px;
 
+  border-radius: 999px;
 
-.action-info-card > svg {
-  width: 20px;
-  height: 20px;
+  background: rgba(0, 210, 190, 0.12);
+  border: 1px solid rgba(0, 210, 190, 0.18);
 
-  flex-shrink: 0;
+  color: #53e7d4;
 
-  color: #3ee08f;
-}
-
-
-.action-info-card div {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-
-
-.action-info-card strong {
   font-size: 12px;
-  color: var(--text-muted, #8f9994);
+  font-weight: 700;
 }
 
 
-.action-info-card span {
-  font-size: 14px;
-  font-weight: 600;
+/* TITLE */
+
+.action-detail-content .screen-title {
+  margin: 0;
+  max-width: 700px;
+
+  font-size: clamp(30px, 6vw, 52px);
+  line-height: 1.04;
+  letter-spacing: -0.04em;
+}
+
+
+/* DESCRIPTION */
+
+.action-detail-content .screen-sub {
+  max-width: 720px;
+  margin-top: 18px;
+
+  color: #aebdb7;
+
+  font-size: 16px;
+  line-height: 1.65;
 }
 
 
 /* =====================================================
-   GOVERNMENT SUPPORT
+   INFORMATION GRID
    ===================================================== */
 
-.action-support-card {
-  margin-top: 16px;
-  padding: 18px;
+.action-detail-info {
+  display: grid;
 
-  border-radius: 16px;
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
 
-  border-color: rgba(62, 224, 143, 0.18);
+  gap: 12px;
+
+  margin-top: 28px;
 }
 
+.action-info-card {
+  min-height: 126px;
 
-.action-support-title {
   display: flex;
-  align-items: center;
-  gap: 8px;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
 
-  font-weight: 700;
-  font-size: 14px;
+  padding: 16px;
+
+  border-radius: 18px;
+
+  background: rgba(14, 28, 24, 0.72);
+  border: 1px solid rgba(255,255,255,0.07);
+
+  backdrop-filter: blur(14px);
+}
+
+.action-info-card > svg {
+  width: 22px;
+  height: 22px;
+
+  margin-bottom: 12px;
 
   color: #3ee08f;
 }
 
-
-.action-support-title svg {
-  width: 18px;
-  height: 18px;
+.action-info-card div {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
 }
 
+.action-info-card strong {
+  font-size: 12px;
+  font-weight: 500;
 
-.action-support-card p {
-  margin: 8px 0 0;
+  color: #8fa49c;
+}
 
-  color: var(--text-muted, #8f9994);
-
-  line-height: 1.6;
-  font-size: 14px;
+.action-info-card span {
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.3;
 }
 
 
@@ -3673,29 +3745,131 @@ transition: none;
    ===================================================== */
 
 .action-organizer {
-  margin: 18px 0;
+  margin: 18px 0 0;
+  padding: 20px;
 
-  padding: 14px 0;
+  border-radius: 20px;
 
-  color: var(--text-muted, #8f9994);
-
-  border-top: 1px solid rgba(255, 255, 255, 0.07);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
-
-  font-size: 13px;
+  background: rgba(12, 28, 24, 0.72);
+  border: 1px solid rgba(255,255,255,0.07);
 }
-
 
 .action-organizer span {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 7px;
+
+  color: #ffffff;
+  font-size: 15px;
+}
+
+.action-organizer strong {
+  color: #55c9ff;
+  font-size: 13px;
 }
 
 
-.action-organizer strong {
-  color: #ffffff;
-  font-size: 12px;
+/* =====================================================
+   GOVERNMENT SUPPORT
+   ===================================================== */
+
+.action-support-card {
+  margin-top: 14px;
+  padding: 20px;
+
+  border-radius: 20px;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(22, 76, 105, 0.25),
+      rgba(12, 31, 42, 0.72)
+    );
+
+  border: 1px solid rgba(54, 181, 255, 0.32);
+}
+
+.action-support-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  margin-bottom: 8px;
+
+  color: #b9e7ff;
+
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.action-support-title svg {
+  width: 21px;
+  height: 21px;
+}
+
+.action-support-card p {
+  margin: 0;
+
+  color: #9db9c7;
+
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+
+/* =====================================================
+   JOIN BUTTON
+   ===================================================== */
+
+#joinCivicActionBtn {
+  width: 100%;
+  min-height: 60px;
+
+  margin-top: 20px;
+
+  border-radius: 999px;
+
+  font-size: 17px;
+  font-weight: 800;
+
+  background:
+    linear-gradient(
+      135deg,
+      #20d99a,
+      #1ba66f
+    );
+
+  color: #03130d;
+
+  border: 1px solid rgba(75,255,180,0.55);
+
+  box-shadow:
+    0 12px 35px rgba(24,214,145,0.20);
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+#joinCivicActionBtn:hover {
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 16px 42px rgba(24,214,145,0.30);
+}
+
+#joinCivicActionBtn:disabled {
+  opacity: 1;
+  cursor: default;
+
+  background:
+    linear-gradient(
+      135deg,
+      #2aa06d,
+      #257e59
+    );
+
+  color: #04130c;
 }
 
 
@@ -3703,30 +3877,63 @@ transition: none;
    MOBILE
    ===================================================== */
 
-@media (max-width: 600px) {
+@media (max-width: 700px) {
+
+  #actionDetailScreen .container.narrow {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
 
   .action-detail-content {
-    padding: 20px;
+    padding: 0 16px 24px;
+    border-radius: 24px;
   }
 
+  .action-detail-content::before {
+    height: 205px;
+    margin-left: -16px;
+    margin-right: -16px;
 
-  .action-detail-info {
-    grid-template-columns: 1fr;
+    border-radius: 24px 24px 0 0;
   }
 
+  .action-detail-icon {
+    width: 58px;
+    height: 58px;
+
+    margin-top: -48px;
+  }
 
   .action-detail-content .screen-title {
-    font-size: clamp(26px, 8vw, 36px);
+    font-size: clamp(30px, 9vw, 42px);
+    line-height: 1.05;
   }
 
-
-  .civic-action-card {
-    padding: 16px;
+  .action-detail-content .screen-sub {
+    font-size: 15px;
+    line-height: 1.6;
   }
 
-
-  .action-meta {
-    gap: 8px;
+  .action-detail-info {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
   }
 
+  .action-info-card {
+    min-height: 115px;
+    padding: 14px;
+  }
+
+  .action-info-card span {
+    font-size: 14px;
+  }
+
+  .action-support-card,
+  .action-organizer {
+    padding: 17px;
+  }
+
+  #joinCivicActionBtn {
+    min-height: 58px;
+  }
 }
