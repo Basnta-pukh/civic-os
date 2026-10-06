@@ -2,10 +2,12 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+
   <meta
     name="viewport"
     content="width=device-width, initial-scale=1, viewport-fit=cover"
   />
+
   <meta name="theme-color" content="#060908" />
   <meta name="color-scheme" content="dark" />
 
@@ -50,30 +52,20 @@
 
   <link rel="stylesheet" href="style.css" />
 
-  <!-- ================= CIVIC OS NAVIGATION + UI FIXES ================= -->
-
   <style>
-
     /* =====================================================
        FINAL MOBILE BOTTOM NAV
-       Forces exactly 5 equal columns
        ===================================================== */
 
     .bottom-nav {
       display: grid !important;
-
-      grid-template-columns:
-        repeat(5, minmax(0, 1fr)) !important;
-
+      grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
       grid-template-rows: 1fr !important;
-
       grid-auto-flow: row !important;
-
       align-items: stretch !important;
       justify-content: stretch !important;
 
       position: fixed !important;
-
       left: 0 !important;
       right: 0 !important;
       bottom: 0 !important;
@@ -88,26 +80,17 @@
       padding: 0 !important;
 
       box-sizing: border-box !important;
-
       float: none !important;
-
       transform: none !important;
-
       overflow: visible !important;
 
       z-index: 1000 !important;
     }
 
-
-    /* =====================================================
-       EVERY NAV BUTTON
-       ===================================================== */
-
     .bottom-nav .nav-item {
       position: relative !important;
 
       display: flex !important;
-
       flex-direction: column !important;
 
       align-items: center !important;
@@ -126,9 +109,7 @@
       box-sizing: border-box !important;
 
       flex: none !important;
-
       float: none !important;
-
       transform: none !important;
 
       grid-column: auto !important;
@@ -142,39 +123,19 @@
       white-space: nowrap !important;
     }
 
-
-    /* =====================================================
-       NAV ICON
-       ===================================================== */
-
     .bottom-nav .nav-item svg,
     .bottom-nav .nav-item i {
       flex-shrink: 0 !important;
     }
 
-
-    /* =====================================================
-       NAV TEXT
-       ===================================================== */
-
     .bottom-nav .nav-item span {
       display: block !important;
-
       white-space: nowrap !important;
-
       text-align: center !important;
-
       max-width: 100% !important;
-
       overflow: hidden !important;
       text-overflow: ellipsis !important;
     }
-
-
-    /* =====================================================
-       REPORT BUTTON
-       Keep it in the CENTER COLUMN
-       ===================================================== */
 
     .bottom-nav .nav-report {
       position: relative !important;
@@ -188,21 +149,13 @@
       bottom: auto !important;
 
       margin: 0 !important;
-
       transform: none !important;
-
       float: none !important;
 
       z-index: 1001 !important;
     }
 
-
-    /* =====================================================
-       VERY SMALL PHONES
-       ===================================================== */
-
     @media (max-width: 430px) {
-
       .bottom-nav {
         height: 72px !important;
         min-height: 72px !important;
@@ -211,7 +164,6 @@
       .bottom-nav .nav-item {
         height: 72px !important;
         min-height: 72px !important;
-
         padding-left: 2px !important;
         padding-right: 2px !important;
       }
@@ -220,9 +172,7 @@
         font-size: 10px !important;
         line-height: 1.2 !important;
       }
-
     }
-
 
     /* =====================================================
        CIVIC AI DRAG BUTTON
@@ -237,18 +187,17 @@
       cursor: grabbing;
       user-select: none;
     }
-
   </style>
-
 </head>
-
 
 <body>
 
   <div class="bg-grid" aria-hidden="true"></div>
 
 
-  <!-- ================= TOP BAR ================= -->
+  <!-- =====================================================
+       TOP BAR
+       ===================================================== -->
 
   <header class="topbar">
 
@@ -266,7 +215,6 @@
           viewBox="0 0 32 32"
           aria-hidden="true"
         >
-
           <rect
             width="32"
             height="32"
@@ -288,7 +236,6 @@
             r="2"
             fill="#04140b"
           />
-
         </svg>
 
         <span class="brand-text">
@@ -349,14 +296,11 @@
 
 
       <span class="live-pill">
-
         <span
           class="pulse-dot"
           aria-hidden="true"
         ></span>
-
         Live demo
-
       </span>
 
     </div>
@@ -364,12 +308,16 @@
   </header>
 
 
-  <!-- ================= MAIN APP ================= -->
+  <!-- =====================================================
+       MAIN APP
+       ===================================================== -->
 
   <main id="app">
 
 
-    <!-- ================= HOME ================= -->
+    <!-- ===================================================
+         HOME
+         =================================================== -->
 
     <section
       id="homeScreen"
@@ -388,7 +336,6 @@
               Civic Intelligence
             </span>
 
-
             <h1
               id="heroTitle"
               class="hero-title"
@@ -397,24 +344,19 @@
               <span class="text-accent">SPEAK UP.</span>
             </h1>
 
-
             <p class="hero-sub">
               Turn everyday civic problems into visible action —
               with citizens, communities, AI and governance working together.
             </p>
 
-
             <p
               class="motto"
               aria-label="Report. Connect. Resolve."
             >
-
               <span>Report.</span>
               <span>Connect.</span>
               <span>Resolve.</span>
-
             </p>
-
 
             <div class="hero-actions">
 
@@ -423,24 +365,17 @@
                 class="btn btn-primary btn-lg"
                 data-goto="reportScreen"
               >
-
                 <i data-lucide="circle-plus"></i>
-
                 Report a Problem
-
               </button>
-
 
               <button
                 type="button"
                 class="btn btn-ghost btn-lg"
                 data-goto="issuesScreen"
               >
-
                 Explore Issues
-
                 <i data-lucide="arrow-right"></i>
-
               </button>
 
             </div>
@@ -452,12 +387,10 @@
             class="hero-visual"
             aria-label="Live civic signal"
           >
-
             <div
               class="signal-card glass"
               id="heroSignal"
             ></div>
-
           </aside>
 
         </div>
@@ -469,7 +402,9 @@
         ></div>
 
 
-        <!-- ================= CIVIC ACTIONS TEASER ================= -->
+        <!-- ===============================================
+             CIVIC ACTIONS TEASER
+             =============================================== -->
 
         <section
           class="block"
@@ -497,7 +432,6 @@
 
 
           <div class="action-grid">
-
 
             <button
               type="button"
@@ -623,7 +557,9 @@
         </section>
 
 
-        <!-- ================= HOW IT WORKS ================= -->
+        <!-- ===============================================
+             HOW IT WORKS
+             =============================================== -->
 
         <section
           class="block"
@@ -656,97 +592,48 @@
           >
 
             <li class="flow-step glass">
-
-              <span class="flow-num">
-                01
-              </span>
-
+              <span class="flow-num">01</span>
               <i data-lucide="flag"></i>
-
-              <span class="flow-title">
-                Problem
-              </span>
-
+              <span class="flow-title">Problem</span>
               <span class="flow-desc">
                 A citizen notices something wrong.
               </span>
-
             </li>
 
-
             <li class="flow-step glass">
-
-              <span class="flow-num">
-                02
-              </span>
-
+              <span class="flow-num">02</span>
               <i data-lucide="megaphone"></i>
-
-              <span class="flow-title">
-                Report
-              </span>
-
+              <span class="flow-title">Report</span>
               <span class="flow-desc">
                 Category, description, location, photo.
               </span>
-
             </li>
 
-
             <li class="flow-step glass">
-
-              <span class="flow-num">
-                03
-              </span>
-
+              <span class="flow-num">03</span>
               <i data-lucide="brain-circuit"></i>
-
-              <span class="flow-title">
-                Analyze
-              </span>
-
+              <span class="flow-title">Analyze</span>
               <span class="flow-desc">
                 AI sets priority and routes the department.
               </span>
-
             </li>
 
-
             <li class="flow-step glass">
-
-              <span class="flow-num">
-                04
-              </span>
-
+              <span class="flow-num">04</span>
               <i data-lucide="network"></i>
-
-              <span class="flow-title">
-                Connect
-              </span>
-
+              <span class="flow-title">Connect</span>
               <span class="flow-desc">
                 Volunteers and skills join the response.
               </span>
-
             </li>
 
-
             <li class="flow-step glass flow-step-accent">
-
-              <span class="flow-num">
-                05
-              </span>
-
+              <span class="flow-num">05</span>
               <i data-lucide="badge-check"></i>
-
-              <span class="flow-title">
-                Resolve
-              </span>
-
+              <span class="flow-title">Resolve</span>
               <span class="flow-desc">
                 Progress is tracked until it is fixed.
               </span>
-
             </li>
 
           </ol>
@@ -754,7 +641,9 @@
         </section>
 
 
-        <!-- ================= RECENT ISSUES ================= -->
+        <!-- ===============================================
+             RECENT ISSUES
+             =============================================== -->
 
         <section
           class="block"
@@ -778,21 +667,16 @@
 
             </div>
 
-
             <button
               type="button"
               class="link-btn"
               data-goto="issuesScreen"
             >
-
               View all
-
               <i data-lucide="arrow-right"></i>
-
             </button>
 
           </div>
-
 
           <div
             class="issue-list"
@@ -802,7 +686,7 @@
         </section>
 
 
-        <!-- ================= COMMUNITY TEASER ================= -->
+        <!-- COMMUNITY TEASER -->
 
         <section class="block">
 
@@ -814,7 +698,7 @@
         </section>
 
 
-        <!-- ================= PLATFORM VISION ================= -->
+        <!-- PLATFORM VISION -->
 
         <section
           class="block"
@@ -827,26 +711,19 @@
               Platform vision
             </p>
 
-
             <h2
               id="visionTitle"
               class="vision-quote"
             >
-
               Not a complaint box.
-
               <span class="muted-text">
                 A civic intelligence layer for the whole city.
               </span>
-
             </h2>
-
 
             <div class="pillars">
 
-
               <div class="pillar">
-
                 <span class="pillar-icon">
                   <i data-lucide="users"></i>
                 </span>
@@ -858,12 +735,10 @@
                 <span class="pillar-desc">
                   One simple place to report and follow up.
                 </span>
-
               </div>
 
 
               <div class="pillar">
-
                 <span class="pillar-icon">
                   <i data-lucide="brain-circuit"></i>
                 </span>
@@ -875,12 +750,10 @@
                 <span class="pillar-desc">
                   Understands, prioritises and routes every report.
                 </span>
-
               </div>
 
 
               <div class="pillar">
-
                 <span class="pillar-icon">
                   <i data-lucide="building-2"></i>
                 </span>
@@ -892,7 +765,6 @@
                 <span class="pillar-desc">
                   Departments see live, organised civic data.
                 </span>
-
               </div>
 
             </div>
@@ -920,7 +792,9 @@
     </section>
 
 
-    <!-- ================= REPORT ================= -->
+    <!-- ===================================================
+         REPORT
+         =================================================== -->
 
     <section
       id="reportScreen"
@@ -998,11 +872,9 @@
 
             </legend>
 
-
             <p class="field-hint">
               Not sure? Choose "Other" and Civic AI will detect it from your description.
             </p>
-
 
             <div
               class="category-grid"
@@ -1027,7 +899,6 @@
 
             </label>
 
-
             <textarea
               id="description"
               name="description"
@@ -1038,7 +909,6 @@
               required
             ></textarea>
 
-
             <div class="field-foot">
 
               <button
@@ -1046,13 +916,9 @@
                 class="link-btn"
                 id="exampleBtn"
               >
-
                 <i data-lucide="sparkles"></i>
-
                 Try an example
-
               </button>
-
 
               <span
                 id="descCount"
@@ -1081,14 +947,12 @@
 
             </label>
 
-
             <div class="input-wrap">
 
               <i
                 data-lucide="map-pin"
                 class="input-icon"
               ></i>
-
 
               <input
                 id="location"
@@ -1102,19 +966,16 @@
 
             </div>
 
-
             <button
               type="button"
               class="chip-btn"
               id="locateBtn"
             >
-
               <i data-lucide="locate-fixed"></i>
 
               <span>
                 Use my current location
               </span>
-
             </button>
 
           </div>
@@ -1139,7 +1000,6 @@
 
             </span>
 
-
             <label
               class="dropzone"
               id="dropzone"
@@ -1155,23 +1015,19 @@
                 aria-labelledby="photoLabel"
               />
 
-
               <span class="dz-icon">
                 <i data-lucide="camera"></i>
               </span>
 
-
               <span class="dz-title">
                 Take or upload a photo
               </span>
-
 
               <span class="dz-hint">
                 Evidence helps departments verify faster
               </span>
 
             </label>
-
 
             <div
               class="photo-preview"
@@ -1184,16 +1040,13 @@
                 alt="Preview of the uploaded evidence photo"
               />
 
-
               <button
                 type="button"
                 class="icon-btn"
                 id="removePhoto"
                 aria-label="Remove photo"
               >
-
                 <i data-lucide="x"></i>
-
               </button>
 
             </div>
@@ -1214,11 +1067,8 @@
             class="btn btn-primary btn-lg btn-block"
             id="analyzeBtn"
           >
-
             <i data-lucide="brain-circuit"></i>
-
             Analyze with AI
-
           </button>
 
         </form>
@@ -1235,7 +1085,9 @@
     </section>
 
 
-    <!-- ================= ISSUES ================= -->
+    <!-- ===================================================
+         ISSUES
+         =================================================== -->
 
     <section
       id="issuesScreen"
@@ -1258,7 +1110,6 @@
             Civic issues
           </h2>
 
-
           <p
             class="screen-sub"
             id="issuesCount"
@@ -1277,7 +1128,6 @@
               data-lucide="search"
               class="input-icon"
             ></i>
-
 
             <input
               id="issueSearch"
@@ -1302,18 +1152,14 @@
           <div class="select-row">
 
             <label class="select">
-
               <span class="sr-only">
                 Filter by category
               </span>
-
               <select id="filterCategory"></select>
-
             </label>
 
 
             <label class="select">
-
               <span class="sr-only">
                 Filter by priority
               </span>
@@ -1342,7 +1188,6 @@
 
 
             <label class="select">
-
               <span class="sr-only">
                 Sort issues
               </span>
@@ -1380,7 +1225,9 @@
     </section>
 
 
-    <!-- ================= COMMUNITY ================= -->
+    <!-- ===================================================
+         COMMUNITY
+         =================================================== -->
 
     <section
       id="communityScreen"
@@ -1402,7 +1249,6 @@
           >
             Civic community
           </h2>
-
 
           <p class="screen-sub">
             Some problems need more than a department.
@@ -1454,7 +1300,6 @@
 
             </span>
 
-
             <span
               class="counter"
               id="skillCount"
@@ -1463,7 +1308,6 @@
             </span>
 
           </div>
-
 
           <div
             class="chip-wrap"
@@ -1499,7 +1343,6 @@
 
           </div>
 
-
           <div
             class="mission-list"
             id="missionList"
@@ -1532,7 +1375,6 @@
 
           </div>
 
-
           <div
             class="people-grid"
             id="peopleGrid"
@@ -1545,7 +1387,9 @@
     </section>
 
 
-    <!-- ================= CIVIC ACTIONS ================= -->
+    <!-- ===================================================
+         CIVIC ACTIONS
+         =================================================== -->
 
     <section
       id="actionsScreen"
@@ -1578,15 +1422,17 @@
 
         <div class="hero-actions">
 
-  <button
-  type="button"
-  class="btn btn-primary btn-lg"
-  id="createActionBtn"
-  onclick="openCreateActivity()"
->
-  <i data-lucide="circle-plus"></i>
-  Create an Activity
-</button>
+          <button
+            type="button"
+            class="btn btn-primary btn-lg"
+            id="createActionBtn"
+          >
+
+            <i data-lucide="circle-plus"></i>
+
+            Create an Activity
+
+          </button>
 
         </div>
 
@@ -1621,12 +1467,13 @@
             id="civicActionsList"
           >
 
-            <!-- ACTIVITY 1 — FLOOD -->
+
+            <!-- ACTIVITY 1 -->
 
             <button
               type="button"
               class="action-card glass civic-action-card action-flood-card"
-              onclick="openCivicAction('flood')"
+              data-civic-action="flood"
             >
 
               <span class="action-card-image action-flood-image"></span>
@@ -1670,12 +1517,12 @@
             </button>
 
 
-            <!-- ACTIVITY 2 — CLEAN-UP -->
+            <!-- ACTIVITY 2 -->
 
             <button
               type="button"
               class="action-card glass civic-action-card action-cleanup-card"
-              onclick="openCivicAction('cleanup')"
+              data-civic-action="cleanup"
             >
 
               <span class="action-card-image action-cleanup-image"></span>
@@ -1719,12 +1566,12 @@
             </button>
 
 
-            <!-- ACTIVITY 3 — TREE PLANTATION -->
+            <!-- ACTIVITY 3 -->
 
             <button
               type="button"
               class="action-card glass civic-action-card action-planting-card"
-              onclick="openCivicAction('planting')"
+              data-civic-action="planting"
             >
 
               <span class="action-card-image action-planting-image"></span>
@@ -1767,6 +1614,7 @@
 
             </button>
 
+
           </div>
 
         </section>
@@ -1776,239 +1624,274 @@
     </section>
 
 
-    <!-- ================= CIVIC ACTION DETAILS ================= -->
+    <!-- ===================================================
+         CREATE ACTIVITY
+         =================================================== -->
 
-   <section
-  id="createActivityScreen"
-  class="screen"
-  aria-labelledby="createActivityTitle"
->
+    <section
+      id="createActivityScreen"
+      class="screen"
+      aria-labelledby="createActivityTitle"
+    >
 
-  <div class="screen-head">
+      <div class="container narrow">
 
-    <div>
-      <span class="eyebrow">
-        CIVIC ACTIONS
-      </span>
+        <header class="screen-head">
 
-      <h2 id="createActivityTitle">
-        Create an Activity
-      </h2>
+          <p class="kicker">
+            Civic Actions
+          </p>
 
-      <p>
-        Start a community activity and invite people to take action together.
-      </p>
-    </div>
+          <h2
+            id="createActivityTitle"
+            class="screen-title"
+          >
+            Create an Activity
+          </h2>
 
-  </div>
+          <p class="screen-sub">
+            Start a community activity and invite people
+            to take action together.
+          </p>
 
-  <form
-    id="createActivityForm"
-    class="glass project-form"
-  >
-
-    <div class="form-field">
-
-      <label for="activityTitle">
-        Activity name
-      </label>
-
-      <input
-        type="text"
-        id="activityTitle"
-        name="activityTitle"
-        placeholder="e.g. Community Clean-Up Drive"
-        required
-        maxlength="80"
-      >
-
-    </div>
+        </header>
 
 
-    <div class="form-row">
-
-      <div class="form-field">
-
-        <label for="activityType">
-          Activity type
-        </label>
-
-        <select
-          id="activityType"
-          name="activityType"
-          required
+        <form
+          id="createActivityForm"
+          class="glass project-form"
         >
 
-          <option value="">
-            Select type
-          </option>
+          <div class="form-field">
 
-          <option value="Clean-up">
-            Clean-up
-          </option>
+            <label for="activityTitle">
+              Activity name
+            </label>
 
-          <option value="Tree planting">
-            Tree planting
-          </option>
+            <input
+              type="text"
+              id="activityTitle"
+              name="activityTitle"
+              placeholder="e.g. Community Clean-Up Drive"
+              required
+              maxlength="80"
+            />
 
-          <option value="Awareness">
-            Awareness
-          </option>
+          </div>
 
-          <option value="Flood preparedness">
-            Flood preparedness
-          </option>
 
-          <option value="Community support">
-            Community support
-          </option>
+          <div class="form-row">
 
-          <option value="Other">
-            Other
-          </option>
+            <div class="form-field">
 
-        </select>
+              <label for="activityType">
+                Activity type
+              </label>
+
+              <select
+                id="activityType"
+                name="activityType"
+                required
+              >
+
+                <option value="">
+                  Select type
+                </option>
+
+                <option value="Clean-up">
+                  Clean-up
+                </option>
+
+                <option value="Tree planting">
+                  Tree planting
+                </option>
+
+                <option value="Awareness">
+                  Awareness
+                </option>
+
+                <option value="Flood preparedness">
+                  Flood preparedness
+                </option>
+
+                <option value="Community support">
+                  Community support
+                </option>
+
+                <option value="Other">
+                  Other
+                </option>
+
+              </select>
+
+            </div>
+
+
+            <div class="form-field">
+
+              <label for="activityParticipants">
+                Expected participants
+              </label>
+
+              <input
+                type="number"
+                id="activityParticipants"
+                name="activityParticipants"
+                min="1"
+                max="10000"
+                placeholder="e.g. 20"
+                required
+              />
+
+            </div>
+
+          </div>
+
+
+          <div class="form-field">
+
+            <label for="activityLocation">
+              Location
+            </label>
+
+            <input
+              type="text"
+              id="activityLocation"
+              name="activityLocation"
+              placeholder="e.g. Khurai, Imphal"
+              required
+            />
+
+          </div>
+
+
+          <div class="form-row">
+
+            <div class="form-field">
+
+              <label for="activityDate">
+                Date
+              </label>
+
+              <input
+                type="date"
+                id="activityDate"
+                name="activityDate"
+                required
+              />
+
+            </div>
+
+
+            <div class="form-field">
+
+              <label for="activityTime">
+                Time
+              </label>
+
+              <input
+                type="time"
+                id="activityTime"
+                name="activityTime"
+                required
+              />
+
+            </div>
+
+          </div>
+
+
+          <div class="form-field">
+
+            <label for="activityDescription">
+              Description
+            </label>
+
+            <textarea
+              id="activityDescription"
+              name="activityDescription"
+              rows="5"
+              maxlength="500"
+              placeholder="Tell the community what this activity is about..."
+              required
+            ></textarea>
+
+          </div>
+
+
+          <div class="form-field">
+
+            <label for="activitySupport">
+              Support needed
+            </label>
+
+            <textarea
+              id="activitySupport"
+              name="activitySupport"
+              rows="3"
+              maxlength="300"
+              placeholder="e.g. Volunteers, waste collection, saplings..."
+            ></textarea>
+
+          </div>
+
+
+          <div class="form-actions">
+
+            <button
+              type="button"
+              class="btn btn-ghost"
+              id="cancelCreateActivity"
+            >
+              Cancel
+            </button>
+
+
+            <button
+              type="submit"
+              class="btn btn-primary"
+            >
+
+              <i data-lucide="circle-check"></i>
+
+              Create Activity
+
+            </button>
+
+          </div>
+
+        </form>
 
       </div>
-
-
-      <div class="form-field">
-
-        <label for="activityParticipants">
-          Expected participants
-        </label>
-
-        <input
-          type="number"
-          id="activityParticipants"
-          name="activityParticipants"
-          min="1"
-          max="10000"
-          placeholder="e.g. 20"
-          required
-        >
-
-      </div>
-
-    </div>
-
-
-    <div class="form-field">
-
-      <label for="activityLocation">
-        Location
-      </label>
-
-      <input
-        type="text"
-        id="activityLocation"
-        name="activityLocation"
-        placeholder="e.g. Khurai, Imphal"
-        required
-      >
-
-    </div>
-
-
-    <div class="form-row">
-
-      <div class="form-field">
-
-        <label for="activityDate">
-          Date
-        </label>
-
-        <input
-          type="date"
-          id="activityDate"
-          name="activityDate"
-          required
-        >
-
-      </div>
-
-
-      <div class="form-field">
-
-        <label for="activityTime">
-          Time
-        </label>
-
-        <input
-          type="time"
-          id="activityTime"
-          name="activityTime"
-          required
-        >
-
-      </div>
-
-    </div>
-
-
-    <div class="form-field">
-
-      <label for="activityDescription">
-        Description
-      </label>
-
-      <textarea
-        id="activityDescription"
-        name="activityDescription"
-        rows="5"
-        maxlength="500"
-        placeholder="Tell the community what this activity is about..."
-        required
-      ></textarea>
-
-    </div>
-
-
-    <div class="form-field">
-
-      <label for="activitySupport">
-        Support needed
-      </label>
-
-      <textarea
-        id="activitySupport"
-        name="activitySupport"
-        rows="3"
-        maxlength="300"
-        placeholder="e.g. Volunteers, waste collection, saplings..."
-      ></textarea>
-
-    </div>
-
-
-    <div class="form-actions">
-
-      <button
-        type="button"
-        class="btn btn-ghost"
-        onclick="showScreen('actionsScreen')"
-      >
-        Cancel
-      </button>
-
-      <button
-        type="submit"
-        class="btn btn-primary"
-      >
-        <i data-lucide="circle-check"></i>
-        Create Activity
-      </button>
-
-    </div>
-
-  </form>
-
-</section>
 
     </section>
 
 
-    <!-- ================= DASHBOARD ================= -->
+    <!-- ===================================================
+         CIVIC ACTION DETAILS
+         =================================================== -->
+
+    <section
+      id="actionDetailScreen"
+      class="screen"
+      aria-labelledby="actionDetailTitle"
+    >
+
+      <div class="container narrow">
+
+        <div
+          id="actionDetailContent"
+          class="glass"
+        ></div>
+
+      </div>
+
+    </section>
+
+
+    <!-- ===================================================
+         DASHBOARD
+         =================================================== -->
 
     <section
       id="dashboardScreen"
@@ -2031,7 +1914,6 @@
             Civic dashboard
           </h2>
 
-
           <p class="screen-sub">
             Live overview of civic activity across the city.
             Updates as citizens report.
@@ -2046,11 +1928,12 @@
 
     </section>
 
+
   </main>
 
 
   <!-- =====================================================
-       FINAL 5-BUTTON MOBILE NAV
+       MOBILE NAVIGATION
        ===================================================== -->
 
   <nav
@@ -2058,25 +1941,16 @@
     aria-label="Primary mobile"
   >
 
-    <!-- 1. HOME -->
-
     <button
       type="button"
       class="nav-item"
       data-nav
       data-goto="homeScreen"
     >
-
       <i data-lucide="house"></i>
-
-      <span>
-        Home
-      </span>
-
+      <span>Home</span>
     </button>
 
-
-    <!-- 2. ISSUES -->
 
     <button
       type="button"
@@ -2084,17 +1958,10 @@
       data-nav
       data-goto="issuesScreen"
     >
-
       <i data-lucide="list-filter"></i>
-
-      <span>
-        Issues
-      </span>
-
+      <span>Issues</span>
     </button>
 
-
-    <!-- 3. REPORT — CENTER -->
 
     <button
       type="button"
@@ -2102,17 +1969,10 @@
       data-nav
       data-goto="reportScreen"
     >
-
       <i data-lucide="circle-plus"></i>
-
-      <span>
-        Report
-      </span>
-
+      <span>Report</span>
     </button>
 
-
-    <!-- 4. ACTIONS -->
 
     <button
       type="button"
@@ -2120,17 +1980,10 @@
       data-nav
       data-goto="actionsScreen"
     >
-
       <i data-lucide="hand-heart"></i>
-
-      <span>
-        Actions
-      </span>
-
+      <span>Actions</span>
     </button>
 
-
-    <!-- 5. DASHBOARD -->
 
     <button
       type="button"
@@ -2138,19 +1991,16 @@
       data-nav
       data-goto="dashboardScreen"
     >
-
       <i data-lucide="layout-dashboard"></i>
-
-      <span>
-        Dashboard
-      </span>
-
+      <span>Dashboard</span>
     </button>
 
   </nav>
 
 
-  <!-- ================= ISSUE DETAIL SHEET ================= -->
+  <!-- =====================================================
+       ISSUE DETAIL SHEET
+       ===================================================== -->
 
   <dialog
     id="issueDialog"
@@ -2165,18 +2015,14 @@
         aria-hidden="true"
       ></div>
 
-
       <button
         type="button"
         class="icon-btn sheet-close"
         id="closeSheet"
         aria-label="Close issue details"
       >
-
         <i data-lucide="x"></i>
-
       </button>
-
 
       <div id="sheetBody"></div>
 
@@ -2185,7 +2031,9 @@
   </dialog>
 
 
-  <!-- ================= TOAST ================= -->
+  <!-- =====================================================
+       TOAST
+       ===================================================== -->
 
   <div
     id="toast"
@@ -2195,7 +2043,9 @@
   ></div>
 
 
-  <!-- ================= CIVIC AI ================= -->
+  <!-- =====================================================
+       CIVIC AI
+       ===================================================== -->
 
   <button
     type="button"
@@ -2207,11 +2057,8 @@
   >
 
     <span class="civic-ai-fab-icon">
-
       <i data-lucide="sparkles"></i>
-
     </span>
-
 
     <span class="civic-ai-fab-text">
       Civic AI
@@ -2232,11 +2079,8 @@
       <div class="civic-ai-heading">
 
         <div class="civic-ai-avatar">
-
           <i data-lucide="sparkles"></i>
-
         </div>
-
 
         <div>
 
@@ -2259,9 +2103,7 @@
         id="closeCivicAi"
         aria-label="Close Civic AI"
       >
-
         <i data-lucide="x"></i>
-
       </button>
 
     </div>
@@ -2292,11 +2134,8 @@
       <div class="civic-ai-message ai">
 
         <div class="civic-ai-message-avatar">
-
           <i data-lucide="sparkles"></i>
-
         </div>
-
 
         <div class="civic-ai-bubble">
 
@@ -2330,7 +2169,6 @@
         Possible causes
       </button>
 
-
       <button
         type="button"
         class="ai-suggestion"
@@ -2339,7 +2177,6 @@
         Prevention
       </button>
 
-
       <button
         type="button"
         class="ai-suggestion"
@@ -2347,7 +2184,6 @@
       >
         Evidence
       </button>
-
 
       <button
         type="button"
@@ -2360,7 +2196,7 @@
     </div>
 
 
-    <!-- ================= CIVIC AI FILE UPLOAD ================= -->
+    <!-- CIVIC AI FILE UPLOAD -->
 
     <div
       class="civic-ai-attachments"
@@ -2424,9 +2260,7 @@
         class="civic-ai-send"
         aria-label="Send message"
       >
-
         <i data-lucide="arrow-up"></i>
-
       </button>
 
     </form>
@@ -2434,17 +2268,17 @@
   </aside>
 
 
-  <!-- ================= CIVIC AI DRAG ================= -->
+  <!-- =====================================================
+       CIVIC AI DRAG
+       ===================================================== -->
 
   <script>
-
     document.addEventListener("DOMContentLoaded", () => {
 
       const fab =
         document.getElementById("civicAiFab");
 
       if (!fab) return;
-
 
       let dragging = false;
       let moved = false;
@@ -2465,18 +2299,14 @@
 
           fab.classList.add("is-dragging");
 
-
           const rect =
             fab.getBoundingClientRect();
-
 
           startX = event.clientX;
           startY = event.clientY;
 
-
           startLeft = rect.left;
           startTop = rect.top;
-
 
           fab.style.left =
             `${rect.left}px`;
@@ -2490,11 +2320,9 @@
           fab.style.bottom =
             "auto";
 
-
           fab.setPointerCapture(
             event.pointerId
           );
-
         }
       );
 
@@ -2505,35 +2333,28 @@
 
           if (!dragging) return;
 
-
           const dx =
             event.clientX - startX;
 
           const dy =
             event.clientY - startY;
 
-
           if (
             Math.abs(dx) > 5 ||
             Math.abs(dy) > 5
           ) {
-
             moved = true;
-
           }
-
 
           const maxLeft =
             window.innerWidth -
             fab.offsetWidth -
             8;
 
-
           const maxTop =
             window.innerHeight -
             fab.offsetHeight -
             8;
-
 
           const newLeft =
             Math.max(
@@ -2544,7 +2365,6 @@
               )
             );
 
-
           const newTop =
             Math.max(
               8,
@@ -2554,13 +2374,11 @@
               )
             );
 
-
           fab.style.left =
             `${newLeft}px`;
 
           fab.style.top =
             `${newTop}px`;
-
         }
       );
 
@@ -2575,31 +2393,22 @@
             "is-dragging"
           );
 
-
           try {
-
             fab.releasePointerCapture(
               event.pointerId
             );
-
           } catch (error) {}
-
 
           if (moved) {
 
             fab.dataset.dragged =
               "true";
 
-
             setTimeout(() => {
-
               fab.dataset.dragged =
                 "false";
-
             }, 250);
-
           }
-
         }
       );
 
@@ -2614,21 +2423,19 @@
           ) {
 
             event.preventDefault();
-
             event.stopImmediatePropagation();
-
           }
-
         },
         true
       );
 
     });
-
   </script>
 
 
-  <!-- ================= CIVIC ACTION DEMO LOGIC ================= -->
+  <!-- =====================================================
+       CIVIC ACTION DATA + DETAILS
+       ===================================================== -->
 
   <script>
 
@@ -2642,11 +2449,14 @@
         time: "9:00 AM – 12:00 PM",
         organizer: "Local Youth Civic Group",
         participants: 24,
+
         description:
           "A community-led awareness activity focused on helping residents understand flood preparedness, emergency planning and basic safety measures.",
+
         support:
           "Government support requested for awareness materials and coordination."
       },
+
 
       cleanup: {
         title: "Community Clean-Up Drive",
@@ -2656,11 +2466,14 @@
         time: "7:00 AM – 10:00 AM",
         organizer: "Khurai Community Volunteers",
         participants: 18,
+
         description:
           "Residents and volunteers will work together to clean a shared public area and improve the surrounding neighbourhood.",
+
         support:
           "Government support requested for waste collection after the activity."
       },
+
 
       planting: {
         title: "Tree Plantation & Green Space Drive",
@@ -2670,8 +2483,10 @@
         time: "8:00 AM – 11:00 AM",
         organizer: "Green Manipur Community",
         participants: 31,
+
         description:
           "A community activity to plant trees and improve a shared green space while encouraging residents to take part in local environmental action.",
+
         support:
           "Government support requested for saplings, equipment and coordination."
       }
@@ -2695,21 +2510,7 @@
       if (!detail) return;
 
 
-      /*
-        IMPORTANT FIX:
-
-        The outer container is only "glass".
-
-        The inner container gets:
-        action-detail-content
-        + activity-specific class.
-
-        This prevents the hero image from
-        appearing twice.
-      */
-
       detail.className = "glass";
-
 
       detail.innerHTML = `
 
@@ -2741,38 +2542,32 @@
           <div class="action-detail-info">
 
             <div class="glass action-info-card">
-
               <i data-lucide="map-pin"></i>
 
               <div>
                 <strong>Location</strong>
                 <span>${action.location}</span>
               </div>
-
             </div>
 
 
             <div class="glass action-info-card">
-
               <i data-lucide="calendar"></i>
 
               <div>
                 <strong>Date</strong>
                 <span>${action.date}</span>
               </div>
-
             </div>
 
 
             <div class="glass action-info-card">
-
               <i data-lucide="clock"></i>
 
               <div>
                 <strong>Time</strong>
                 <span>${action.time}</span>
               </div>
-
             </div>
 
 
@@ -2842,6 +2637,19 @@
 
           </button>
 
+
+          <button
+            type="button"
+            class="btn btn-ghost btn-lg btn-block"
+            onclick="showScreen('actionsScreen')"
+          >
+
+            <i data-lucide="arrow-left"></i>
+
+            Back to Activities
+
+          </button>
+
         </div>
 
       `;
@@ -2854,9 +2662,7 @@
         window.lucide &&
         typeof window.lucide.createIcons === "function"
       ) {
-
         window.lucide.createIcons();
-
       }
 
     }
@@ -2885,9 +2691,7 @@
         button &&
         button.dataset.joined === "true"
       ) {
-
         return;
-
       }
 
 
@@ -2895,10 +2699,8 @@
 
 
       if (count) {
-
         count.textContent =
           `${action.participants} joined`;
-
       }
 
 
@@ -2913,7 +2715,6 @@
         `;
 
         button.disabled = true;
-
       }
 
 
@@ -2921,9 +2722,7 @@
         window.lucide &&
         typeof window.lucide.createIcons === "function"
       ) {
-
         window.lucide.createIcons();
-
       }
 
 
@@ -2951,19 +2750,19 @@
   </script>
 
 
-  <!-- ================= LIBRARIES ================= -->
+  <!-- =====================================================
+       LIBRARIES
+       ===================================================== -->
 
   <script
     src="https://unpkg.com/lucide@1.51.0/dist/umd/lucide.min.js"
     defer
   ></script>
 
-
   <script
     src="script.js"
     defer
   ></script>
-
 
 </body>
 </html>
