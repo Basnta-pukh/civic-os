@@ -1291,6 +1291,7 @@ const SCREEN_HASH = {
   issuesScreen: "issues",
   communityScreen: "community",
   actionsScreen: "actions",
+  createActivityScreen: "create-activity",
   actionDetailScreen: "action-detail",
   dashboardScreen: "dashboard"
 };
@@ -1310,6 +1311,9 @@ const SCREEN_TITLE = {
 
   actionsScreen:
     "Civic Actions · Civic OS",
+
+  createActivityScreen: 
+    "Civic OS — Create Activity",
 
   actionDetailScreen:
     "Civic Action · Civic OS",
