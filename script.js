@@ -1419,7 +1419,8 @@ const SCREEN_HASH = {
   actionsScreen: "actions",
   createActivityScreen: "create-activity",
   actionDetailScreen: "action-detail",
-  dashboardScreen: "dashboard"
+  dashboardScreen: "dashboard",
+  pwdIntelligenceScreen: "pwd-intelligence"
 };
 
 const SCREEN_TITLE = {
@@ -1445,7 +1446,10 @@ const SCREEN_TITLE = {
     "Civic Action · Civic OS",
 
   dashboardScreen:
-    "Civic dashboard · Civic OS"
+    "Civic dashboard · Civic OS",
+
+  pwdIntelligenceScreen:
+    "PWD road intelligence · Civic OS"
 };
 
 function screenFromHash() {
@@ -1558,6 +1562,10 @@ function renderScreen(id) {
 
   if (id === "dashboardScreen") {
     renderDashboard();
+  }
+
+  if (id === "pwdIntelligenceScreen") {
+    renderPwdIntelligence();
   }
 
   if (id === "communityScreen") {
@@ -3923,6 +3931,198 @@ function toggleSupport(id) {
   );
 }
 
+
+/* =========================================================
+   9A. PWD ROAD INTELLIGENCE
+   ========================================================= */
+
+function calculateRoadPriority(issue) {
+  if (!issue || issue.category !== "roads") return 0;
+
+  const text = `${issue.description || ""} ${issue.location || ""}`.toLowerCase();
+
+  const severityScore = {
+    High: 40,
+    Medium: 25,
+    Low: 10
+  }[issue.priority] || 15;
+
+  const reportScore = Math.min(
+    25,
+    Math.max(5, (issue.supporters || 1) * 3)
+  );
+
+  const trafficScore = /traffic|vehicles|cars|bus|school|market|hospital|main road|highway/i.test(text)
+    ? 15
+    : 7;
+
+  const connectivityScore = /main road|highway|bridge|junction|market|school|hospital|college|bus depot/i.test(text)
+    ? 10
+    : 5;
+
+  const evidenceScore = issue.photo ? 5 : 0;
+
+  return Math.min(
+    100,
+    severityScore +
+      reportScore +
+      trafficScore +
+      connectivityScore +
+      evidenceScore
+  );
+}
+
+function getRoadPriorityReason(issue, score) {
+  const reasons = [];
+
+  if (issue.priority === "High") {
+    reasons.push("high reported severity");
+  }
+
+  if ((issue.supporters || 0) >= 4) {
+    reasons.push("multiple citizen reports/support");
+  }
+
+  const text = `${issue.description || ""} ${issue.location || ""}`.toLowerCase();
+
+  if (/traffic|vehicles|cars|bus|school|market|hospital|main road|highway/i.test(text)) {
+    reasons.push("potential traffic or public-access impact");
+  }
+
+  if (/main road|highway|bridge|junction|market|school|hospital|college|bus depot/i.test(text)) {
+    reasons.push("important connectivity/public location");
+  }
+
+  if (issue.photo) {
+    reasons.push("photo evidence available");
+  }
+
+  if (!reasons.length) {
+    reasons.push("road condition requires field assessment");
+  }
+
+  return reasons;
+}
+
+function renderPwdIntelligence() {
+  const body = $("#pwdIntelligenceBody");
+  if (!body) return;
+
+  const roads = issues
+    .filter((i) => i.category === "roads")
+    .map((issue) => ({
+      issue,
+      score: calculateRoadPriority(issue)
+    }))
+    .sort((a, b) => b.score - a.score);
+
+  const high = roads.filter((r) => r.score >= 70).length;
+  const medium = roads.filter((r) => r.score >= 45 && r.score < 70).length;
+  const low = roads.filter((r) => r.score < 45).length;
+
+  body.innerHTML = `
+    <div class="kpi-grid">
+      <div class="kpi glass kpi-high">
+        <span class="kpi-label"><i data-lucide="siren"></i> High priority roads</span>
+        <span class="kpi-value">${high}</span>
+        <span class="kpi-sub">Immediate review recommended</span>
+      </div>
+      <div class="kpi glass">
+        <span class="kpi-label"><i data-lucide="traffic-cone"></i> Medium priority</span>
+        <span class="kpi-value">${medium}</span>
+        <span class="kpi-sub">Schedule field inspection</span>
+      </div>
+      <div class="kpi glass kpi-resolved">
+        <span class="kpi-label"><i data-lucide="check-circle-2"></i> Lower priority</span>
+        <span class="kpi-value">${low}</span>
+        <span class="kpi-sub">Monitor and verify</span>
+      </div>
+      <div class="kpi glass">
+        <span class="kpi-label"><i data-lucide="map"></i> Road reports</span>
+        <span class="kpi-value">${roads.length}</span>
+        <span class="kpi-sub">Citizen-submitted evidence</span>
+      </div>
+    </div>
+
+    <section class="panel glass" style="margin-top:18px;">
+      <div class="panel-head">
+        <div>
+          <h3 class="panel-title">AI maintenance priority queue</h3>
+          <p class="panel-sub">Explainable MVP score — not a trained predictive model.</p>
+        </div>
+        <span class="demo-badge">PWD-03 · MVP</span>
+      </div>
+
+      <div style="display:grid;gap:12px;">
+        ${roads.length ? roads.map((r, index) => {
+          const issue = r.issue;
+          const reasons = getRoadPriorityReason(issue, r.score);
+          const tone = r.score >= 70 ? "pill-high" : r.score >= 45 ? "pill-medium" : "pill-low";
+          return `
+            <button type="button" class="issue-card glass" data-issue="${escapeHtml(issue.id)}" style="width:100%;text-align:left;">
+              <span class="issue-icon ${r.score >= 70 ? "is-high" : ""}" aria-hidden="true">
+                <i data-lucide="road"></i>
+              </span>
+              <span class="issue-main">
+                <span class="issue-top">
+                  <span>#${index + 1}</span><span aria-hidden="true">·</span>
+                  <span>${escapeHtml(issue.id)}</span><span aria-hidden="true">·</span>
+                  <span>${escapeHtml(issue.location)}</span>
+                </span>
+                <span class="issue-title">${escapeHtml(issue.title)}</span>
+                <span class="issue-meta">
+                  <span><i data-lucide="building-2"></i>${escapeHtml(issue.authority || "Manipur PWD")}</span>
+                  <span><i data-lucide="map-pin"></i>${escapeHtml(issue.division || "PWD jurisdiction review")}</span>
+                </span>
+                <span class="issue-tags">
+                  <span class="pill ${tone}">Priority score ${r.score}/100</span>
+                  <span class="pill">${issue.supporters} report/support signal</span>
+                </span>
+                <span class="muted-text" style="display:block;margin-top:8px;">
+                  ${escapeHtml(reasons.slice(0,3).join(" · "))}
+                </span>
+              </span>
+              <i data-lucide="chevron-right" class="issue-chevron"></i>
+            </button>
+          `;
+        }).join("") : `
+          <div class="empty-state">
+            <i data-lucide="road"></i>
+            <strong>No road reports yet</strong>
+            <span>Submit a road photo from Report a problem to populate this queue.</span>
+          </div>
+        `}
+      </div>
+    </section>
+
+    <section class="panel glass" style="margin-top:18px;">
+      <div class="panel-head">
+        <div>
+          <h3 class="panel-title">AI inspection recommendation</h3>
+          <p class="panel-sub">The system explains why a road should be reviewed.</p>
+        </div>
+        <i data-lucide="brain-circuit" style="color:var(--accent)"></i>
+      </div>
+      <div class="insight-card">
+        <span class="action-icon"><i data-lucide="scan-line"></i></span>
+        <div>
+          <p class="insight-title">
+            ${roads.length
+              ? `Top priority: ${escapeHtml(roads[0].issue.location)} — ${roads[0].score}/100`
+              : "Waiting for road evidence"}
+          </p>
+          <p class="insight-sub">
+            ${roads.length
+              ? escapeHtml(getRoadPriorityReason(roads[0].issue, roads[0].score).join(", ")) + ". Recommended next step: field inspection."
+              : "Once a road report is submitted, the priority engine will rank it here."}
+          </p>
+        </div>
+      </div>
+    </section>
+  `;
+
+  refreshIcons();
+}
 
 /* =========================================================
    9. DASHBOARD
