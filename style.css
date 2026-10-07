@@ -5538,15 +5538,20 @@ transition: none;
   align-items: center;
   justify-content: center;
   gap: 10px;
-  margin-top: 24px !important;
-  margin-bottom: 12px !important;
-  position: sticky;
-  bottom: 86px;
+  margin-top: 32px !important;
+  margin-bottom: 28px !important;
+
+  /* Keep the button in normal document flow so it never covers About text. */
+  position: relative !important;
+  bottom: auto !important;
+  z-index: 2;
 }
 
 @media (max-width: 760px) {
   .action-detail-join {
-    margin-top: 24px !important;
-    margin-bottom: 14px !important;
+    margin-top: 32px !important;
+    margin-bottom: 34px !important;
+    position: relative !important;
+    bottom: auto !important;
   }
 }
