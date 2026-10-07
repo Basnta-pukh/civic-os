@@ -7024,101 +7024,121 @@ function openCivicAction(actionId) {
     return;
   }
 
-
   detail.innerHTML = `
-
     <div class="action-detail-content">
 
-      <div class="action-detail-icon">
-        <i data-lucide="${action.icon}"></i>
-      </div>
+      <div class="action-detail-hero">
+        <div class="action-detail-hero-copy">
 
-      <p class="kicker">
-        Civic Action
-      </p>
-
-      <h2
-        id="actionDetailTitle"
-        class="screen-title"
-      >
-        ${action.title}
-      </h2>
-
-      <p class="screen-sub">
-        ${action.description}
-      </p>
-
-
-      <div class="action-detail-info">
-
-        <div>
-          <strong>Location</strong>
-          <span>${action.location}</span>
-        </div>
-
-        <div>
-          <strong>Date</strong>
-          <span>${action.date}</span>
-        </div>
-
-        <div>
-          <strong>Time</strong>
-          <span>${action.time}</span>
-        </div>
-
-        <div>
-          <strong>Organizer</strong>
-          <span>${action.organizer}</span>
-        </div>
-
-        <div>
-          <strong>Participants</strong>
-          <span id="actionParticipantCount">
-            ${action.participants}
+          <span class="action-detail-category">
+            <i data-lucide="hand-heart"></i>
+            Civic Action
           </span>
+
+          <h2
+            id="actionDetailTitle"
+            class="action-detail-title"
+          >
+            ${escapeHtml(action.title)}
+          </h2>
+
+          <p class="action-detail-description">
+            ${escapeHtml(action.description)}
+          </p>
+
+        </div>
+
+        <div class="action-detail-hero-icon">
+          <i data-lucide="${action.icon}"></i>
+        </div>
+      </div>
+
+      <div class="action-detail-stats">
+
+        <div class="action-detail-stat">
+          <span class="action-stat-icon location">
+            <i data-lucide="map-pin"></i>
+          </span>
+          <span class="action-stat-label">Location</span>
+          <strong>${escapeHtml(action.location)}</strong>
+        </div>
+
+        <div class="action-detail-stat">
+          <span class="action-stat-icon date">
+            <i data-lucide="calendar-days"></i>
+          </span>
+          <span class="action-stat-label">Date</span>
+          <strong>${escapeHtml(action.date)}</strong>
+        </div>
+
+        <div class="action-detail-stat">
+          <span class="action-stat-icon time">
+            <i data-lucide="clock-3"></i>
+          </span>
+          <span class="action-stat-label">Time</span>
+          <strong>${escapeHtml(action.time)}</strong>
+        </div>
+
+        <div class="action-detail-stat">
+          <span class="action-stat-icon people">
+            <i data-lucide="users"></i>
+          </span>
+          <span class="action-stat-label">Participants</span>
+          <strong id="actionParticipantCount">${action.participants} joined</strong>
         </div>
 
       </div>
 
-
-      <div class="action-support">
-
-        <strong>Support Needed</strong>
-
-        <p>
-          ${action.support}
-        </p>
-
+      <div class="action-detail-organizer">
+        <span class="action-organizer-icon">
+          <i data-lucide="users-round"></i>
+        </span>
+        <span>
+          <small>Organized by</small>
+          <strong>${escapeHtml(action.organizer)}</strong>
+          <em>Community Group</em>
+        </span>
       </div>
 
+      <div class="action-detail-support">
+        <span class="action-support-icon">
+          <i data-lucide="landmark"></i>
+        </span>
+        <span>
+          <strong>Government Support</strong>
+          <p>${escapeHtml(action.support)}</p>
+        </span>
+      </div>
+
+      <div class="action-detail-about">
+        <span class="action-about-icon">
+          <i data-lucide="leaf"></i>
+        </span>
+        <span>
+          <strong>About the Activity</strong>
+          <p>${escapeHtml(action.description)}</p>
+        </span>
+      </div>
 
       <button
         type="button"
-        class="btn btn-primary btn-lg btn-block"
+        class="btn btn-primary btn-lg btn-block action-detail-join"
         id="joinCivicActionBtn"
         onclick="joinCivicAction('${actionId}')"
       >
-
         <i data-lucide="user-plus"></i>
-
         Join Activity
-
       </button>
 
     </div>
-
   `;
-
 
   showScreen(
     "actionDetailScreen"
   );
 
-
   refreshIcons();
-
 }
-
 
 function joinCivicAction(actionId) {
 
