@@ -5096,3 +5096,197 @@ transition: none;
     min-height: 55px;
   }
 }
+
+
+/* =========================================================
+   CREATE ACTIVITY — MOBILE HACKATHON POLISH
+   ========================================================= */
+
+#createActivityScreen .container.narrow {
+  max-width: 760px;
+}
+
+#createActivityScreen .screen-head {
+  padding-bottom: 18px;
+}
+
+#createActivityScreen .screen-title {
+  letter-spacing: -.045em;
+}
+
+#createActivityForm.project-form {
+  display: grid;
+  gap: 18px;
+  padding: 24px;
+  margin-bottom: 30px;
+  border: 1px solid rgba(255,255,255,.11);
+  border-radius: 26px;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(62,224,143,.10), transparent 32%),
+    linear-gradient(145deg, rgba(255,255,255,.065), rgba(255,255,255,.025));
+  box-shadow: 0 22px 60px rgba(0,0,0,.22);
+}
+
+#createActivityForm .form-field {
+  min-width: 0;
+}
+
+#createActivityForm .form-field label {
+  display: block;
+  margin-bottom: 8px;
+  color: #cbd9d3;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+#createActivityForm .form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+#createActivityForm input,
+#createActivityForm select,
+#createActivityForm textarea {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 14px;
+  color: #f3faf6;
+  background: rgba(3,8,6,.62);
+  font: inherit;
+}
+
+#createActivityForm input,
+#createActivityForm select {
+  min-height: 50px;
+  padding: 0 14px;
+}
+
+#createActivityForm textarea {
+  min-height: 125px;
+  padding: 13px 14px;
+  resize: vertical;
+}
+
+#createActivityForm input::placeholder,
+#createActivityForm textarea::placeholder {
+  color: #788982;
+}
+
+#createActivityForm input:focus,
+#createActivityForm select:focus,
+#createActivityForm textarea:focus {
+  border-color: rgba(62,224,143,.55);
+  box-shadow: 0 0 0 4px rgba(62,224,143,.08);
+  outline: none;
+}
+
+#createActivityForm .form-actions {
+  display: grid;
+  grid-template-columns: .7fr 1.3fr;
+  gap: 12px;
+  padding-top: 4px;
+}
+
+#createActivityForm .form-actions button {
+  min-height: 54px;
+  border-radius: 16px;
+  touch-action: manipulation;
+}
+
+#createActivityForm #cancelCreateActivity {
+  position: relative;
+  z-index: 5;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+#createActivityForm .btn-primary {
+  box-shadow: 0 14px 32px rgba(62,224,143,.13);
+}
+
+/* Detail hero image */
+.action-detail-hero {
+  isolation: isolate;
+}
+
+.action-detail-hero-image {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-image: var(--action-image);
+  background-size: cover;
+  background-position: center;
+  opacity: .78;
+  pointer-events: none;
+}
+
+.action-detail-hero::before {
+  z-index: 1;
+}
+
+.action-detail-hero-copy,
+.action-detail-hero-icon {
+  z-index: 2;
+}
+
+.action-detail-hero-image + .action-detail-hero-copy {
+  position: relative;
+}
+
+/* =========================================================
+   ACTION CARDS — VISUAL THUMBNAILS
+   ========================================================= */
+
+#civicActionsList .action-card {
+  overflow: hidden;
+}
+
+#civicActionsList .action-card::before {
+  content: "";
+  display: block;
+  width: 100%;
+  height: 118px;
+  margin: -20px -20px 4px;
+  width: calc(100% + 40px);
+  background:
+    radial-gradient(circle at 75% 20%, rgba(62,224,143,.28), transparent 28%),
+    linear-gradient(135deg, rgba(62,224,143,.13), rgba(44,76,64,.08));
+  border-bottom: 1px solid rgba(255,255,255,.07);
+}
+
+@media (max-width: 760px) {
+  #createActivityForm.project-form {
+    padding: 18px;
+    gap: 15px;
+    border-radius: 22px;
+  }
+
+  #createActivityForm .form-row {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+
+  #createActivityForm .form-actions {
+    grid-template-columns: 1fr 1.45fr;
+    position: relative;
+    z-index: 5;
+  }
+
+  #createActivityForm .form-actions button {
+    min-height: 52px;
+  }
+
+  .action-detail-hero-image {
+    opacity: .42;
+  }
+
+  .action-detail-hero::before {
+    background:
+      linear-gradient(90deg, rgba(3,10,7,.94) 0%, rgba(3,10,7,.67) 65%, rgba(3,10,7,.30) 100%),
+      linear-gradient(0deg, rgba(3,10,7,.88) 0%, transparent 65%);
+  }
+}
