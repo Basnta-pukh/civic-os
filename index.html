@@ -450,7 +450,7 @@
                 </span>
 
                 <span class="action-desc">
-                  Describe it, pin the location, add a photo.
+                  Photograph road damage, locate it and let AI structure the PWD report.
                 </span>
 
               </span>
@@ -614,7 +614,7 @@
               <i data-lucide="brain-circuit"></i>
               <span class="flow-title">Analyze</span>
               <span class="flow-desc">
-                AI sets priority and routes the department.
+                AI detects the road issue, assesses risk and recommends routing.
               </span>
             </li>
 
@@ -818,9 +818,22 @@
           </h2>
 
           <p class="screen-sub">
-            Describe what you see. Civic AI will categorise it,
-            set a priority and route it to the right department.
+            Upload road evidence and describe what you see. Civic AI will
+            identify the road issue, assess priority and route the report
+            toward the relevant PWD authority.
           </p>
+
+          <div class="glass" style="margin-top:18px;padding:16px 18px;border-left:3px solid var(--accent);">
+            <div style="display:flex;gap:12px;align-items:flex-start;">
+              <i data-lucide="scan-line" style="color:var(--accent);flex:0 0 auto;margin-top:2px;"></i>
+              <div>
+                <strong style="display:block;margin-bottom:4px;">PWD Smart Road Reporting</strong>
+                <span class="muted-text" style="font-size:.9rem;line-height:1.5;">
+                  Photo evidence → AI road analysis → location → PWD routing → priority recommendation.
+                </span>
+              </div>
+            </div>
+          </div>
 
         </header>
 
@@ -873,7 +886,7 @@
             </legend>
 
             <p class="field-hint">
-              Not sure? Choose "Other" and Civic AI will detect it from your description.
+              For the PWD challenge, choose <strong>Roads</strong>. Add a clear road photo so the MVP can demonstrate AI-assisted road damage analysis.
             </p>
 
             <div
@@ -966,6 +979,10 @@
 
             </div>
 
+            <p class="field-hint" style="margin-top:10px;">
+              Location is used to support authority and jurisdiction routing. The MVP uses the location you provide; production would connect this to a verified government jurisdiction database.
+            </p>
+
             <button
               type="button"
               class="chip-btn"
@@ -992,10 +1009,10 @@
                 04
               </span>
 
-              Add a photo
+              Add road evidence
 
               <span class="optional">
-                Optional
+                Recommended
               </span>
 
             </span>
