@@ -6994,7 +6994,7 @@ const civicActionData = {
   flood: {
     title: "Flood Preparedness & Awareness Drive",
     icon: "waves",
-    image: "https://commons.wikimedia.org/wiki/Special:Redirect/file/India%20-%20Kids%20-%20Planting%20trees%20for%20her%20future%20%284040009491%29.jpg",
+    image: "https://images.unsplash.com/photo-1547683905-f686c993aae5?auto=format&fit=crop&w=1600&q=90",
     location: "Imphal",
     date: "12 October 2026",
     time: "9:00 AM – 12:00 PM",
@@ -7009,7 +7009,7 @@ const civicActionData = {
   cleanup: {
     title: "Community Clean-Up Drive",
     icon: "sparkles",
-    image: "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&w=1400&q=85",
+    image: "https://images.unsplash.com/photo-1618477461853-cf6ed80faba5?auto=format&fit=crop&w=1600&q=90",
     location: "Khurai",
     date: "10 October 2026",
     time: "7:00 AM – 10:00 AM",
@@ -7024,7 +7024,7 @@ const civicActionData = {
   planting: {
     title: "Tree Plantation & Green Space Drive",
     icon: "trees",
-    image: "https://commons.wikimedia.org/wiki/Special:Redirect/file/Tree%20planting%20closeup.jpg",
+    image: "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=1600&q=90",
     location: "Lamphel",
     date: "18 October 2026",
     time: "8:00 AM – 11:00 AM",
