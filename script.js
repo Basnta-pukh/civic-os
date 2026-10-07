@@ -7280,6 +7280,12 @@ function renderCivicActions() {
         class="action-card glass civic-action-card"
         data-civic-action="${item.id}"
       >
+        <span
+          class="action-card-image"
+          style="background-image: linear-gradient(90deg, rgba(4,12,9,.08), rgba(4,12,9,.18)), url('${action.image || ""}')"
+          aria-hidden="true"
+        ></span>
+
         <span class="action-icon">
           <i data-lucide="${item.icon}"></i>
         </span>
@@ -7318,6 +7324,12 @@ function renderCivicActions() {
       class="action-card glass civic-action-card user-civic-action-card"
       data-civic-action="${activity.id}"
     >
+      <span
+        class="action-card-image"
+        style="background-image: linear-gradient(90deg, rgba(4,12,9,.08), rgba(4,12,9,.18)), url('${activity.image || ""}')"
+        aria-hidden="true"
+      ></span>
+
       <span class="action-icon">
         <i data-lucide="${activity.icon || "megaphone"}"></i>
       </span>
