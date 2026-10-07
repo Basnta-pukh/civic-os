@@ -28,14 +28,14 @@ const CATEGORIES = {
   roads: {
     label: "Roads",
     aiLabel: "Road Infrastructure",
-    department: "Public Works",
+    department: "Manipur PWD",
     icon: "construction",
     keywords: [
       "pothole", "road", "street", "crack", "asphalt",
       "pavement", "footpath", "sidewalk", "speed bump", "manhole"
     ],
     action:
-      "Inspect the affected road and determine whether repair or resurfacing is required.",
+      "Inspect the affected road and determine whether repair, patching or resurfacing is required.",
     skills: ["Infrastructure Assessment", "Mapping", "Photography"],
   },
 
@@ -156,6 +156,110 @@ const STATUSES = [
   "In Progress",
   "Resolved"
 ];
+
+/* =========================================================
+   PWD ROAD INTELLIGENCE — MVP ROUTING
+   Source-backed division names are kept separate from the
+   routing logic. Jurisdiction matching is deliberately
+   conservative until an official GIS/jurisdiction dataset
+   is connected.
+   ========================================================= */
+
+const PWD_DIVISIONS = [
+  "Imphal East Division",
+  "Imphal West Division",
+  "Highway South Division",
+  "Thoubal Division",
+  "Bishnupur Division",
+  "Churachandpur Division",
+  "Chandel Division",
+  "Tamenglong Division",
+  "Ukhrul Division",
+  "Senapati Division",
+  "NH-I Division",
+  "NH-III Division"
+];
+
+function routeRoadReport(location) {
+  const text = String(location || "").toLowerCase();
+
+  const districtMatches = [
+    ["imphal east", "Imphal East Division"],
+    ["imphal-east", "Imphal East Division"],
+    ["imphal west", "Imphal West Division"],
+    ["imphal-west", "Imphal West Division"],
+    ["thoubal", "Thoubal Division"],
+    ["bishnupur", "Bishnupur Division"],
+    ["churachandpur", "Churachandpur Division"],
+    ["churachanpur", "Churachandpur Division"],
+    ["chandel", "Chandel Division"],
+    ["tamenglong", "Tamenglong Division"],
+    ["ukhrul", "Ukhrul Division"],
+    ["senapati", "Senapati Division"]
+  ];
+
+  const match = districtMatches.find(
+    ([term]) => text.includes(term)
+  );
+
+  if (match) {
+    return {
+      authority: "Manipur Public Works Department (PWD)",
+      division: match[1],
+      routingConfidence: 92,
+      routingNote: "MVP jurisdiction match based on the location text."
+    };
+  }
+
+  return {
+    authority: "Manipur Public Works Department (PWD)",
+    division: "PWD jurisdiction review",
+    routingConfidence: 62,
+    routingNote: "Exact division requires an official jurisdiction/GIS lookup."
+  };
+}
+
+function assessRoadDamage(description) {
+  const text = String(description || "").toLowerCase();
+
+  const defectSignals = [
+    ["pothole", "Pothole"],
+    ["potholes", "Pothole"],
+    ["crack", "Road crack"],
+    ["cracks", "Road crack"],
+    ["broken surface", "Surface damage"],
+    ["damaged road", "Surface damage"],
+    ["collapsed", "Severe surface failure"],
+    ["sinkhole", "Severe surface failure"],
+    ["erosion", "Road edge/erosion damage"]
+  ];
+
+  const matches = defectSignals
+    .filter(([term]) => text.includes(term))
+    .map(([, label]) => label);
+
+  const unique = [...new Set(matches)];
+
+  let severity = "Medium";
+
+  if (
+    /deep|huge|large|dangerous|unsafe|accident|blocked|collapse|sinkhole/i.test(text)
+  ) {
+    severity = "High";
+  } else if (
+    /small|minor|slight|shallow/i.test(text)
+  ) {
+    severity = "Low";
+  }
+
+  return {
+    defect: unique[0] || "Road surface damage",
+    additionalDefects: unique.slice(1),
+    severity
+  };
+}
+
+
 
 const PRIORITY_RANK = {
   High: 3,
@@ -403,10 +507,30 @@ function analyzeReport({
       ? `Priority dispatch: ${cat.action} Secure the area until the work is complete.`
       : cat.action;
 
+  const roadIntelligence =
+    key === "roads"
+      ? assessRoadDamage(description)
+      : null;
+
+  const routing =
+    key === "roads"
+      ? routeRoadReport(location)
+      : {
+          authority: cat.department,
+          division: "Department routing",
+          routingConfidence: 70,
+          routingNote: "General civic department routing."
+        };
+
   return {
     categoryKey: key,
     categoryLabel: cat.aiLabel,
     department: cat.department,
+    authority: routing.authority,
+    division: routing.division,
+    routingConfidence: routing.routingConfidence,
+    routingNote: routing.routingNote,
+    roadIntelligence,
     priority,
     confidence,
     summary,
@@ -1850,7 +1974,10 @@ function getDraft() {
     hasPhoto:
       Boolean(
         state.draftPhotoUrl
-      )
+      ),
+
+    isRoadReport:
+      checked?.value === "roads"
   };
 }
 
@@ -2029,6 +2156,21 @@ function handleAnalyze(event) {
     );
 
     locEl.focus();
+
+    return;
+  }
+
+  if (
+    draft.isRoadReport &&
+    !draft.hasPhoto
+  ) {
+    showFormError(
+      "For PWD road reporting, please add a road photo before AI analysis."
+    );
+
+    document
+      .getElementById("photo")
+      ?.focus();
 
     return;
   }
@@ -2332,6 +2474,40 @@ function renderAnalysis() {
 
         <div class="ai-cell">
           <span class="ai-label">
+            Responsible authority
+          </span>
+
+          <span class="ai-value">
+            ${escapeHtml(
+              a.authority || a.department
+            )}
+          </span>
+        </div>
+
+        <div class="ai-cell">
+          <span class="ai-label">
+            PWD division routing
+          </span>
+
+          <span class="ai-value">
+            ${escapeHtml(
+              a.division || "Department routing"
+            )}
+          </span>
+        </div>
+
+        <div class="ai-cell">
+          <span class="ai-label">
+            Routing confidence
+          </span>
+
+          <span class="ai-value">
+            ${a.routingConfidence || 70}%
+          </span>
+        </div>
+
+        <div class="ai-cell">
+          <span class="ai-label">
             Suggested department
           </span>
 
@@ -2406,6 +2582,22 @@ function renderAnalysis() {
         </div>
 
         ${signals}
+
+        ${a.roadIntelligence ? `
+          <div class="ai-cell wide">
+            <span class="ai-label">
+              <i data-lucide="scan-line"></i>
+              Road vision analysis · Demo AI
+            </span>
+            <p class="ai-text">
+              Defect detected: <strong>${escapeHtml(a.roadIntelligence.defect)}</strong>.
+              Severity: <strong>${escapeHtml(a.roadIntelligence.severity)}</strong>.
+              ${a.roadIntelligence.additionalDefects.length
+                ? `Additional visible signals: ${escapeHtml(a.roadIntelligence.additionalDefects.join(", "))}.`
+                : "The MVP currently uses the report description to demonstrate the vision-analysis workflow; a trained computer-vision model would replace this layer in production."}
+            </p>
+          </div>
+        ` : ""}
 
       </div>
 
@@ -2556,7 +2748,7 @@ function submitReport() {
           ${escapeHtml(id)}
           ·
           ${escapeHtml(
-            issue.department
+            issue.authority || issue.department
           )}
         </p>
 
@@ -2567,9 +2759,9 @@ function submitReport() {
         <p class="success-sub">
           Your report is now live.
           ${escapeHtml(
-            issue.department
+            issue.authority || issue.department
           )}
-          has been notified and
+          is the recommended authority and
           you will see every status
           update here.
         </p>
@@ -2609,7 +2801,7 @@ function submitReport() {
   });
 
   toast(
-    `${id} submitted to ${issue.department}`
+    `${id} routed to ${issue.authority || issue.department}`
   );
 }
 
