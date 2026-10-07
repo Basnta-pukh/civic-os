@@ -6797,6 +6797,29 @@ function bindEvents() {
      CREATE CIVIC ACTIVITY
      ======================================================= */
 
+  const cancelCreateActivity =
+    document.getElementById(
+      "cancelCreateActivity"
+    );
+
+  if (cancelCreateActivity) {
+    cancelCreateActivity.addEventListener(
+      "click",
+      () => {
+        const form = document.getElementById(
+          "createActivityForm"
+        );
+
+        if (form) {
+          form.reset();
+        }
+
+        showScreen("actionsScreen");
+      }
+    );
+  }
+
+
   const createActivityForm =
     document.getElementById(
       "createActivityForm"
@@ -6962,6 +6985,7 @@ const civicActionData = {
   flood: {
     title: "Flood Preparedness & Awareness Drive",
     icon: "waves",
+    image: "https://commons.wikimedia.org/wiki/Special:Redirect/file/India%20-%20Kids%20-%20Planting%20trees%20for%20her%20future%20%284040009491%29.jpg",
     location: "Imphal",
     date: "12 October 2026",
     time: "9:00 AM – 12:00 PM",
@@ -6976,6 +7000,7 @@ const civicActionData = {
   cleanup: {
     title: "Community Clean-Up Drive",
     icon: "sparkles",
+    image: "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&w=1400&q=85",
     location: "Khurai",
     date: "10 October 2026",
     time: "7:00 AM – 10:00 AM",
@@ -6990,6 +7015,7 @@ const civicActionData = {
   planting: {
     title: "Tree Plantation & Green Space Drive",
     icon: "trees",
+    image: "https://commons.wikimedia.org/wiki/Special:Redirect/file/Tree%20planting%20closeup.jpg",
     location: "Lamphel",
     date: "18 October 2026",
     time: "8:00 AM – 11:00 AM",
@@ -7027,7 +7053,9 @@ function openCivicAction(actionId) {
   detail.innerHTML = `
     <div class="action-detail-content">
 
-      <div class="action-detail-hero">
+      <div class="action-detail-hero" style="${action.image ? "--action-image: url('" + action.image + "')" : ""}">
+        <div class="action-detail-hero-image" aria-hidden="true"></div>
+
         <div class="action-detail-hero-copy">
 
           <span class="action-detail-category">
