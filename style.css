@@ -3545,7 +3545,7 @@ transition: none;
 
 #actionDetailScreen .container.narrow {
   max-width: 920px;
-  padding-bottom: 120px;
+  padding-bottom: 175px;
 }
 
 #actionDetailScreen .link-btn {
@@ -3852,7 +3852,7 @@ transition: none;
   width: 100%;
   min-height: 60px;
 
-  margin-top: 20px;
+  margin-top: 32px;
 
   border-radius: 999px;
 
