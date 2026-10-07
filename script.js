@@ -6916,6 +6916,15 @@ function bindEvents() {
             support ||
             "No additional support requested.",
 
+          image:
+            type === "Tree planting"
+              ? "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=1400&q=85"
+              : type === "Clean-up"
+              ? "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&w=1400&q=85"
+              : type === "Flood preparedness"
+              ? "https://images.unsplash.com/photo-1547683905-f686c993aae5?auto=format&fit=crop&w=1400&q=85"
+              : "",
+
           organizer:
             "Community Member",
 
