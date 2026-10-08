@@ -1482,3 +1482,86 @@ html,body{
   .civic-command-orbit{width:72px;height:72px;flex-basis:72px}
   .civic-command-orbit i{width:32px;height:32px}
 }
+
+
+/* =========================================================
+   INTERACTION SAFETY PATCH · 2026-10-08
+   Keep 3D visuals behind the UI and preserve iPhone scrolling.
+   ========================================================= */
+
+.civic-portal-shell::before,
+.civic-portal-shell::after,
+.civic-portal-grain,
+.civic-portal-beam,
+.civic-workspace-main::before,
+.civic-splash-mark::after,
+.civic-auth-card::before,
+.civic-portal-card::before,
+.civic-hero-action::after,
+.civic-stat::after,
+.civic-ai-extraction::before,
+.civic-ai-avatar::after,
+.civic-command-orbit::before,
+.civic-command-orbit::after{
+  pointer-events:none!important;
+}
+
+.civic-portal-shell *,
+.civic-workspace *{
+  box-sizing:border-box;
+}
+
+.civic-portal-shell{
+  touch-action:auto!important;
+}
+
+.civic-workspace{
+  touch-action:none!important;
+}
+
+.civic-workspace-main{
+  position:relative!important;
+  z-index:1!important;
+  touch-action:pan-y!important;
+  -webkit-overflow-scrolling:touch!important;
+  overscroll-behavior-y:auto!important;
+  overflow-x:hidden!important;
+  overflow-y:auto!important;
+}
+
+.civic-workspace-top{
+  z-index:20!important;
+  pointer-events:auto!important;
+}
+
+.civic-workspace-main button,
+.civic-workspace-main a,
+.civic-workspace-main input,
+.civic-workspace-main textarea,
+.civic-workspace-main label,
+.civic-workspace-nav{
+  pointer-events:auto!important;
+}
+
+.civic-workspace-nav{
+  z-index:30!important;
+  pointer-events:auto!important;
+  touch-action:manipulation!important;
+}
+
+.civic-workspace-main::before{
+  z-index:-1!important;
+}
+
+.civic-spatial-road,
+.civic-command-orbit{
+  pointer-events:none!important;
+}
+
+@media(max-width:720px){
+  .civic-workspace-main{
+    height:calc(100svh - 72px)!important;
+    max-height:calc(100svh - 72px)!important;
+    padding-bottom:110px!important;
+  }
+}
