@@ -33,3 +33,47 @@
 .civic-validation-card{margin-top:16px}.civic-validation-card .civic-section-head{align-items:center}.civic-validation-card .civic-work-secondary{white-space:nowrap}.civic-validation-summary{display:flex;align-items:baseline;gap:7px;padding:12px 0}.civic-validation-summary strong{font-size:22px;background:linear-gradient(100deg,#a78bfa,#67e8f9);-webkit-background-clip:text;background-clip:text;color:transparent}.civic-validation-summary span{font-size:8px;color:#737e94}.civic-validation-row{display:flex;justify-content:space-between;align-items:center;padding:9px 10px;border-top:1px solid rgba(255,255,255,.045);font-size:8px}.civic-validation-row span{display:flex;align-items:center;gap:7px;color:#9aa5b7}.civic-validation-row i{width:13px}.civic-validation-row.pass i,.civic-validation-row.pass b{color:#5eead4}.civic-validation-row.fail i,.civic-validation-row.fail b{color:#fb7185}.civic-validation-idle{padding:12px;border-radius:10px;background:rgba(255,255,255,.02);color:#687489;font-size:8px}@media(max-width:500px){.civic-validation-card .civic-section-head{align-items:flex-start;flex-direction:column}.civic-validation-card .civic-work-secondary{width:100%}}
 
 .civic-validation-summary{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:8px}.civic-validation-summary>div{padding:10px 11px;border:1px solid rgba(255,255,255,.06);border-radius:12px;background:rgba(255,255,255,.025)}.civic-validation-summary strong{display:block;font-size:24px}.civic-validation-summary b{display:block;font-size:12px;color:#cbd5e1}.civic-validation-summary span{display:block;font-size:7px;color:#737e94;margin-top:2px}.civic-validation-note{font-size:7px;color:#778398;padding:8px 1px 5px}@media(max-width:500px){.civic-validation-summary{grid-template-columns:1fr 1fr}.civic-validation-summary>div:first-child{grid-column:1/-1}.civic-validation-row small{display:none}}
+
+/* App-shell refinement: keep Civic OS feeling like a product, not a presentation */
+.civic-workspace{background:#080a10}
+.civic-workspace-top{height:64px;padding:0 24px;background:rgba(8,10,16,.94);border-bottom:1px solid rgba(255,255,255,.06)}
+.civic-workspace-brand span{width:30px;height:30px;border-radius:9px;font-size:14px}
+.civic-workspace-brand strong{font-size:13px}
+.civic-workspace-context span{font-size:12px}
+.civic-workspace-main{width:min(1240px,100%);padding:26px 28px 96px}
+.civic-welcome{margin-bottom:20px;align-items:center}
+.civic-welcome h1{font-size:clamp(25px,3.4vw,38px);letter-spacing:-.045em}
+.civic-welcome p{font-size:12px}
+.civic-welcome-badge{font-size:8px;padding:6px 9px}
+.civic-work-card{border-radius:16px;padding:18px;background:rgba(17,20,29,.82);box-shadow:0 10px 35px rgba(0,0,0,.14)}
+.civic-hero-action{margin-top:14px;padding:18px;border-radius:15px}
+.civic-hero-action strong{font-size:16px}
+.civic-hero-action span{font-size:10px}
+.civic-work-primary{padding:10px 13px;border-radius:10px}
+.civic-stat{padding:13px;border-radius:13px}
+.civic-stat strong{font-size:21px}
+.civic-quick{padding:12px;border-radius:12px}
+.civic-workspace-nav{height:64px;gap:0;padding:7px 12px;background:rgba(8,10,16,.96)}
+.civic-nav-btn{font-size:8px;min-width:72px}
+.civic-nav-btn i{width:17px;height:17px}
+.civic-empty-page{min-height:45vh}
+.civic-empty-page h2{font-size:30px}
+.civic-report-top h1{font-size:clamp(27px,4vw,42px)}
+.civic-report-top p{font-size:12px}
+.civic-ai-page-head h1{font-size:clamp(27px,4vw,42px)!important}
+.civic-architecture-page h1{font-size:clamp(27px,4vw,42px)!important}
+@media(min-width:900px){
+ .civic-workspace{padding-left:210px}
+ .civic-workspace-top{position:fixed;left:210px;right:0;top:0}
+ .civic-workspace-main{margin-top:64px}
+ .civic-workspace-nav{position:fixed;left:0;top:0;bottom:0;width:210px;height:100%;flex-direction:column;justify-content:flex-start;align-items:stretch;gap:5px;padding:82px 12px 20px;border-top:0;border-right:1px solid rgba(255,255,255,.06);background:#0a0c13}
+ .civic-nav-btn{flex-direction:row;justify-content:flex-start;gap:12px;min-width:0;width:100%;padding:11px 13px;border-radius:10px;font-size:10px}
+ .civic-nav-btn.is-active{background:rgba(139,92,246,.12)}
+ .civic-workspace-account{width:34px;height:34px}
+}
+@media(max-width:720px){
+ .civic-workspace-main{padding:20px 14px 88px}
+ .civic-workspace-top{height:58px;padding:0 14px}
+ .civic-report-layout{grid-template-columns:1fr}
+ .civic-report-top{align-items:flex-start;flex-direction:column}
+}
