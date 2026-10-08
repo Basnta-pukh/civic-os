@@ -240,3 +240,57 @@ body:has(#civicWorkspace.is-active) > .bottom-nav{
     overflow-x:hidden !important;
   }
 }
+
+
+/* =====================================================
+   CIVIC OS STABLE APP ROOT
+   One document, one scroll container, no legacy bleed.
+   ===================================================== */
+html,body{
+  margin:0 !important;
+  width:100% !important;
+  min-height:100% !important;
+  background:#08090f !important;
+  overflow-x:hidden !important;
+}
+body{
+  min-height:100svh !important;
+}
+.civic-portal-shell{
+  position:fixed !important;
+  inset:0 !important;
+  width:100% !important;
+  height:100svh !important;
+  min-height:100svh !important;
+  overflow:hidden !important;
+  z-index:99990 !important;
+}
+.civic-workspace{
+  position:fixed !important;
+  inset:0 !important;
+  width:100% !important;
+  height:100svh !important;
+  min-height:100svh !important;
+  overflow:hidden !important;
+  z-index:99999 !important;
+}
+.civic-workspace-main{
+  -webkit-overflow-scrolling:touch;
+  touch-action:pan-y;
+  overscroll-behavior-y:contain;
+}
+@media(max-width:720px){
+  html,body{
+    width:100% !important;
+    max-width:100% !important;
+  }
+  .civic-portal-shell,.civic-workspace{
+    height:100svh !important;
+    min-height:100svh !important;
+  }
+  .civic-workspace-main{
+    overflow-x:hidden !important;
+    overflow-y:auto !important;
+    touch-action:pan-y !important;
+  }
+}
