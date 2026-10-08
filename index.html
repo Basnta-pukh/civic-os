@@ -53,6 +53,7 @@
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="civic-enhancements.css" />
   <link rel="stylesheet" href="hackathon-upgrade.css" />
+  <link rel="stylesheet" href="portal-upgrade.css" />
 
   <style>
     /* =====================================================
@@ -193,6 +194,84 @@
 </head>
 
 <body>
+
+  <!-- =====================================================
+       CIVIC OS PREMIUM PORTAL SHELL
+       Citizen + Government entry experience
+       ===================================================== -->
+  <div id="civicPortalShell" class="civic-portal-shell" aria-label="Civic OS entry">
+    <div class="civic-portal-grain" aria-hidden="true"></div>
+    <div class="civic-portal-beam" aria-hidden="true"></div>
+
+    <section id="civicSplashView" class="civic-entry-view is-active">
+      <div class="civic-splash-mark">
+        <span class="civic-splash-symbol">C</span>
+      </div>
+      <p class="civic-entry-kicker">MANIPUR · INFRASTRUCTURE INTELLIGENCE</p>
+      <h1>Civic <span>OS</span></h1>
+      <p>Understand problems. Prioritise action. Build a better Manipur.</p>
+      <div class="civic-loading-line"><i></i></div>
+      <span class="civic-loading-label">Preparing Civic AI</span>
+    </section>
+
+    <section id="civicAuthView" class="civic-entry-view">
+      <div class="civic-auth-card glass">
+        <div class="civic-auth-brand">
+          <span class="civic-mini-mark">C</span>
+          <span>Civic OS</span>
+        </div>
+        <span class="civic-entry-badge"><i data-lucide="sparkles"></i> Built for Manipur</span>
+        <p class="civic-entry-kicker">WELCOME BACK</p>
+        <h2>Build a better Manipur.</h2>
+        <p class="civic-auth-copy">Your reports can become actionable infrastructure intelligence.</p>
+
+        <div class="civic-auth-tabs" role="tablist" aria-label="Authentication">
+          <button type="button" class="is-active" data-auth-tab="login">Log in</button>
+          <button type="button" data-auth-tab="signup">Create account</button>
+        </div>
+
+        <form id="civicLoginForm" class="civic-auth-form">
+          <label>Email<input type="email" id="civicAuthEmail" placeholder="you@example.com" required></label>
+          <label>Password<input type="password" id="civicAuthPassword" placeholder="••••••••" required></label>
+          <button class="civic-entry-primary" type="submit"><span>Continue</span><i data-lucide="arrow-right"></i></button>
+        </form>
+
+        <button type="button" class="civic-demo-entry" id="civicDemoEntry">
+          <i data-lucide="play-circle"></i>
+          Explore the live demo
+        </button>
+      </div>
+    </section>
+
+    <section id="civicPortalSelectView" class="civic-entry-view">
+      <div class="civic-portal-heading">
+        <span class="civic-entry-badge"><i data-lucide="layers-3"></i> Choose your experience</span>
+        <p class="civic-entry-kicker">CIVIC OS</p>
+        <h2>One platform.<br><span>Two powerful portals.</span></h2>
+        <p>Choose the workspace that matches what you need to do.</p>
+      </div>
+
+      <div class="civic-portal-grid">
+        <button type="button" class="civic-portal-card citizen" data-portal="citizen">
+          <span class="civic-portal-icon"><i data-lucide="user-round"></i></span>
+          <span class="civic-portal-meta">FOR CITIZENS</span>
+          <strong>Citizen Portal</strong>
+          <p>Report road problems, understand them with Civic AI and track what happens next.</p>
+          <span class="civic-portal-actions"><b>Enter portal</b><i data-lucide="arrow-up-right"></i></span>
+        </button>
+
+        <button type="button" class="civic-portal-card government" data-portal="government">
+          <span class="civic-portal-icon"><i data-lucide="landmark"></i></span>
+          <span class="civic-portal-meta">FOR PWD TEAMS</span>
+          <strong>Government Portal</strong>
+          <p>Turn road evidence into inspection priorities, road intelligence and maintenance action.</p>
+          <span class="civic-portal-actions"><b>Enter portal</b><i data-lucide="arrow-up-right"></i></span>
+        </button>
+      </div>
+
+      <button type="button" class="civic-back-entry" id="civicBackToAuth"><i data-lucide="arrow-left"></i> Back to account</button>
+    </section>
+  </div>
 
   <div class="bg-grid" aria-hidden="true"></div>
 
@@ -2538,5 +2617,6 @@
     defer
   ></script>
 
+<script src="portal-upgrade.js"></script>
 </body>
 </html>
