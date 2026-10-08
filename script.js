@@ -5855,6 +5855,48 @@ function detectCivicCategory(
   return null;
 }
 
+function openPwdRoadReportFromAi(prompt) {
+  const reportScreen = document.getElementById("reportScreen");
+  if (!reportScreen) return;
+  showScreen("reportScreen");
+  const roadRadio = document.getElementById("cat-roads");
+  if (roadRadio) roadRadio.checked = true;
+  const description = document.getElementById("description");
+  if (description) description.value = String(prompt || "").trim();
+  invalidateAnalysis();
+  updateStepper();
+  toast("Road report opened — add location and photo", "map-pin");
+}
+
+function getPwdRoadAssistantResponse(prompt) {
+  const text = String(prompt || "").trim();
+  const routing = typeof routeRoadReport === "function"
+    ? routeRoadReport("")
+    : { authority: "Manipur Public Works Department (PWD)", division: "PWD jurisdiction review", confidence: 62 };
+
+  return `
+    <strong>PWD Road Complaint Assistant <span class="demo-badge">Demo AI</span></strong>
+    <p>I understand this as a <strong>road-related complaint</strong>. I can help turn it into a structured PWD report.</p>
+    <div class="insight-card">
+      <p class="insight-title">Initial routing</p>
+      <p class="insight-text">
+        <strong>Authority:</strong> ${escapeHtml(routing.authority)}<br>
+        <strong>Division:</strong> ${escapeHtml(routing.division)}<br>
+        <strong>Routing confidence:</strong> ${routing.confidence}%
+      </p>
+    </div>
+    <p>To route it more precisely, the report still needs the <strong>exact location</strong> and preferably a <strong>clear road photo</strong>. I will not invent a jurisdiction when those details are missing.</p>
+    <div class="ai-suggestion-row">
+      <button type="button" class="btn btn-primary btn-sm" data-action="pwd-create-report" data-prompt="${escapeHtml(text)}">
+        <i data-lucide="file-plus-2"></i> Create Road Report
+      </button>
+      <button type="button" class="btn btn-ghost btn-sm" data-action="pwd-use-location">
+        <i data-lucide="map-pin"></i> Add Location
+      </button>
+    </div>
+  `;
+}
+
 function generateCivicAiResponse(
   prompt
 ) {
@@ -5883,6 +5925,20 @@ function generateCivicAiResponse(
   let response = "";
 
   if (
+    category === "roads" &&
+    (
+      question.includes("pothole") ||
+      question.includes("road") ||
+      question.includes("crack") ||
+      question.includes("street") ||
+      question.includes("bridge") ||
+      question.includes("damage")
+    )
+  ) {
+    response = getPwdRoadAssistantResponse(prompt);
+  }
+
+  else if (
     question.includes(
       "caus"
     ) ||
@@ -6500,6 +6556,26 @@ function bindEvents() {
         "submit-report"
       ) {
         submitReport();
+      }
+
+
+      if (
+        action ===
+        "pwd-create-report"
+      ) {
+        openPwdRoadReportFromAi(
+          actionBtn.dataset.prompt || ""
+        );
+      }
+
+      if (
+        action ===
+        "pwd-use-location"
+      ) {
+        showScreen("reportScreen");
+        const locateBtn =
+          document.getElementById("locateBtn");
+        if (locateBtn) locateBtn.click();
       }
 
 
