@@ -1565,3 +1565,133 @@ html,body{
     padding-bottom:110px!important;
   }
 }
+
+
+/* =========================================================
+   CIVIC OS — FINAL INTERACTION / SCROLL SAFETY
+   Single source of truth for viewport interaction.
+   Decorative layers never capture input.
+   ========================================================= */
+html,body{
+  width:100%;
+  min-height:100%;
+  margin:0;
+  overflow:hidden !important;
+  overscroll-behavior:none;
+}
+
+.civic-portal-shell,
+.civic-workspace{
+  touch-action:auto !important;
+}
+
+.civic-portal-shell{
+  overflow:auto !important;
+  -webkit-overflow-scrolling:touch;
+  pointer-events:auto !important;
+}
+
+.civic-workspace{
+  overflow:hidden !important;
+  pointer-events:auto !important;
+}
+
+.civic-workspace-top{
+  position:absolute !important;
+  left:0 !important;
+  right:0 !important;
+  top:0 !important;
+  height:76px !important;
+  z-index:100 !important;
+  pointer-events:auto !important;
+}
+
+.civic-workspace-main{
+  position:absolute !important;
+  left:0 !important;
+  right:0 !important;
+  top:76px !important;
+  bottom:72px !important;
+  width:100% !important;
+  max-width:none !important;
+  height:auto !important;
+  max-height:none !important;
+  margin:0 !important;
+  overflow-x:hidden !important;
+  overflow-y:auto !important;
+  -webkit-overflow-scrolling:touch !important;
+  touch-action:pan-y !important;
+  overscroll-behavior-y:auto !important;
+  z-index:10 !important;
+  pointer-events:auto !important;
+}
+
+.civic-workspace-nav{
+  position:fixed !important;
+  left:0 !important;
+  right:0 !important;
+  bottom:0 !important;
+  z-index:200 !important;
+  pointer-events:auto !important;
+  touch-action:manipulation !important;
+}
+
+.civic-workspace-main button,
+.civic-workspace-main a,
+.civic-workspace-main input,
+.civic-workspace-main textarea,
+.civic-workspace-main select,
+.civic-workspace-main label,
+.civic-workspace-top button,
+.civic-workspace-nav button{
+  position:relative;
+  z-index:2;
+  pointer-events:auto !important;
+  touch-action:manipulation !important;
+}
+
+.civic-portal-grain,
+.civic-portal-beam,
+.civic-portal-shell::before,
+.civic-portal-shell::after,
+.civic-workspace::before,
+.civic-workspace::after,
+.civic-workspace-main::before,
+.civic-workspace-main::after,
+.civic-splash-mark::after,
+.civic-auth-card::before,
+.civic-auth-card::after,
+.civic-portal-card::before,
+.civic-portal-card::after,
+.civic-hero-action::before,
+.civic-hero-action::after,
+.civic-stat::before,
+.civic-stat::after,
+.civic-ai-extraction::before,
+.civic-ai-extraction::after,
+.civic-ai-avatar::before,
+.civic-ai-avatar::after,
+.civic-command-orbit::before,
+.civic-command-orbit::after{
+  pointer-events:none !important;
+}
+
+.civic-spatial-road,
+.civic-command-orbit{
+  pointer-events:none !important;
+}
+
+@media(max-width:720px){
+  .civic-workspace-top{
+    height:58px !important;
+  }
+  .civic-workspace-main{
+    top:58px !important;
+    bottom:72px !important;
+    padding:24px 14px 40px !important;
+  }
+  .civic-workspace-nav{
+    height:72px !important;
+    padding-bottom:calc(9px + env(safe-area-inset-bottom)) !important;
+  }
+}
