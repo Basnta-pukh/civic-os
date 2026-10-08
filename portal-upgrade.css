@@ -2231,3 +2231,16 @@ html,body{
 .civic-ai-insight{display:grid!important;gap:12px!important;position:sticky!important;top:10px!important}.civic-insight-head{display:flex!important;justify-content:space-between!important;align-items:center!important;color:var(--civic-muted)!important;font-size:9px!important;font-weight:850!important;letter-spacing:.1em!important}.civic-insight-head svg{width:17px!important;color:var(--civic-ai)!important}.civic-ai-route-card{background:#111827!important;color:#fff!important;border-radius:18px!important;padding:19px!important;box-shadow:0 16px 38px rgba(17,24,39,.12)!important}.civic-ai-route-card .civic-entry-badge{color:#C4B5FD!important;background:rgba(124,58,237,.18)!important}.civic-ai-route-card>div{display:flex!important;gap:11px!important;margin-top:16px!important}.civic-ai-route-card>div>svg{width:20px!important;color:#A5B4FC!important;flex:none!important}.civic-ai-route-card>div span{display:grid!important;gap:4px!important}.civic-ai-route-card b{font-size:13px!important}.civic-ai-route-card small{font-size:10px!important;color:#CBD5E1!important;line-height:1.5!important}
 .civic-ai-product .civic-ai-suggestions button{border-radius:12px!important;background:#F8FAFC!important;border:1px solid #E2E8F0!important;padding:9px 11px!important;color:#334155!important;font-size:10px!important;font-weight:700!important}.civic-ai-product .civic-ai-suggestions button:hover{border-color:#A5B4FC!important;color:#4F46E5!important;background:#F5F3FF!important}
 @media(max-width:760px){.civic-ai-product-grid{grid-template-columns:1fr!important}.civic-ai-insight{position:static!important}.civic-ai-evidence-empty{align-items:flex-start!important;flex-wrap:wrap!important}.civic-ai-evidence-empty small{margin-left:30px!important;max-width:none!important;text-align:left!important}.civic-ai-evidence-preview{height:150px!important}}
+
+/* CIVIC OS — DEPTH BACKGROUND + EVIDENCE CONTAINMENT */
+.civic-workspace,.civic-portal-shell{background:#F6F7F9!important;position:relative!important}
+.civic-workspace:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(circle at 8% 12%,rgba(229,57,53,.055),transparent 25%),radial-gradient(circle at 92% 18%,rgba(109,93,251,.06),transparent 24%),linear-gradient(rgba(17,24,39,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(17,24,39,.025) 1px,transparent 1px);background-size:auto,auto,42px 42px,42px 42px}
+.civic-workspace-main>*{position:relative!important;z-index:1!important}
+.civic-ai-evidence,.civic-ai-evidence-preview{contain:layout paint!important;transform:none!important;-webkit-transform:none!important;backface-visibility:hidden!important;-webkit-backface-visibility:hidden!important}
+.civic-ai-evidence-preview{isolation:isolate!important;min-height:0!important}
+.civic-ai-evidence-preview img{position:absolute!important;inset:0!important}
+.civic-ai-evidence-preview div,.civic-ai-evidence-preview button{transform:translateZ(0)!important}
+.civic-ai-page{background:transparent!important}
+.civic-report-builder,.civic-gov-intel,.civic-inspection-page,.civic-verification-page{position:relative!important}
+.civic-ai-route-card{box-shadow:0 18px 45px rgba(79,70,229,.12)!important}
+.civic-ai-product-grid .civic-work-card{box-shadow:0 14px 36px rgba(17,24,39,.055)!important}
