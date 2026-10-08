@@ -7890,3 +7890,15 @@ window.CivicOS = window.CivicOS || {};
 Object.defineProperty(window.CivicOS, "issues", { get: () => issues });
 window.CivicOS.calculateRoadPriority = calculateRoadPriority;
 window.CivicOS.getRoadPriorityReason = getRoadPriorityReason;
+
+/* =========================================================
+   HACKATHON DEMO BRIDGE
+   Exposes read-only runtime state to the presentation layer.
+   ========================================================= */
+window.CivicOS = window.CivicOS || {};
+Object.defineProperties(window.CivicOS, {
+  issues: { get: () => issues },
+  state: { get: () => state },
+  analyzeReport: { value: analyzeReport },
+  refreshIcons: { value: refreshIcons }
+});
