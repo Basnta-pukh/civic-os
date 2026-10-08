@@ -1838,3 +1838,348 @@ html,body{
     padding-top:13px !important;
   }
 }
+
+
+/* =========================================================
+   CIVIC OS — CIVIC INTELLIGENCE VISUAL SYSTEM
+   Clean data-product surface: off-white + white + crimson.
+   ========================================================= */
+
+:root{
+  --civic-bg:#F8F9FA;
+  --civic-surface:#FFFFFF;
+  --civic-text:#111827;
+  --civic-muted:#6B7280;
+  --civic-border:#E5E7EB;
+  --civic-red:#E53935;
+  --civic-red-dark:#C62828;
+  --civic-violet:#6D5DFB;
+  --civic-blue:#2563EB;
+  --civic-green:#16A34A;
+  --civic-amber:#F59E0B;
+  --civic-radius:20px;
+  --civic-shadow:0 4px 20px rgba(0,0,0,.04);
+}
+
+/* Entry */
+.civic-portal-shell{
+  background:
+    radial-gradient(700px 420px at 8% 0%,rgba(229,57,53,.08),transparent 68%),
+    radial-gradient(650px 420px at 92% 100%,rgba(109,93,251,.07),transparent 68%),
+    var(--civic-bg)!important;
+  color:var(--civic-text)!important;
+}
+.civic-portal-grain,.civic-portal-beam{opacity:0!important}
+.civic-splash-mark{
+  background:var(--civic-red)!important;
+  box-shadow:0 14px 30px rgba(229,57,53,.20)!important;
+}
+.civic-splash-mark~h1 span,
+.civic-portal-heading h2 span{
+  background:linear-gradient(90deg,var(--civic-red),var(--civic-violet))!important;
+  -webkit-background-clip:text!important;
+  background-clip:text!important;
+}
+.civic-entry-kicker{color:#6B7280!important}
+.civic-splash-mark~p:not(.civic-entry-kicker){color:#6B7280!important}
+.civic-loading-line{background:#E5E7EB!important}
+.civic-loading-line i{background:var(--civic-red)!important}
+.civic-loading-label{color:#9CA3AF!important}
+
+.civic-auth-card{
+  background:#fff!important;
+  border:1px solid var(--civic-border)!important;
+  box-shadow:0 18px 55px rgba(17,24,39,.08)!important;
+  backdrop-filter:none!important;
+}
+.civic-auth-brand{color:var(--civic-text)!important}
+.civic-mini-mark{background:var(--civic-red)!important}
+.civic-entry-badge{
+  background:#FEF2F2!important;
+  border-color:#FECACA!important;
+  color:#B91C1C!important;
+}
+.civic-auth-copy{color:var(--civic-muted)!important}
+.civic-auth-tabs{background:#F3F4F6!important}
+.civic-auth-tabs button{color:#6B7280!important}
+.civic-auth-tabs button.is-active{background:#fff!important;color:#111827!important;box-shadow:var(--civic-shadow)}
+.civic-auth-form label{color:#374151!important}
+.civic-auth-form input{
+  background:#fff!important;
+  color:#111827!important;
+  border-color:#D1D5DB!important;
+}
+.civic-entry-primary{
+  background:var(--civic-red)!important;
+  box-shadow:0 8px 18px rgba(229,57,53,.18);
+}
+.civic-demo-entry,.civic-back-entry{color:#6B7280!important}
+
+/* Portal selector */
+.civic-portal-heading h2{color:#111827!important}
+.civic-portal-heading>p:last-child{color:#6B7280!important}
+.civic-portal-card{
+  background:#fff!important;
+  border:1px solid var(--civic-border)!important;
+  box-shadow:var(--civic-shadow)!important;
+}
+.civic-portal-card:hover{
+  transform:translateY(-4px)!important;
+  border-color:#D1D5DB!important;
+  box-shadow:0 14px 35px rgba(17,24,39,.08)!important;
+}
+.civic-portal-icon{
+  background:#FEF2F2!important;
+  color:var(--civic-red)!important;
+}
+.government .civic-portal-icon{
+  background:#ECFDF5!important;
+  color:#087F73!important;
+}
+.civic-portal-meta{color:#9CA3AF!important}
+.civic-portal-card strong{color:#111827!important}
+.civic-portal-card p{color:#6B7280!important}
+.civic-portal-actions{
+  border-color:#E5E7EB!important;
+  color:var(--civic-red)!important;
+}
+.government .civic-portal-actions{color:#087F73!important}
+
+/* Workspace shell */
+.civic-workspace{
+  background:var(--civic-bg)!important;
+  color:var(--civic-text)!important;
+}
+.civic-workspace-top{
+  background:rgba(255,255,255,.94)!important;
+  border-color:var(--civic-border)!important;
+  box-shadow:0 1px 12px rgba(17,24,39,.04);
+  backdrop-filter:blur(18px);
+}
+.civic-workspace-brand{color:#111827!important}
+.civic-workspace-brand span{background:var(--civic-red)!important}
+.civic-workspace-context span{color:#111827!important}
+.civic-workspace-context small{color:#6B7280!important}
+.civic-workspace-account{
+  color:#4B5563!important;
+  background:#fff!important;
+  border-color:#E5E7EB!important;
+  box-shadow:none!important;
+}
+
+/* Headings / surfaces */
+.civic-welcome h1,
+.civic-report-top h1,
+.civic-ai-page-head h1,
+.civic-section-head h3,
+.civic-work-card h3,
+.civic-empty-page h2{color:#111827!important}
+.civic-welcome p,
+.civic-report-top p,
+.civic-ai-page-head p,
+.civic-work-card>p,
+.civic-section-head p{color:#6B7280!important}
+
+.civic-work-card,
+.civic-stat,
+.civic-quick,
+.civic-history-card,
+.civic-road-card,
+.civic-inspection-card,
+.civic-ai-extraction,
+.civic-ai-composer,
+.civic-trust-metrics>div{
+  background:#fff!important;
+  color:#111827!important;
+  border:1px solid var(--civic-border)!important;
+  box-shadow:var(--civic-shadow)!important;
+}
+.civic-work-card:hover,
+.civic-history-card:hover,
+.civic-road-card:hover,
+.civic-inspection-card:hover{
+  transform:translateY(-3px)!important;
+  box-shadow:0 12px 30px rgba(17,24,39,.07)!important;
+}
+.civic-stat{background:#fff!important}
+.civic-stat strong{color:#111827!important}
+.civic-stat span{color:#6B7280!important}
+.civic-stat::after{opacity:.25}
+
+.civic-hero-action{
+  background:#111827!important;
+  border:0!important;
+  box-shadow:0 14px 35px rgba(17,24,39,.14)!important;
+}
+.civic-hero-action strong{color:#fff!important}
+.civic-hero-action span{color:#D1D5DB!important}
+.civic-work-primary{
+  background:var(--civic-red)!important;
+  box-shadow:0 7px 16px rgba(229,57,53,.22)!important;
+}
+.civic-quick{
+  color:#374151!important;
+}
+.civic-quick i{color:var(--civic-red)!important}
+.civic-quick small{color:#6B7280!important}
+
+/* Citizen accent */
+.civic-citizen .civic-welcome-badge,
+.civic-citizen .civic-ai-status{
+  color:#B91C1C!important;
+  background:#FEF2F2!important;
+  border-color:#FECACA!important;
+}
+.civic-citizen .civic-nav-btn.is-active{color:var(--civic-red)!important}
+.civic-citizen .civic-nav-btn.is-active::before{background:#FEF2F2!important}
+.civic-citizen .civic-entry-badge{
+  color:#B91C1C!important;
+  background:#FEF2F2!important;
+  border-color:#FECACA!important;
+}
+
+/* Government accent */
+.civic-government .civic-welcome-badge{
+  color:#087F73!important;
+  background:#ECFDF5!important;
+  border-color:#A7F3D0!important;
+}
+.civic-government .civic-nav-btn.is-active{color:#087F73!important}
+.civic-government .civic-nav-btn.is-active::before{background:#ECFDF5!important}
+.civic-government .civic-work-primary{background:#087F73!important}
+.civic-government .civic-hero-action{
+  background:#111827!important;
+}
+.civic-government .civic-quick i{color:#087F73!important}
+
+/* Report form */
+.civic-upload{
+  background:#FAFAFA!important;
+  border-color:#D1D5DB!important;
+  box-shadow:none!important;
+}
+.civic-upload strong{color:#111827!important}
+.civic-upload span{color:#6B7280!important}
+.civic-upload i{color:var(--civic-red)!important}
+.civic-report-location,
+.civic-report-textarea{
+  background:#fff!important;
+  border-color:#D1D5DB!important;
+  color:#111827!important;
+}
+.civic-report-location input{color:#111827!important}
+.civic-report-location button{
+  background:#F3F4F6!important;
+  color:#374151!important;
+}
+.civic-analyze-btn{background:var(--civic-red)!important}
+.civic-ai-check{border-color:#E5E7EB!important}
+.civic-ai-check b{color:#111827!important}
+.civic-ai-check small{color:#6B7280!important}
+.civic-trust-note{
+  background:#F9FAFB!important;
+  border-color:#E5E7EB!important;
+  color:#6B7280!important;
+}
+.civic-trust-note strong{color:#374151!important}
+.civic-trust-note p{color:#6B7280!important}
+.civic-analysis-result{
+  background:#fff!important;
+  border-color:#E5E7EB!important;
+  box-shadow:var(--civic-shadow)!important;
+}
+.civic-analysis-head strong{color:#111827!important}
+.civic-result-grid div{background:#F8F9FA!important}
+.civic-result-grid small{color:#6B7280!important}
+.civic-result-grid b{color:#111827!important}
+.civic-result-reason{color:#6B7280!important}
+.civic-result-next{color:#087F73!important;border-color:#E5E7EB!important}
+.civic-result-next b{color:#111827!important}
+.civic-result-next small{color:#6B7280!important}
+
+/* Civic AI */
+.civic-ai-avatar{
+  background:linear-gradient(135deg,var(--civic-violet),var(--civic-blue))!important;
+}
+.civic-ai-message.user>div{
+  background:#F3F0FF!important;
+  border-color:#E7E1FF!important;
+}
+.civic-ai-message strong{color:#111827!important}
+.civic-ai-message p{color:#4B5563!important}
+.civic-ai-suggestions button{
+  background:#fff!important;
+  border-color:#E5E7EB!important;
+  color:#4B5563!important;
+}
+.civic-ai-suggestions button:hover{
+  color:#6D5DFB!important;
+  border-color:#C4B5FD!important;
+}
+.civic-ai-composer{
+  background:#fff!important;
+  border-color:#D1D5DB!important;
+}
+.civic-ai-composer textarea{color:#111827!important}
+.civic-ai-composer button{
+  background:var(--civic-red)!important;
+}
+.civic-ai-fields div{
+  background:#F8F9FA!important;
+  border-color:#E5E7EB!important;
+}
+.civic-ai-fields span{color:#6B7280!important}
+.civic-ai-fields b{color:#111827!important}
+.civic-ai-confidence{background:#F8F9FA!important;color:#6B7280!important}
+.civic-ai-confidence b{color:#6D5DFB!important}
+
+/* Government data surfaces */
+.civic-filter{
+  background:#fff!important;
+  border-color:#E5E7EB!important;
+  color:#6B7280!important;
+}
+.civic-filter.is-active{
+  background:#ECFDF5!important;
+  border-color:#A7F3D0!important;
+  color:#087F73!important;
+}
+.civic-gov-sort{color:#6B7280!important}
+.civic-road-passport,
+.civic-risk-zone,
+.civic-priority-row{background:#fff!important;border-color:#E5E7EB!important}
+.civic-government .civic-risk-zone::before,
+.civic-government .civic-priority-row::before,
+.civic-government .civic-road-passport::before{
+  background:linear-gradient(#087F73,#35D5FF)!important;
+}
+
+/* Bottom nav */
+.civic-workspace-nav{
+  background:rgba(255,255,255,.96)!important;
+  border-color:#E5E7EB!important;
+  box-shadow:0 -8px 25px rgba(17,24,39,.06)!important;
+}
+.civic-nav-btn{color:#9CA3AF!important}
+.civic-nav-btn.is-active{color:var(--civic-red)!important}
+.civic-government .civic-nav-btn.is-active{color:#087F73!important}
+
+/* Metrics look tabular and deliberate */
+.civic-stat strong,
+.civic-result-grid b,
+.civic-trust-metrics strong{
+  font-variant-numeric:tabular-nums;
+  font-feature-settings:"tnum";
+}
+
+/* 3D elements become subtle product illustrations, not the page itself */
+.civic-spatial-road{filter:drop-shadow(0 14px 12px rgba(17,24,39,.20))}
+.civic-command-orbit{opacity:.9}
+
+/* Mobile: keep the new surfaces compact */
+@media(max-width:720px){
+  .civic-work-card,
+  .civic-stat,
+  .civic-quick{box-shadow:0 3px 14px rgba(17,24,39,.04)!important}
+  .civic-hero-action{border-radius:18px!important}
+}
