@@ -1,122 +1,7418 @@
-/* Civic OS premium entry + role-based workspaces */
-(()=>{const shell=document.getElementById("civicPortalShell"),workspace=document.getElementById("civicWorkspace");if(!shell||!workspace)return;
-const views={splash:document.getElementById("civicSplashView"),auth:document.getElementById("civicAuthView"),portal:document.getElementById("civicPortalSelectView")};
-const show=n=>Object.entries(views).forEach(([k,v])=>v&&v.classList.toggle("is-active",k===n));
-const configs={citizen:{label:"Citizen Portal",sub:"Report, understand and track civic issues",nav:[["home","Home","house"],["report","Report","camera-plus"],["ai","Civic AI","sparkles"],["reports","My Reports","clipboard-list"],["account","Account","user-round"]]},government:{label:"Government Portal",sub:"PWD road infrastructure intelligence",nav:[["overview","Overview","layout-dashboard"],["intelligence","Intelligence","brain-circuit"],["inspections","Inspections","clipboard-check"],["roads","Roads","route"],["account","Account","user-round"]]}};
-let portal="citizen",current="home";
-const CIVIC_DEMO_IMAGES={"road":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Imphal%2C_Manipur_%2855%29.jpeg","pothole":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Sturdy%20Mahindra%20Jeeps%20are%20the%20only%20vehicles%20that%20can%20stand%20up%20to%20those%20potholed%20roads%21.jpg","market":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Thoubal%20bazar.jpg","rain":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Toubul%20Patmang%20Road%20Diversion%20on%20a%20rainy%20day.jpg"};
-function action(a){if(a==="report"){openCitizenReport()}else if(a==="ai"){openCitizenAi()}else if(a==="reports"){current="reports";renderNav();renderPage(current)}else if(a==="intelligence"){openGovernmentIntelligence()}else if(a==="inspections"){openGovernmentInspections()}else if(a==="verification"){openGovernmentVerification()}else if(a==="open-inspections"){openGovernmentInspections()}else if(a==="open-verification"){openGovernmentVerification()}else if(a==="architecture"){openCivicArchitecture()}}
-function openCitizenReport(){current="report";renderNav();const main=document.getElementById("civicWorkspaceMain");main.innerHTML='<div class="civic-report-builder"><div class="civic-report-top"><div><span class="civic-entry-badge">PWD-01 · AI ROAD REPORTING</span><h1>Tell us what you found.</h1><p>Give Civic OS the evidence. It will structure the report, assess visible risk and recommend the right PWD route.</p></div><div class="civic-ai-status"><i data-lucide="sparkles"></i><span>Civic AI ready</span></div></div><div class="civic-report-layout"><section class="civic-work-card"><div class="civic-step"><span>01</span><div><strong>Road evidence</strong><small>Photo or video helps the AI assess visible damage.</small></div></div><label class="civic-upload civic-upload-visual" for="civicRoadPhoto"><input id="civicRoadPhoto" type="file" accept="image/*,video/*" hidden><div class="civic-upload-empty"><i data-lucide="camera"></i><strong>Drop road evidence here</strong><span>Tap to choose a photo or video</span><small>Clear road view · JPG · PNG · video</small></div><div id="civicUploadPreview" class="civic-upload-preview" hidden><img id="civicPreviewImage" alt="Selected road evidence"><div><b>Evidence ready</b><span id="civicPreviewName"></span></div></div></label><div id="civicPhotoState" class="civic-photo-state">No evidence attached yet.</div><div class="civic-step"><span>02</span><div><strong>Where is it?</strong><small>Use a landmark, locality or road name. Precise GPS can be added later.</small></div></div><div class="civic-report-location"><i data-lucide="map-pin"></i><input id="civicReportLocation" placeholder="e.g. Kangla Road, Imphal"><button type="button" id="civicUseLocation">Use location</button></div><div class="civic-step"><span>03</span><div><strong>What happened?</strong><small>Describe what you see in your own words.</small></div></div><textarea id="civicReportDescription" class="civic-report-textarea" rows="5" placeholder="Example: Large pothole near the school entrance. Vehicles are swerving around it, especially at night."></textarea><button type="button" id="civicAnalyzeReport" class="civic-entry-primary civic-analyze-btn"><i data-lucide="sparkles"></i><span>Analyze with Civic AI</span></button><div id="civicReportResult"></div></section><aside class="civic-report-side"><div class="civic-work-card"><h3>What Civic AI checks</h3><div class="civic-ai-check"><i data-lucide="scan-search"></i><span><b>Visible damage</b><small>Potholes, cracks and surface failure</small></span></div><div class="civic-ai-check"><i data-lucide="triangle-alert"></i><span><b>Risk & impact</b><small>Safety, access and community impact</small></span></div><div class="civic-ai-check"><i data-lucide="route"></i><span><b>Authority routing</b><small>Recommended PWD division with confidence</small></span></div><div class="civic-ai-check"><i data-lucide="copy-check"></i><span><b>Duplicate signal</b><small>Checks for similar existing reports</small></span></div></div><div class="civic-trust-note"><i data-lucide="shield-check"></i><div><strong>AI is advisory</strong><p>Officials remain responsible for final inspection, routing and maintenance decisions.</p></div></div></aside></div></div>';bindCitizenReport();refresh()}
-function bindCitizenReport(){const file=document.getElementById("civicRoadPhoto"),state=document.getElementById("civicPhotoState"),preview=document.getElementById("civicUploadPreview"),previewImg=document.getElementById("civicPreviewImage"),previewName=document.getElementById("civicPreviewName");file?.addEventListener("change",()=>{const f=file.files?.[0];if(!f)return;state.textContent="Evidence attached · "+f.name;state.classList.add("has-file");if(f.type.startsWith("image/")){previewImg.src=URL.createObjectURL(f);previewName.textContent=f.name;preview.hidden=false}});document.getElementById("civicUseLocation")?.addEventListener("click",()=>{const input=document.getElementById("civicReportLocation"),btn=document.getElementById("civicUseLocation");if(!navigator.geolocation){input.value="Location unavailable · enter road or locality manually";return}btn.disabled=true;btn.textContent="Locating…";navigator.geolocation.getCurrentPosition(async pos=>{const lat=pos.coords.latitude.toFixed(6),lon=pos.coords.longitude.toFixed(6);input.value="GPS "+lat+", "+lon+" · resolving locality…";try{const r=await fetch("https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat="+encodeURIComponent(lat)+"&lon="+encodeURIComponent(lon)+"&zoom=14&addressdetails=1",{headers:{"Accept":"application/json"}});if(r.ok){const d=await r.json(),a=d.address||{},district=a.state_district||a.county||a.city_district||a.city||"";input.value=(d.display_name||("GPS "+lat+", "+lon))+" · GPS verified";input.dataset.lat=lat;input.dataset.lon=lon;input.dataset.district=district}else input.value="GPS "+lat+", "+lon+" · locality lookup unavailable";}catch(e){input.value="GPS "+lat+", "+lon+" · locality lookup unavailable";}btn.disabled=false;btn.textContent="Use location"},()=>{input.value="Location permission denied · enter road or locality manually";btn.disabled=false;btn.textContent="Use location"},{enableHighAccuracy:true,timeout:10000,maximumAge:0})});document.getElementById("civicAnalyzeReport")?.addEventListener("click",runCitizenAnalysis)}
-function runCitizenAnalysis(){const description=document.getElementById("civicReportDescription")?.value.trim()||"",location=document.getElementById("civicReportLocation")?.value.trim()||"",file=document.getElementById("civicRoadPhoto")?.files?.[0],result=document.getElementById("civicReportResult");if(!description||!location){result.innerHTML='<div class="civic-analysis-error">Add a description and location before analysis.</div>';return}if(!file){result.innerHTML='<div class="civic-analysis-error">Add a road photo or video so the evidence quality can be assessed.</div>';return}result.innerHTML='<div class="civic-ai-processing"><i data-lucide="loader-circle"></i><span>Analyzing evidence · checking risk · finding the right route</span></div>';refresh();setTimeout(()=>{let a=null;try{a=CIVIC_AI_ENGINE.analyzeRoad({categoryKey:"road",description,location,hasPhoto:true,photoName:file?.name||""}).result}catch(e){}const detected=a?.categoryLabel||"Road damage";const severity=a?.severity||"Medium";const priority=a?.priority||"Medium";const route=a?.routing||{};const confidence=Math.round(a?.confidence||72);const reason=a?.summary||"Road evidence indicates a maintenance issue that should be reviewed.";result.innerHTML='<div class="civic-analysis-result civic-analysis-visual"><div class="civic-analysis-photo"><img src="'+URL.createObjectURL(file)+'" alt="Submitted road evidence"><span>SUBMITTED EVIDENCE</span></div><div class="civic-analysis-head"><span class="civic-entry-badge">AI EVIDENCE REPORT</span><strong>'+detected+'</strong><span class="civic-result-pill">'+priority+' priority</span></div><div class="civic-result-grid"><div><small>SEVERITY</small><b>'+severity+'</b></div><div><small>PRIORITY</small><b>'+priority+(a?.priorityScore!=null?" · "+a.priorityScore+"/100":"")+'</b></div><div><small>AI CONFIDENCE</small><b>'+confidence+'%</b></div><div><small>ROUTE CONFIDENCE</small><b>'+((route.confidence!=null?route.confidence+"%":"Needs review"))+'</b></div></div><p class="civic-result-reason">'+reason+'</p><div class="civic-result-next"><i data-lucide="arrow-right"></i><span><b>Recommended next step</b><small>Submit this evidence for PWD review. Human verification remains required.</small></span></div></div>';refresh()},850)}
-function civicIncidentCluster(x){const clusterMap={"RD-104":{count:4,signal:"Strong cluster",sources:["Citizen report","Citizen report","Field observation","Repeat signal"],window:"2 days",segment:"Kangla Road corridor"},"RD-087":{count:3,signal:"Recurring cluster",sources:["Citizen report","Citizen report","Citizen report"],window:"5 days",segment:"Thoubal market approach"},"RD-132":{count:2,signal:"Emerging cluster",sources:["Citizen report","Citizen report"],window:"8 days",segment:"Bishnupur bypass"},"RD-061":{count:1,signal:"Single report",sources:["Citizen report"],window:"1 day",segment:"Senapati town link"}};return clusterMap[x.id]||{count:1,signal:"Single report",sources:["Citizen report"],window:"1 day",segment:x.road}}
 
-function civicRunValidation(){
-  const cases=[
-    {name:"Deep pothole",d:"A deep pothole is dangerous near a school",l:"Imphal East",expect:"High"},
-    {name:"Cracked corridor",d:"Large cracked road with many vehicles",l:"Thoubal",expect:"High"},
-    {name:"Minor marking",d:"Small faded road marking",l:"Bishnupur",expect:"Low"},
-    {name:"Flooded road",d:"Road is unsafe after flooding",l:"Senapati",expect:"High"},
-    {name:"Blocked route",d:"A road is blocked and unsafe for traffic",l:"Imphal West",expect:"High"},
-    {name:"Hospital access",d:"Large pothole outside the hospital",l:"Imphal East",expect:"High"},
-    {name:"Small surface issue",d:"Slight small road damage",l:"Thoubal",expect:"Low"},
-    {name:"Accident risk",d:"Dangerous damaged road causing vehicles to swerve",l:"Bishnupur",expect:"High"},
-    {name:"School route",d:"Road damage affects the school route",l:"Senapati",expect:"High"},
-    {name:"Emergency access",d:"Pothole is blocking emergency access",l:"Imphal East",expect:"High"},
-    {name:"Moderate damage",d:"Road surface has cracks",l:"Churachandpur",expect:"Medium"},
-    {name:"General damage",d:"There is damage on the road",l:"Ukhrul",expect:"Medium"},
-    {name:"Routing Imphal East",d:"Pothole on damaged road",l:"Imphal East",expectRoute:"Imphal East"},
-    {name:"Routing Imphal West",d:"Pothole on damaged road",l:"Imphal West",expectRoute:"Imphal West"},
-    {name:"Routing Thoubal",d:"Pothole on damaged road",l:"Thoubal",expectRoute:"Thoubal"},
-    {name:"Routing Bishnupur",d:"Pothole on damaged road",l:"Bishnupur",expectRoute:"Bishnupur"},
-    {name:"Routing Senapati",d:"Pothole on damaged road",l:"Senapati",expectRoute:"Senapati"},
-    {name:"Routing Ukhrul",d:"Pothole on damaged road",l:"Ukhrul",expectRoute:"Ukhrul"},
-    {name:"Routing Chandel",d:"Pothole on damaged road",l:"Chandel",expectRoute:"Chandel"},
-    {name:"Routing Tamenglong",d:"Pothole on damaged road",l:"Tamenglong",expectRoute:"Tamenglong"}
-  ];
-  const out=document.getElementById("civicValidationResults");
-  if(!out)return;
-  let priorityPass=0,routePass=0,review=0;
-  const rows=cases.map(c=>{
-    let r=null;
-    try{r=CIVIC_AI_ENGINE.analyzeRoad({categoryKey:"road",description:c.d,location:c.l,hasPhoto:true}).result}catch(e){}
-    const priorityOk=c.expect?!!r&&r.priority===c.expect:true;
-    const routeOk=c.expectRoute?!!r&&r.division===c.expectRoute:true;
-    if(c.expect) priorityOk?priorityPass++:review++;
-    if(c.expectRoute) routeOk?routePass++:review++;
-    const ok=priorityOk&&routeOk;
-    return '<div class="civic-validation-row '+(ok?"pass":"fail")+'"><span><i data-lucide="'+(ok?"circle-check":"circle-x")+'"></i>'+c.name+'</span><small>'+(c.expectRoute?("Expected "+c.expectRoute+" · Got "+(r?.division||"—")):("Expected "+c.expect+" · Got "+(r?.priority||"—")))+'</small><b>'+(ok?"PASS":"REVIEW")+'</b></div>';
-  }).join("");
-  const totalPriority=cases.filter(c=>c.expect).length;
-  const totalRoute=cases.filter(c=>c.expectRoute).length;
-  const overall=priorityPass+routePass;
-  const total=totalPriority+totalRoute;
-  out.innerHTML='<div class="civic-validation-summary"><div><strong>'+Math.round((overall/total)*100)+'%</strong><span>prototype validation score</span></div><div><b>'+priorityPass+'/'+totalPriority+'</b><span>priority checks</span></div><div><b>'+routePass+'/'+totalRoute+'</b><span>routing checks</span></div></div><div class="civic-validation-note">Illustrative regression suite · not a production model accuracy claim.</div>'+rows;
-  refresh();
+"use strict";
+
+/* =========================================================
+   Civic OS — script.js
+   Report. Connect. Resolve.
+
+   1. Reference data
+   2. Demo AI engine
+   3. Demo data
+   4. App state & helpers
+   5. Screen switching
+   6. Home
+   7. Report flow
+   8. Issue explorer + detail sheet
+   9. Dashboard
+   10. Community matching
+   11. Civic AI
+   12. Event binding
+   13. Init
+   ========================================================= */
+
+
+/* =========================================================
+   1. REFERENCE DATA
+   ========================================================= */
+
+const CATEGORIES = {
+  roads: {
+    label: "Roads",
+    aiLabel: "Road Infrastructure",
+    department: "Public Works",
+    icon: "construction",
+    keywords: [
+      "pothole", "road", "street", "crack", "asphalt",
+      "pavement", "footpath", "sidewalk", "speed bump", "manhole"
+    ],
+    action:
+      "Inspect the affected road and determine whether repair or resurfacing is required.",
+    skills: ["Infrastructure Assessment", "Mapping", "Photography"],
+  },
+
+  garbage: {
+    label: "Garbage",
+    aiLabel: "Waste & Sanitation",
+    department: "Sanitation",
+    icon: "trash-2",
+    keywords: [
+      "garbage", "trash", "waste", "litter", "dump",
+      "bin", "rubbish", "smell", "collection"
+    ],
+    action:
+      "Schedule a sanitation crew to clear the waste and review the local collection route.",
+    skills: ["Community Outreach", "Event Organizing", "Graphic Design"],
+  },
+
+  streetlights: {
+    label: "Streetlights",
+    aiLabel: "Public Lighting",
+    department: "Public Lighting",
+    icon: "lightbulb",
+    keywords: [
+      "streetlight", "street light", "lamp", "light",
+      "dark", "bulb", "pole", "wire"
+    ],
+    action:
+      "Send a lighting technician to inspect the fixture, wiring and power supply.",
+    skills: ["Electrical Repair", "Mapping"],
+  },
+
+  water: {
+    label: "Water",
+    aiLabel: "Water & Drainage",
+    department: "Water Department",
+    icon: "droplets",
+    keywords: [
+      "water", "leak", "pipe", "drain", "sewage",
+      "flood", "tap", "supply", "overflow", "waterlog"
+    ],
+    action:
+      "Dispatch a water crew to locate the source, isolate the problem and restore safe supply.",
+    skills: ["Plumbing", "Infrastructure Assessment"],
+  },
+
+  health: {
+    label: "Public health",
+    aiLabel: "Public Health",
+    department: "Public Health",
+    icon: "heart-pulse",
+    keywords: [
+      "mosquito", "disease", "health", "clinic",
+      "hospital", "stagnant", "dengue", "rats",
+      "hygiene", "sick"
+    ],
+    action:
+      "Request a public health inspection and schedule preventive treatment of the area.",
+    skills: ["Public Health", "Community Outreach"],
+  },
+
+  education: {
+    label: "Education",
+    aiLabel: "Education Facilities",
+    department: "Education Department",
+    icon: "graduation-cap",
+    keywords: [
+      "school", "classroom", "teacher", "student",
+      "desk", "library", "college", "books"
+    ],
+    action:
+      "Ask the education department to audit the facility and plan repairs or resources.",
+    skills: ["Teaching", "Project Management", "Infrastructure Assessment"],
+  },
+
+  environment: {
+    label: "Environment",
+    aiLabel: "Environment",
+    department: "Environment Department",
+    icon: "leaf",
+    keywords: [
+      "tree", "pollution", "smoke", "air", "noise",
+      "river", "lake", "park", "burning", "cut down"
+    ],
+    action:
+      "Have the environment department assess the impact and enforce applicable regulations.",
+    skills: ["Environmental Science", "Mapping", "Data Analysis"],
+  },
+
+  safety: {
+    label: "Public safety",
+    aiLabel: "Public Safety",
+    department: "Public Safety",
+    icon: "shield-alert",
+    keywords: [
+      "signal", "crime", "theft", "unsafe", "harass",
+      "accident", "fire", "traffic light", "junction", "crossing"
+    ],
+    action:
+      "Alert public safety officers to secure the area and coordinate an urgent response.",
+    skills: ["Community Outreach", "Mapping"],
+  },
+
+  other: {
+    label: "Other",
+    aiLabel: "General Civic Issue",
+    department: "Municipal Helpdesk",
+    icon: "ellipsis",
+    keywords: [],
+    action:
+      "Review the report and route it to the most relevant municipal department.",
+    skills: ["Community Outreach"],
+  },
+};
+
+const STATUSES = [
+  "Reported",
+  "Verified",
+  "In Progress",
+  "Resolved"
+];
+
+const PRIORITY_RANK = {
+  High: 3,
+  Medium: 2,
+  Low: 1
+};
+
+const HIGH_PRIORITY_SIGNALS = [
+  "danger",
+  "dangerous",
+  "accident",
+  "flood",
+  "fire",
+  "emergency",
+  "unsafe",
+  "injur",
+  "collapse",
+  "exposed wire",
+  "live wire",
+  "electrocut",
+  "sparking",
+];
+
+const IMPACT_SIGNALS = [
+  "school",
+  "children",
+  "kids",
+  "hospital",
+  "elderly",
+  "blocked",
+  "large",
+  "deep",
+  "night",
+  "every day",
+  "many",
+];
+
+const LOW_SIGNALS = [
+  "minor",
+  "small",
+  "cosmetic",
+  "slight",
+  "faded"
+];
+
+const SKILLS = [
+  "Mapping",
+  "Data Analysis",
+  "Graphic Design",
+  "Social Media",
+  "Community Outreach",
+  "Event Organizing",
+  "Infrastructure Assessment",
+  "Electrical Repair",
+  "Plumbing",
+  "Public Health",
+  "Environmental Science",
+  "Photography",
+  "Teaching",
+  "Project Management",
+];
+
+const RESPONSE_TIME = {
+  High: "Within 24 hours",
+  Medium: "Within 3–5 days",
+  Low: "Within 2 weeks"
+};
+
+const STOPWORDS = new Set([
+  "near",
+  "there",
+  "with",
+  "from",
+  "that",
+  "this",
+  "have",
+  "been",
+  "very",
+  "into",
+  "outside",
+  "front",
+  "behind",
+  "next",
+  "close",
+  "area",
+  "side",
+  "some",
+  "they",
+  "which",
+  "their",
+  "about",
+  "still",
+  "since",
+  "days",
+  "week",
+  "morning",
+  "people",
+  "every",
+]);
+
+
+/* =========================================================
+   2. DEMO AI ENGINE
+   ========================================================= */
+
+function matchTerms(text, terms) {
+  return terms.filter((term) =>
+    new RegExp("\\b" + escapeRegExp(term), "i").test(text)
+  );
 }
 
-function openCivicArchitecture(){portal="government";current="architecture";renderNav();const main=document.getElementById("civicWorkspaceMain");main.innerHTML='<div class="civic-architecture-page"><div class="civic-ai-page-head"><div><span class="civic-entry-badge">TECHNICAL METHOD · CIVIC OS</span><h1>How Civic OS turns evidence into action.</h1><p>A transparent AI-assisted pipeline designed for road maintenance decisions, with human verification at every high-impact step.</p></div><div class="civic-ai-live"><i data-lucide="workflow"></i><span>Architecture view</span></div></div><div class="civic-architecture-flow"><div><span>01</span><i data-lucide="camera"></i><b>Citizen evidence</b><small>Photo · video · description · location</small></div><strong>→</strong><div><span>02</span><i data-lucide="brain-circuit"></i><b>AI understanding</b><small>Vision + language + structured extraction</small></div><strong>→</strong><div><span>03</span><i data-lucide="chart-no-axes-combined"></i><b>Civic intelligence</b><small>Risk · priority · duplicate · routing</small></div><strong>→</strong><div><span>04</span><i data-lucide="shield-check"></i><b>Human decision</b><small>Inspection · maintenance · closure</small></div></div><div class="civic-architecture-grid"><section class="civic-work-card"><span class="civic-entry-badge">AI LAYERS</span><h2>Four specialised intelligence layers</h2><div class="civic-arch-list"><div><i data-lucide="scan-eye"></i><span><b>Vision analysis</b><small>Road images → visible defect type, severity and evidence quality.</small></span></div><div><i data-lucide="message-square-text"></i><span><b>Language understanding</b><small>Citizen text → issue, location, safety, duration and context.</small></span></div><div><i data-lucide="map"></i><span><b>Jurisdiction engine</b><small>Location signals → candidate PWD division with explicit uncertainty.</small></span></div><div><i data-lucide="gauge"></i><span><b>Priority engine</b><small>Evidence + risk factors → explainable inspection recommendation.</small></span></div></div></section><aside class="civic-work-card"><span class="civic-entry-badge">TRUST BOUNDARY</span><h2>AI assists. Officials decide.</h2><p class="civic-detail-reason">Civic OS does not silently assign officers, declare repairs complete or make final maintenance decisions. Ambiguous jurisdiction, weak evidence and uncertain visual analysis remain review cases.</p><div class="civic-arch-trust"><i data-lucide="shield-alert"></i><span>Model confidence ≠ evidence quality ≠ routing confidence.</span></div></aside></div><section class="civic-work-card civic-validation-card"><div class="civic-section-head"><div><span class="civic-entry-badge">PROTOTYPE VALIDATION</span><h3>🧪 Run the decision-layer checks</h3><p>Small deterministic checks catch regressions in classification, priority and routing while the production AI models are being validated.</p></div><button class="civic-work-secondary" id="civicRunValidation">Run checks</button></div><div id="civicValidationResults"><div class="civic-validation-idle">No validation run yet.</div></div></section><section class="civic-work-card"><div class="civic-section-head"><div><span class="civic-entry-badge">IMPLEMENTATION STATUS</span><h3>Prototype → production path</h3><p>The current demo uses transparent local fallbacks while keeping the integration boundary ready for validated AI services.</p></div></div><div class="civic-arch-status"><span><b>Now</b>Rule-based fallback + demo intelligence</span><span><b>Next</b>Validated vision/NLP models</span><span><b>Then</b>GIS + backend + evaluation dataset</span><span><b>Always</b>Human verification for high-impact decisions</span></div></section></div>';document.getElementById("civicRunValidation").onclick=civicRunValidation;refresh()}
+function detectCategory(text) {
+  let bestKey = "other";
+  let bestHits = 0;
 
-function openGovernmentIntelligence(){portal="government";current="intelligence";renderNav();const main=document.getElementById("civicWorkspaceMain");main.innerHTML='<div class="civic-gov-intel"><div class="civic-ai-page-head"><div><span class="civic-entry-badge">PWD-03 · MAINTENANCE INTELLIGENCE</span><h1>Know what needs attention first.</h1><p>Civic OS combines reported damage, safety risk, connectivity, recurrence and evidence quality into an explainable inspection priority.</p></div><div class="civic-ai-live"><i data-lucide="brain-circuit"></i><span>Decision layer ready</span></div></div><section class="civic-risk-map"><div class="civic-section-head"><div><span class="civic-entry-badge">LIVE RISK VIEW · DEMO DATA</span><h3>🗺️ Active road risk zones</h3><p>Concentration of reported road signals by district. This prototype view is illustrative, not live GIS data.</p></div><span class="civic-demo-chip">4 monitored zones</span></div><div class="civic-map-grid"><button class="civic-zone critical" data-zone="Imphal East"><i data-lucide="map-pin"></i><span>Imphal East</span><b>Critical · 94</b><small>4 linked signals</small></button><button class="civic-zone high" data-zone="Thoubal"><i data-lucide="map-pin"></i><span>Thoubal</span><b>High · 87</b><small>3 linked signals</small></button><button class="civic-zone medium" data-zone="Bishnupur"><i data-lucide="map-pin"></i><span>Bishnupur</span><b>Moderate · 76</b><small>2 linked signals</small></button><button class="civic-zone monitor" data-zone="Senapati"><i data-lucide="map-pin"></i><span>Senapati</span><b>Monitor · 61</b><small>1 linked signal</small></button></div></section><div class="civic-gov-toolbar"><div class="civic-filter-row"><button class="civic-filter is-active" data-gov-filter="all">All roads</button><button class="civic-filter" data-gov-filter="critical">Critical</button><button class="civic-filter" data-gov-filter="inspection">Needs inspection</button><button class="civic-filter" data-gov-filter="repeat">Repeat failures</button></div><div class="civic-filter-summary"><span id="civicFilterCount">4 roads</span><button class="civic-gov-sort" id="civicSortToggle"><i data-lucide="arrow-down-up"></i><span>Priority · highest first</span></button></div></div><div class="civic-gov-grid"><section class="civic-work-card"><div class="civic-section-head"><div><h3>AI inspection queue</h3><p>Explainable recommendations for field inspection.</p></div><span class="civic-live-count">18 critical</span></div><div id="civicPriorityQueue" class="civic-priority-list"></div></section><aside class="civic-work-card"><div id="civicPriorityDetail"></div></aside></div><div class="civic-trust-note"><i data-lucide="shield-check"></i><div><strong>Human decision layer</strong><p>AI recommends inspection priority. Authorized PWD officials verify field conditions and make final maintenance decisions.</p></div></div></div>';bindGovernmentIntelligence();refresh()}
-function openGovernmentVerification(){portal="government";current="verification";renderNav();const main=document.getElementById("civicWorkspaceMain");main.innerHTML='<div class="civic-verification-page"><div class="civic-ai-page-head"><div><span class="civic-entry-badge">REPAIR VERIFICATION · PWD</span><h1>Prove the repair, not just the report.</h1><p>Compare before-and-after evidence, record visible improvement and keep final closure with the authorized official.</p></div><div class="civic-ai-live"><i data-lucide="scan-search"></i><span>Evidence comparison</span></div></div><div class="civic-verification-grid"><section class="civic-work-card"><div class="civic-section-head"><div><h3>RD-104 · Kangla Road corridor</h3><p>Severe pothole cluster · Imphal East</p></div><span class="civic-live-count">Awaiting closure</span></div><div class="civic-proof-grid"><div class="civic-proof-card"><div class="civic-proof-label">BEFORE</div><div class="civic-proof-visual"><i data-lucide="image"></i><span>Reported damage evidence</span></div><small>Captured during citizen report</small></div><div class="civic-proof-card"><div class="civic-proof-label">AFTER</div><div class="civic-proof-visual after"><i data-lucide="camera"></i><span>Repair evidence</span></div><small>Upload field photo for comparison</small></div></div><label class="civic-proof-upload"><i data-lucide="upload"></i><span><b>Add after-repair photo</b><small>JPG, PNG · field evidence</small></span><input id="civicAfterRepair" type="file" accept="image/*"></label><button class="civic-compare-btn" id="civicCompareRepair"><i data-lucide="scan-search"></i>Compare repair evidence</button><div id="civicRepairResult"></div></section><aside class="civic-work-card"><span class="civic-entry-badge">VERIFICATION LOGIC</span><h2>Human closure gate</h2><p class="civic-detail-reason">Civic OS can assist with visible comparison, but a model must not silently declare a road repaired.</p><div class="civic-verification-steps"><div class="is-done"><span>1</span><b>Before evidence</b><small>Original damage recorded</small></div><div class="is-done"><span>2</span><b>Repair action</b><small>Maintenance recorded</small></div><div class="is-active"><span>3</span><b>After evidence</b><small>Visual comparison</small></div><div><span>4</span><b>Official closure</b><small>Human decision required</small></div></div></aside></div><div class="civic-trust-note"><i data-lucide="shield-check"></i><div><strong>Trust boundary</strong><p>Visual comparison is advisory. Final closure requires authorized PWD review and recorded evidence.</p></div></div></div>';bindVerification();refresh()}
-function bindVerification(){const input=document.getElementById("civicAfterRepair"),btn=document.getElementById("civicCompareRepair"),out=document.getElementById("civicRepairResult");btn.onclick=()=>{if(!input.files.length){out.innerHTML='<div class="civic-verify-state">Add an after-repair photo before running the comparison.</div>';return}out.innerHTML='<div class="civic-repair-processing"><i data-lucide="loader-circle"></i><span>Comparing visible road condition...</span></div>';refresh();setTimeout(()=>{out.innerHTML='<div class="civic-repair-result"><div class="civic-repair-score"><strong>82%</strong><span>visible improvement signal</span></div><div class="civic-repair-grid"><div><span>Damage visibility</span><b>Reduced</b></div><div><span>Surface continuity</span><b>Improved</b></div><div><span>Evidence quality</span><b>Good</b></div><div><span>AI confidence</span><b>78%</b></div></div><p>Advisory result: the after-repair image shows a strong visible improvement signal. Confirm on site before closure.</p><button class="primary civic-close-case" id="civicCloseRepair"><i data-lucide="badge-check"></i>Record official closure</button></div>';document.getElementById("civicCloseRepair").onclick=()=>{out.innerHTML='<div class="civic-verify-state"><strong>Closure recorded for this demo</strong><span>Human review completed. Repair verification is now part of the Road Passport lifecycle.</span></div>';refresh()};refresh()},900)}}
-function openGovernmentInspections(){portal="government";current="inspections";renderNav();const main=document.getElementById("civicWorkspaceMain");main.innerHTML='<div class="civic-inspection-page"><div class="civic-ai-page-head"><div><span class="civic-entry-badge">FIELD OPERATIONS · PWD</span><h1>Turn intelligence into action.</h1><p>Field teams verify AI findings on-site, capture evidence and record what should happen next.</p></div><div class="civic-ai-live"><i data-lucide="clipboard-check"></i><span>Field workflow</span></div></div><div class="civic-inspection-grid"><section class="civic-work-card"><div class="civic-section-head"><div><h3>Inspection queue</h3><p>Cases ready for human verification.</p></div><span class="civic-live-count">4 ready</span></div><div id="civicInspectionList" class="civic-inspection-list"></div></section><section class="civic-work-card"><div id="civicInspectionDetail"></div></section></div><div class="civic-trust-note"><i data-lucide="shield-check"></i><div><strong>Human verification required</strong><p>Field observations remain the source of truth. AI assists comparison and documentation; it does not close maintenance cases by itself.</p></div></div></div>';bindInspections();refresh()}
-function bindInspections(){const cases=[{id:"RD-104",road:"Kangla Road corridor",district:"Imphal East",issue:"Severe pothole cluster",priority:94,age:"2 days",status:"Ready for inspection"},{id:"RD-087",road:"Thoubal market approach",district:"Thoubal",issue:"Surface cracking",priority:87,age:"5 days",status:"Ready for inspection"},{id:"RD-132",road:"Bishnupur bypass",district:"Bishnupur",issue:"Edge damage",priority:76,age:"8 days",status:"Awaiting field visit"}];const list=document.getElementById("civicInspectionList");const detail=document.getElementById("civicInspectionDetail");function show(c){detail.innerHTML='<span class="civic-detail-badge">'+c.status+'</span><h2>'+c.road+'</h2><p class="civic-detail-location"><i data-lucide="map-pin"></i>'+c.district+' · '+c.id+'</p><div class="civic-inspection-summary"><div><span>AI priority</span><b>'+c.priority+'/100</b></div><div><span>Reported</span><b>'+c.age+'</b></div><div><span>Issue</span><b>'+c.issue+'</b></div></div><div class="civic-checklist"><label><input type="checkbox"> Road condition matches report</label><label><input type="checkbox"> Safety risk confirmed</label><label><input type="checkbox"> Location/road segment verified</label><label><input type="checkbox"> Photos captured</label></div><textarea id="civicFieldNote" placeholder="Add field observation..."></textarea><div class="civic-detail-actions"><button data-save-inspection><i data-lucide="save"></i>Save field findings</button><button class="primary" data-verify-case><i data-lucide="badge-check"></i>Verify case</button></div><div id="civicVerifyArea"></div>';detail.querySelector("[data-save-inspection]").onclick=()=>{const n=document.getElementById("civicFieldNote").value.trim();document.getElementById("civicVerifyArea").innerHTML='<div class="civic-saved-state"><i data-lucide="check-circle-2"></i>Field findings saved locally for this demo'+(n?" · observation captured":"")+'</div>';refresh()};detail.querySelector("[data-verify-case]").onclick=()=>{document.getElementById("civicVerifyArea").innerHTML='<div class="civic-verify-state"><strong>Verified for maintenance review</strong><span>Human verification recorded. The case can now move to maintenance planning.</span></div>';refresh()};refresh()}list.innerHTML=cases.map((c,i)=>'<button class="civic-inspection-item '+(!i?"is-selected":"")+'" data-case="'+c.id+'"><span class="civic-inspection-icon"><i data-lucide="map-pin-check"></i></span><span><b>'+c.road+'</b><small>'+c.issue+' · Priority '+c.priority+'</small></span><strong>'+c.priority+'</strong></button>').join("");list.querySelectorAll("[data-case]").forEach(b=>b.onclick=()=>{list.querySelectorAll(".civic-inspection-item").forEach(x=>x.classList.remove("is-selected"));b.classList.add("is-selected");show(cases.find(x=>x.id===b.dataset.case))});show(cases[0])}
-function civicPriorityScore(x){const weights={safety:25,severity:20,repeats:15,traffic:15,connectivity:10,history:10,evidence:5};const severity=x.severity??x.risk;const repeats=Math.min(100,x.repeat*25);const history=x.history??Math.min(100,x.repeat*20+40);return Math.round((x.risk*weights.safety+severity*weights.severity+repeats*weights.repeats+x.traffic*weights.traffic+x.connectivity*weights.connectivity+history*weights.history+x.evidence*weights.evidence)/100)}
-function bindGovernmentIntelligence(){const data=[{id:"RD-104",road:"Kangla Road corridor",district:"Imphal East",score:94,status:"Critical",repeat:4,risk:92,severity:96,traffic:88,connectivity:82,history:92,evidence:91,reason:"High safety risk, repeated reports and strong evidence."},{id:"RD-087",road:"Thoubal market approach",district:"Thoubal",score:87,status:"Needs inspection",repeat:3,risk:78,severity:82,traffic:84,connectivity:79,history:78,evidence:86,reason:"Recurring surface damage on a high-access corridor."},{id:"RD-132",road:"Bishnupur bypass",district:"Bishnupur",score:76,status:"Needs inspection",repeat:2,risk:69,severity:72,traffic:76,connectivity:74,history:62,evidence:80,reason:"Moderate risk with repeated complaints and useful evidence."},{id:"RD-061",road:"Senapati town link",district:"Senapati",score:61,status:"Monitor",repeat:1,risk:52,severity:55,traffic:60,connectivity:65,history:48,evidence:71,reason:"Lower immediate risk; continue monitoring."}];data.forEach(x=>x.modelScore=civicPriorityScore(x));let filtered=data;const q=document.getElementById("civicPriorityQueue"),detail=document.getElementById("civicPriorityDetail");function render(){const count=document.getElementById("civicFilterCount");if(count)count.textContent=filtered.length+" road"+(filtered.length===1?"":"s");q.innerHTML=filtered.map((x,i)=>'<button class="civic-priority-item civic-priority-visual '+(i===0?"is-selected":"")+'" data-road="'+x.id+'"><img src="'+(x.id==="RD-104"?CIVIC_DEMO_IMAGES.pothole:x.id==="RD-087"?CIVIC_DEMO_IMAGES.market:x.id==="RD-132"?CIVIC_DEMO_IMAGES.road:CIVIC_DEMO_IMAGES.rain)+'" alt="Road evidence"><span class="civic-priority-rank">0'+(i+1)+'</span><span class="civic-priority-main"><b>'+x.road+'</b><small>'+x.district+' · '+x.repeat+' repeat signals</small></span><strong class="civic-priority-score">'+x.score+'</strong></button>').join("");q.querySelectorAll("[data-road]").forEach(b=>b.onclick=()=>showRoad(data.find(x=>x.id===b.dataset.road)));showRoad(filtered[0])}function showRoad(x){if(!x)return;detail.innerHTML='<div class="civic-detail-media"><img src="'+(x.id==="RD-104"?CIVIC_DEMO_IMAGES.pothole:x.id==="RD-087"?CIVIC_DEMO_IMAGES.market:x.id==="RD-132"?CIVIC_DEMO_IMAGES.road:CIVIC_DEMO_IMAGES.rain)+'" alt="Road evidence for '+x.id+'"><span>DEMO EVIDENCE</span></div><div class="civic-detail-badge">'+x.status+'</div><h2>'+x.road+'</h2><p class="civic-detail-location"><i data-lucide="map-pin"></i>'+x.district+' · Road asset '+x.id+'</p><div class="civic-big-score"><strong>'+x.score+'</strong><span>/ 100<br>priority</span></div><p class="civic-detail-reason">'+x.reason+'</p><div class="civic-formula"><b>Why '+x.score+'/100?</b><span>Safety 25% · Severity 20% · Repeat 15% · Traffic 15% · Connectivity 10% · History 10% · Evidence 5%</span></div><div class="civic-cluster-card"><div><span class="civic-entry-badge">INCIDENT CLUSTER</span><b>'+civicIncidentCluster(x).count+' linked signal'+(civicIncidentCluster(x).count===1?"":"s")+'</b><small>'+civicIncidentCluster(x).signal+' · '+civicIncidentCluster(x).window+'</small></div><span class="civic-cluster-badge">'+civicIncidentCluster(x).segment+'</span></div><div class="civic-factor-list"><div><span>Safety risk · 25%</span><b>'+x.risk+'%</b><i style="width:'+x.risk+'%"></i></div><div><span>Defect severity · 20%</span><b>'+x.severity+'%</b><i style="width:'+x.severity+'%"></i></div><div><span>Repeated reports · 15%</span><b>'+Math.min(100,x.repeat*25)+'%</b><i style="width:'+Math.min(100,x.repeat*25)+'%"></i></div><div><span>Traffic importance · 15%</span><b>'+x.traffic+'%</b><i style="width:'+x.traffic+'%"></i></div><div><span>Connectivity · 10%</span><b>'+x.connectivity+'%</b><i style="width:'+x.connectivity+'%"></i></div><div><span>Road history · 10%</span><b>'+x.history+'%</b><i style="width:'+x.history+'%"></i></div><div><span>Evidence quality · 5%</span><b>'+x.evidence+'%</b><i style="width:'+x.evidence+'%"></i></div></div><div class="civic-detail-actions"><button data-action-gov="passport"><i data-lucide="route"></i>Road Passport</button><button data-action-gov="inspect"><i data-lucide="clipboard-check"></i>Assign inspection</button></div>';detail.querySelector('[data-action-gov="passport"]').onclick=()=>showRoadPassport(x);detail.querySelector('[data-action-gov="inspect"]').onclick=()=>showRoadPassport(x,true);refresh()}function showRoadPassport(x,inspect=false){detail.innerHTML='<span class="civic-entry-badge">ROAD PASSPORT · '+x.id+'</span><h2>'+x.road+'</h2><p class="civic-detail-location"><i data-lucide="map-pin"></i>'+x.district+'</p><div class="civic-passport-status"><span>AI priority</span><b>'+x.score+'/100</b></div><div class="civic-passport-timeline"><div class="is-done"><span>1</span><b>Citizen evidence</b><small>Reports and media received</small></div><div class="is-done"><span>2</span><b>AI assessment</b><small>Risk and recurrence analysed</small></div><div class="'+(inspect?"is-active":"")+'"><span>3</span><b>Field inspection</b><small>'+(inspect?"Ready for assignment":"Pending verification")+'</small></div><div><span>4</span><b>Maintenance</b><small>Official action recorded</small></div><div><span>5</span><b>Close & verify</b><small>Before/after evidence</small></div></div><div class="civic-detail-actions"><button data-back-gov><i data-lucide="arrow-left"></i>Back to queue</button><button class="primary" data-inspect-now><i data-lucide="clipboard-check"></i>'+(inspect?"Inspection selected":"Start inspection")+'</button></div>';detail.querySelector("[data-back-gov]").onclick=()=>render();detail.querySelector("[data-inspect-now]").onclick=()=>{detail.querySelector(".civic-passport-timeline div:nth-child(3)").classList.add("is-active");detail.querySelector(".civic-passport-timeline div:nth-child(3) small").textContent="Inspection assigned · human verification pending";refresh()};refresh()}document.querySelectorAll("[data-zone]").forEach(z=>z.onclick=()=>{document.querySelectorAll("[data-zone]").forEach(x=>x.classList.remove("is-selected"));z.classList.add("is-selected");const match=data.find(x=>x.district===z.dataset.zone);if(match)showRoad(match)});const sortBtn=document.getElementById("civicSortToggle");if(sortBtn)sortBtn.onclick=()=>{filtered=[...filtered].reverse();sortBtn.classList.toggle("is-reversed");render()};document.querySelectorAll("[data-gov-filter]").forEach(b=>b.onclick=()=>{document.querySelectorAll("[data-gov-filter]").forEach(x=>x.classList.remove("is-active"));b.classList.add("is-active");const f=b.dataset.govFilter;filtered=f==="critical"?data.filter(x=>x.status==="Critical"):f==="inspection"?data.filter(x=>x.status==="Needs inspection"):f==="repeat"?data.filter(x=>x.repeat>1):data;render()});render()}
-function openCitizenAi(){current="ai";renderNav();const main=document.getElementById("civicWorkspaceMain");main.innerHTML='<div class="civic-ai-page civic-ai-product"><div class="civic-ai-page-head"><div><span class="civic-entry-badge">PWD-02 · CIVIC AI</span><h1>Describe it. I’ll find the right path.</h1><p>Explain the problem naturally. Civic AI structures the issue, identifies location signals and recommends the appropriate civic reporting route.</p></div><div class="civic-ai-live"><i data-lucide="sparkles"></i><span>Assistant ready</span></div></div><div class="civic-ai-product-grid"><section class="civic-ai-chat civic-work-card"><div class="civic-ai-chatbar"><div><span class="civic-ai-orb"><i data-lucide="sparkles"></i></span><span><b>Civic AI</b><small>Road & civic intelligence</small></span></div><span class="civic-ai-online"><i></i> Online</span></div><div id="civicAiEvidence" class="civic-ai-evidence"><div class="civic-ai-evidence-empty"><i data-lucide="image-plus"></i><span>Attach a road photo for visual analysis</span><small>Text-only reports still work, but evidence quality may be lower.</small></div></div><div id="civicAiMessages" class="civic-ai-messages"><div class="civic-ai-message assistant"><span class="civic-ai-avatar"><i data-lucide="sparkles"></i></span><div><strong>Civic AI</strong><p>Hi 👋 Tell me what you noticed. I’ll turn your description into structured civic evidence.</p></div></div></div><div class="civic-ai-suggestions"><button data-ai-suggest="There is a large pothole near my college in Imphal East and vehicles are swerving around it.">🚧 Pothole near a college</button><button data-ai-suggest="The road surface is badly cracked near Thoubal market and the damage is getting worse.">🛣️ Cracks near a market</button><button data-ai-suggest="A road is flooded and unsafe for vehicles after rain.">🌧️ Flooded road</button></div><div class="civic-ai-composer"><button id="civicAiAttach" type="button" class="civic-ai-attach" aria-label="Attach image"><i data-lucide="paperclip"></i></button><input id="civicAiFile" type="file" accept="image/*" hidden><textarea id="civicAiInput" rows="2" placeholder="Describe the civic problem..."></textarea><button id="civicAiSend" type="button" aria-label="Send"><i data-lucide="arrow-up"></i></button></div><div class="civic-ai-disclaimer"><i data-lucide="shield-check"></i> AI assists with understanding and routing. Officials verify jurisdiction and maintenance decisions.</div></section><aside class="civic-ai-insight"><div id="civicAiExtraction" class="civic-work-card"><div class="civic-insight-head"><span>LIVE ANALYSIS</span><i data-lucide="scan-search"></i></div><h3>Issue understanding</h3><p>Send a description to see structured evidence here.</p><div class="civic-ai-fields"><div><span>ISSUE</span><b>Waiting</b></div><div><span>LOCATION</span><b>Waiting</b></div><div><span>SEVERITY</span><b>Waiting</b></div><div><span>SAFETY</span><b>Waiting</b></div><div><span>IMPACT</span><b>Waiting</b></div><div><span>ROUTE</span><b>Waiting</b></div></div></div><div id="civicAiNext" class="civic-ai-route-card"><span class="civic-entry-badge">RECOMMENDED CHANNEL</span><div><i data-lucide="route"></i><span><b>Waiting for context</b><small>Civic AI will recommend a reporting path when enough evidence is available.</small></span></div></div></aside></div></div>';bindCitizenAi();refresh()}
-function bindCitizenAi(){const input=document.getElementById("civicAiInput"),file=document.getElementById("civicAiFile"),attach=document.getElementById("civicAiAttach"),evidence=document.getElementById("civicAiEvidence");attach?.addEventListener("click",()=>file?.click());file?.addEventListener("change",()=>{const f=file.files?.[0];if(!f)return;evidence.innerHTML='<div class="civic-ai-evidence-preview"><img src="'+URL.createObjectURL(f)+'" alt="Uploaded road evidence"><div><b>Evidence attached</b><span>'+escapeAi(f.name)+'</span></div><button type="button" id="civicAiRemove" aria-label="Remove image">×</button></div>';document.getElementById("civicAiRemove")?.addEventListener("click",()=>{file.value="";evidence.innerHTML='<div class="civic-ai-evidence-empty"><i data-lucide="image-plus"></i><span>Attach a road photo for visual analysis</span><small>Text-only reports still work, but evidence quality may be lower.</small></div>';refresh()});refresh()});document.getElementById("civicAiSend")?.addEventListener("click",()=>runCitizenAi(input.value));document.querySelectorAll("[data-ai-suggest]").forEach(b=>b.addEventListener("click",()=>{input.value=b.dataset.aiSuggest;runCitizenAi(input.value)}));input?.addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();runCitizenAi(input.value)}})}
-/* Civic AI engine contract.
-   portal-upgrade.js never owns the model implementation.
-   It consumes the isolated civic-engine contract and keeps uncertainty visible.
-*/
-const CIVIC_AI_ENGINE={
-  mode:window.CivicLocalEngine ? "deterministic-fallback" : "unavailable",
-  version:"0.2",
-  capabilities:["road-defect-classification","language-extraction","routing-suggestion","risk-assessment","duplicate-signal"],
-  analyzeRoad(input){
-    try{
-      if(!window.CivicLocalEngine) return {provider:"unavailable",result:null,error:"engine-not-loaded"};
-      const result=window.CivicLocalEngine.analyzeReport(input||{});
-      return {
-        provider:"deterministic-fallback",
-        result,
-        modelConfidence:result.modelConfidence,
-        visualAnalysis:result.visualAnalysis,
-        routingConfidence:result.routing?.confidence ?? null
-      };
-    }catch(error){
-      return {provider:"deterministic-fallback",result:null,error:"analysis-unavailable"};
+  for (const [key, cat] of Object.entries(CATEGORIES)) {
+    const hits = matchTerms(text, cat.keywords).length;
+
+    if (hits > bestHits) {
+      bestKey = key;
+      bestHits = hits;
     }
   }
+
+  return {
+    key: bestKey,
+    hits: bestHits
+  };
+}
+
+function analyzeReport({
+  categoryKey,
+  description,
+  location,
+  hasPhoto
+}) {
+  const text = description.toLowerCase();
+  const detected = detectCategory(text);
+
+  let key =
+    categoryKey && categoryKey !== "other"
+      ? categoryKey
+      : detected.key;
+
+  const autoDetected =
+    (!categoryKey || categoryKey === "other") &&
+    detected.key !== "other";
+
+  const chosenHits =
+    categoryKey && CATEGORIES[categoryKey]
+      ? matchTerms(
+          text,
+          CATEGORIES[categoryKey].keywords
+        ).length
+      : 0;
+
+  const suggestion =
+    categoryKey &&
+    categoryKey !== "other" &&
+    chosenHits === 0 &&
+    detected.hits > 0 &&
+    detected.key !== categoryKey
+      ? detected.key
+      : null;
+
+  if (!CATEGORIES[key]) {
+    key = "other";
+  }
+
+  const cat = CATEGORIES[key];
+
+  const highHits = matchTerms(
+    text,
+    HIGH_PRIORITY_SIGNALS
+  );
+
+  const impactHits = matchTerms(
+    text,
+    IMPACT_SIGNALS
+  );
+
+  const lowHits = matchTerms(
+    text,
+    LOW_SIGNALS
+  );
+
+  let priority = "Medium";
+
+  if (
+    highHits.length ||
+    impactHits.length >= 2
+  ) {
+    priority = "High";
+  } else if (
+    lowHits.length &&
+    !impactHits.length
+  ) {
+    priority = "Low";
+  }
+
+  const confidence = Math.min(
+    97,
+    62 +
+      Math.min(
+        Math.max(
+          detected.hits,
+          chosenHits
+        ),
+        3
+      ) *
+        8 +
+      (categoryKey &&
+      categoryKey !== "other"
+        ? 8
+        : 0) +
+      (hasPhoto ? 6 : 0) +
+      Math.min(
+        highHits.length +
+          impactHits.length,
+        3
+      ) *
+        3
+  );
+
+  let riskNote = "";
+
+  if (highHits.length) {
+    riskNote =
+      ` The report mentions risk factors (${highHits.join(
+        ", "
+      )}), so it is flagged for urgent attention.`;
+  } else if (impactHits.length >= 2) {
+    riskNote =
+      ` Impact factors (${impactHits.join(
+        ", "
+      )}) raise its urgency.`;
+  }
+
+  const summary =
+    `A citizen reports a ${cat.aiLabel.toLowerCase()} problem at ${location}. ` +
+    `${firstSentence(description)}${riskNote}`;
+
+  const recommendation =
+    priority === "High"
+      ? `Priority dispatch: ${cat.action} Secure the area until the work is complete.`
+      : cat.action;
+
+  return {
+    categoryKey: key,
+    categoryLabel: cat.aiLabel,
+    department: cat.department,
+    priority,
+    confidence,
+    summary,
+    recommendation,
+    responseTime: RESPONSE_TIME[priority],
+    signals: [
+      ...highHits,
+      ...impactHits
+    ],
+    skills: cat.skills,
+    autoDetected,
+    suggestion,
+    duplicate: findPossibleDuplicate(
+      key,
+      location,
+      description
+    ),
+  };
+}
+
+function tokenize(text) {
+  return [
+    ...new Set(
+      text
+        .toLowerCase()
+        .split(/[^a-z0-9]+/)
+        .filter(
+          (w) =>
+            w.length >= 4 &&
+            !STOPWORDS.has(w)
+        )
+    )
+  ];
+}
+
+function findPossibleDuplicate(
+  categoryKey,
+  location,
+  description
+) {
+  const tokens = tokenize(
+    `${location} ${description}`
+  );
+
+  let best = null;
+  let bestScore = 0;
+
+  for (const issue of issues) {
+    if (
+      issue.status === "Resolved" ||
+      issue.category !== categoryKey
+    ) {
+      continue;
+    }
+
+    const issueTokens = new Set(
+      tokenize(
+        `${issue.location} ${issue.title}`
+      )
+    );
+
+    const score = tokens.filter(
+      (t) => issueTokens.has(t)
+    ).length;
+
+    if (score > bestScore) {
+      best = issue;
+      bestScore = score;
+    }
+  }
+
+  return bestScore >= 2
+    ? best
+    : null;
+}
+
+
+/* =========================================================
+   3. DEMO DATA
+   ========================================================= */
+
+const NOW = Date.now();
+const HOUR = 36e5;
+
+const SEED_ISSUES = [
+  {
+    id: "CIV-1042",
+    title: "Large pothole near school entrance",
+    category: "roads",
+    priority: "High",
+    status: "Reported",
+    hoursAgo: 2,
+    supporters: 23,
+    area: "Ward 4",
+    location:
+      "Oakridge Primary School, Main Road",
+    description:
+      "A large, deep pothole has formed right at the school entrance. Cars swerve to avoid it and it is dangerous for children crossing in the morning."
+  },
+
+  {
+    id: "CIV-1041",
+    title:
+      "Garbage collection delayed for a week",
+    category: "garbage",
+    priority: "Medium",
+    status: "In Progress",
+    hoursAgo: 9,
+    supporters: 41,
+    area: "Ward 2",
+    location:
+      "Market Street, Block C",
+    description:
+      "Garbage has not been collected for seven days. Bins are overflowing onto the footpath and the smell is spreading to nearby shops."
+  },
+
+  {
+    id: "CIV-1040",
+    title:
+      "Streetlight repaired on Lake View Road",
+    category: "streetlights",
+    priority: "Low",
+    status: "Resolved",
+    hoursAgo: 30,
+    supporters: 12,
+    area: "Ward 3",
+    location:
+      "Lake View Road, near Pine Apartments",
+    description:
+      "One streetlight was flickering and then stopped working. The stretch was dark after 8pm."
+  },
+
+  {
+    id: "CIV-1039",
+    title:
+      "Water pipe leaking onto footpath",
+    category: "water",
+    priority: "Medium",
+    status: "Verified",
+    hoursAgo: 14,
+    supporters: 17,
+    area: "Ward 1",
+    location:
+      "Station Road, near the bus depot",
+    description:
+      "A water pipe under the footpath has been leaking for two days. Clean water is being wasted and the path is slippery."
+  },
+
+  {
+    id: "CIV-1038",
+    title:
+      "Open drain overflowing after rain",
+    category: "water",
+    priority: "High",
+    status: "In Progress",
+    hoursAgo: 26,
+    supporters: 58,
+    area: "Ward 5",
+    location:
+      "Riverside Colony, Lane 5",
+    description:
+      "The open drain overflows every time it rains and sewage water floods the lane. Residents cannot walk through safely."
+  },
+
+  {
+    id: "CIV-1037",
+    title:
+      "Exposed wires on streetlight pole",
+    category: "streetlights",
+    priority: "High",
+    status: "Verified",
+    hoursAgo: 20,
+    supporters: 34,
+    area: "Ward 3",
+    location:
+      "Central Park, west gate",
+    description:
+      "The cover of the streetlight pole is missing and exposed wires are hanging at hand height. This is unsafe for children playing nearby."
+  },
+
+  {
+    id: "CIV-1036",
+    title:
+      "Illegal dumping in empty plot",
+    category: "garbage",
+    priority: "Medium",
+    status: "Reported",
+    hoursAgo: 30,
+    supporters: 9,
+    area: "Ward 2",
+    location:
+      "Behind Green Avenue Apartments",
+    description:
+      "Construction waste and household trash are being dumped in the empty plot at night. The pile keeps growing."
+  },
+
+  {
+    id: "CIV-1035",
+    title:
+      "Mosquito breeding in stagnant water",
+    category: "health",
+    priority: "Medium",
+    status: "In Progress",
+    hoursAgo: 48,
+    supporters: 27,
+    area: "Ward 5",
+    location:
+      "Riverside Colony playground",
+    description:
+      "Stagnant water has collected around the playground and there are a lot of mosquitoes. Several families reported dengue symptoms."
+  },
+
+  {
+    id: "CIV-1034",
+    title:
+      "Leaking roof and broken desks at public school",
+    category: "education",
+    priority: "Medium",
+    status: "Reported",
+    hoursAgo: 52,
+    supporters: 19,
+    area: "Ward 6",
+    location:
+      "Government High School, Hill Road",
+    description:
+      "Two classrooms have a leaking roof and many desks are broken. Students are sitting on the floor during lessons."
+  },
+
+  {
+    id: "CIV-1033",
+    title:
+      "Trees cut down without permission",
+    category: "environment",
+    priority: "Medium",
+    status: "Verified",
+    hoursAgo: 72,
+    supporters: 46,
+    area: "Ward 6",
+    location:
+      "Old Mill Road",
+    description:
+      "Six old trees were cut down along the road over the weekend. Residents are not aware of any approval for this."
+  },
+
+  {
+    id: "CIV-1032",
+    title:
+      "Traffic signal not working at junction",
+    category: "safety",
+    priority: "High",
+    status: "Resolved",
+    hoursAgo: 96,
+    supporters: 64,
+    area: "Ward 1",
+    location:
+      "Clock Tower Junction",
+    description:
+      "The traffic signal at the junction has been off since the storm. There was almost an accident during rush hour."
+  },
+
+  {
+    id: "CIV-1031",
+    title:
+      "Road cracks and waterlogging on ring road",
+    category: "roads",
+    priority: "Medium",
+    status: "In Progress",
+    hoursAgo: 120,
+    supporters: 22,
+    area: "Ward 4",
+    location:
+      "Sector 9 Ring Road",
+    description:
+      "Long cracks have opened up on the road surface and water collects in them after rain, slowing traffic."
+  },
+
+  {
+    id: "CIV-1030",
+    title:
+      "Overflowing public bins at bus terminal",
+    category: "garbage",
+    priority: "Low",
+    status: "Resolved",
+    hoursAgo: 144,
+    supporters: 8,
+    area: "Ward 1",
+    location:
+      "City Bus Terminal",
+    description:
+      "The public bins at the terminal are full by noon and litter spreads across the waiting area."
+  },
+
+  {
+    id: "CIV-1029",
+    title:
+      "Dark stretch with no working streetlights",
+    category: "streetlights",
+    priority: "Medium",
+    status: "Reported",
+    hoursAgo: 76,
+    supporters: 31,
+    area: "Ward 3",
+    location:
+      "Canal Walk, between bridges 2 and 3",
+    description:
+      "Almost all lamps on this walkway are out. It is completely dark at night and many people avoid walking home this way."
+  }
+];
+
+let issues = [];
+let nextIssueNumber = 1043;
+
+const PEOPLE = [
+  {
+    name: "Aisha Rahman",
+    role: "Student · GIS & mapping",
+    area: "Ward 4",
+    skills: [
+      "Mapping",
+      "Data Analysis",
+      "Photography"
+    ]
+  },
+
+  {
+    name: "Daniel Okafor",
+    role: "Civil engineer",
+    area: "Ward 1",
+    skills: [
+      "Infrastructure Assessment",
+      "Project Management"
+    ]
+  },
+
+  {
+    name: "Meera Iyer",
+    role: "Graphic designer",
+    area: "Ward 2",
+    skills: [
+      "Graphic Design",
+      "Social Media"
+    ]
+  },
+
+  {
+    name: "Carlos Mendes",
+    role: "Licensed electrician",
+    area: "Ward 3",
+    skills: [
+      "Electrical Repair",
+      "Infrastructure Assessment"
+    ]
+  },
+
+  {
+    name: "Priya Nair",
+    role: "Community organizer",
+    area: "Ward 5",
+    skills: [
+      "Community Outreach",
+      "Event Organizing",
+      "Social Media"
+    ]
+  },
+
+  {
+    name: "Tom Becker",
+    role: "Retired plumber",
+    area: "Ward 1",
+    skills: [
+      "Plumbing",
+      "Infrastructure Assessment"
+    ]
+  },
+
+  {
+    name: "Lina Haddad",
+    role: "Public health nurse",
+    area: "Ward 5",
+    skills: [
+      "Public Health",
+      "Community Outreach"
+    ]
+  },
+
+  {
+    name: "Green Ward Collective",
+    role: "Environmental NGO · 120 members",
+    area: "Citywide",
+    org: true,
+    skills: [
+      "Environmental Science",
+      "Event Organizing",
+      "Community Outreach"
+    ]
+  },
+
+  {
+    name: "City Tech Students Club",
+    role: "University club · 45 members",
+    area: "Citywide",
+    org: true,
+    skills: [
+      "Mapping",
+      "Data Analysis",
+      "Social Media",
+      "Teaching"
+    ]
+  }
+];
+
+const MISSIONS = [
+  {
+    id: "M1",
+    issueId: "CIV-1035",
+    title:
+      "Riverside drain & mosquito cleanup drive",
+    needed: 12,
+    joined: 7,
+    description:
+      "Clear stagnant water, distribute repellent and share prevention tips with families.",
+    skills: [
+      "Event Organizing",
+      "Community Outreach",
+      "Public Health"
+    ]
+  },
+
+  {
+    id: "M2",
+    issueId: "CIV-1041",
+    title:
+      "Waste segregation awareness campaign",
+    needed: 6,
+    joined: 3,
+    description:
+      "Design posters and social posts so Market Street shops separate waste correctly.",
+    skills: [
+      "Graphic Design",
+      "Social Media",
+      "Community Outreach"
+    ]
+  },
+
+  {
+    id: "M3",
+    issueId: "CIV-1029",
+    title:
+      "Map every unlit street in Ward 3",
+    needed: 5,
+    joined: 2,
+    description:
+      "Walk the ward at night, photograph dark spots and build a lighting gap map for the department.",
+    skills: [
+      "Mapping",
+      "Data Analysis",
+      "Photography"
+    ]
+  },
+
+  {
+    id: "M4",
+    issueId: "CIV-1034",
+    title:
+      "Assess school building safety",
+    needed: 4,
+    joined: 1,
+    description:
+      "Document classroom damage and help the school prepare a repair request.",
+    skills: [
+      "Infrastructure Assessment",
+      "Teaching",
+      "Project Management"
+    ]
+  },
+
+  {
+    id: "M5",
+    issueId: "CIV-1033",
+    title:
+      "Tree census on Old Mill Road",
+    needed: 8,
+    joined: 3,
+    description:
+      "Count and map remaining trees to support the environment department's investigation.",
+    skills: [
+      "Environmental Science",
+      "Mapping",
+      "Data Analysis"
+    ]
+  }
+];
+
+const WEEKLY_BASELINE = {
+  reported: [6, 9, 7, 11, 8, 12, 5],
+  resolved: [4, 6, 8, 7, 9, 8, 3]
 };
-window.CIVIC_AI_ENGINE=CIVIC_AI_ENGINE;
-let civicAiContext={lastIssue:"",lastLocation:"",lastSeverity:"",lastRoute:"",turns:[]};
-function runCitizenAi(text){text=(text||"").trim();if(!text)return;const messages=document.getElementById("civicAiMessages"),input=document.getElementById("civicAiInput");messages.insertAdjacentHTML("beforeend",'<div class="civic-ai-message user"><div><p>'+escapeAi(text)+'</p></div></div>');input.value="";messages.insertAdjacentHTML("beforeend",'<div class="civic-ai-message assistant processing"><span class="civic-ai-avatar"><i data-lucide="sparkles"></i></span><div><strong>Civic AI</strong><p>Understanding the issue, location, safety signals and reporting route…</p></div></div>');refresh();setTimeout(()=>{let a=null;try{a=CIVIC_AI_ENGINE.analyzeRoad({description:text,location:text,hasPhoto:!!document.getElementById("civicAiFile")?.files?.length}).result}catch(e){}const lower=text.toLowerCase();
-const issue=a?.categoryLabel||(/flood|waterlogging|drain/i.test(lower)?"Flooding / drainage":/light|streetlight|lamp/i.test(lower)?"Street lighting":/garbage|waste|trash/i.test(lower)?"Waste / sanitation":/water|leak|pipe/i.test(lower)?"Water supply":"Road damage");
-if(/where|location|place|which area|which district/i.test(lower)&&civicAiContext.lastLocation){
-  civicAiContext.lastLocation=civicAiContext.lastLocation;
-}const severity=a?.severity||(/huge|large|deep|danger|unsafe|blocked|accident/i.test(lower)?"High":"Medium");const safety=/danger|dangerous|unsafe|accident|swerving|children|school|hospital|night|blocked/i.test(lower)?"Elevated":"Not clearly indicated";const impact=/school|college|hospital|market|many|traffic|vehicles|blocked|children/i.test(lower)?"Community / access impact":"Needs more context";let loc="Not confidently identified";const districts=["Imphal East","Imphal West","Thoubal","Bishnupur","Churachandpur","Chandel","Tamenglong","Ukhrul","Senapati"];for(const d of districts)if(lower.includes(d.toLowerCase()))loc=d;const route=a?.routing?.division||"Jurisdiction uncertain · human verification required";const confidence=Math.round(a?.confidence||68);const priorityScore=a?.priorityScore||null;
-civicAiContext.lastIssue=issue;civicAiContext.lastLocation=loc;civicAiContext.lastSeverity=severity;civicAiContext.lastRoute=route;
-civicAiContext.turns.push({role:"user",text,issue,location:loc,severity,route});
-if(civicAiContext.turns.length>12)civicAiContext.turns.shift();const card=document.getElementById("civicAiExtraction");card.innerHTML='<h3>Live issue understanding</h3><p>Structured from your message. Fields marked for verification stay uncertain.</p><div class="civic-ai-fields"><div><span>ISSUE</span><b>'+issue+'</b></div><div><span>LOCATION</span><b>'+loc+'</b></div><div><span>SEVERITY</span><b>'+severity+'</b></div><div><span>SAFETY</span><b>'+safety+'</b></div><div><span>IMPACT</span><b>'+impact+'</b></div><div><span>ROUTE</span><b>'+route+'</b></div></div><div class="civic-ai-scorebar"><div><span>PRIORITY SIGNAL</span><strong>'+ (priorityScore!=null?priorityScore+"/100":"Review required") +'</strong></div><div class="civic-score-track"><i style="width:'+Math.max(8,priorityScore||18)+'%"></i></div></div><div class="civic-ai-confidence">Analysis confidence <b>'+confidence+'%</b></div>';const next=document.getElementById("civicAiNext");next.innerHTML='<i data-lucide="route"></i><div><strong>Recommended path</strong><p>'+(issue==="Road damage"?"This looks suitable for a PWD road report. Add a photo and precise location for stronger evidence.":"This may need a different civic service channel. Civic AI should verify the responsible authority before submission.")+'</p></div>';const processing=messages.querySelector(".processing");processing?.remove();messages.insertAdjacentHTML("beforeend",'<div class="civic-ai-message assistant"><span class="civic-ai-avatar"><i data-lucide="sparkles"></i></span><div><strong>Civic AI</strong><p>I understand this as <b>'+issue+'</b> with <b>'+severity.toLowerCase()+' severity</b>. '+(loc!=="Not confidently identified"?"I found a possible district signal for <b>"+loc+"</b>, but jurisdiction still needs verification.":"I could not confidently identify the jurisdiction yet.")+' '+(issue==="Road damage"?"For a stronger PWD report, add a clear photo and exact location.":"I would not route this to PWD without confirming the service area.")+'</p></div></div>');refresh()},650)}
-function escapeAi(value){return value.replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
-function renderPage(key){const main=document.getElementById("civicWorkspaceMain");if(!main)return;let html="";
-if(portal==="citizen"){if(key==="home")html='<div class="civic-welcome civic-welcome-visual"><div><span class="civic-entry-badge">CITIZEN WORKSPACE · MANIPUR</span><h1>See a problem.<br><span>Turn it into action.</span></h1><p>Capture road evidence once. Civic OS helps structure it, assess risk and guide it toward the right public works team.</p><div class="civic-home-actions"><button class="civic-work-primary" data-action="report"><i data-lucide="camera-plus"></i><span>Report a road problem</span></button><button class="civic-work-secondary" data-action="ai"><i data-lucide="sparkles"></i><span>Ask Civic AI</span></button></div></div><div class="civic-home-visual"><img src="'+CIVIC_DEMO_IMAGES.road+'" alt="Road scene in Imphal, Manipur"><div class="civic-image-overlay"><span>LIVE EVIDENCE VIEW</span><b>Road network · Manipur</b><small>Illustrative reference image</small></div></div></div><div class="civic-stat-strip"><div><strong>3</strong><span>My reports</span></div><div><strong>1</strong><span>In progress</span></div><div><strong>2</strong><span>Resolved</span></div><div class="civic-stat-highlight"><i data-lucide="shield-check"></i><span><b>Human verified</b> final decisions stay with officials</span></div></div><div class="civic-home-grid"><section class="civic-section-panel"><div class="civic-section-head"><div><span class="civic-entry-badge">RECENT EVIDENCE</span><h3>Reports with visual proof</h3><p>See the evidence behind each case instead of reading a wall of text.</p></div><button class="civic-text-link" data-action="reports">View all <i data-lucide="arrow-up-right"></i></button></div><div class="civic-evidence-grid"><article class="civic-evidence-card"><img src="'+CIVIC_DEMO_IMAGES.pothole+'" alt="Pothole road evidence"><div><span>NEEDS INSPECTION · 94</span><b>Large road surface damage</b><small>Imphal East · RD-104 · Demo evidence</small></div></article><article class="civic-evidence-card"><img src="'+CIVIC_DEMO_IMAGES.market+'" alt="Road and market scene in Thoubal"><div><span>UNDER REVIEW · 87</span><b>Cracked surface near market</b><small>Thoubal · RD-087 · Demo evidence</small></div></article></div></section><aside class="civic-section-panel civic-home-path"><span class="civic-entry-badge">HOW IT MOVES</span><h3>From street view to PWD review.</h3><div><i data-lucide="camera"></i><span><b>1 · Capture</b><small>Photo, location and description</small></span></div><div><i data-lucide="brain-circuit"></i><span><b>2 · Understand</b><small>AI structures issue and risk</small></span></div><div><i data-lucide="shield-check"></i><span><b>3 · Verify</b><small>Officials make the final call</small></span></div></aside></div>';else if(key==="report")html='<div class="civic-empty-page"><div><span class="civic-entry-badge">PWD-01 · ROAD REPORTING</span><h2>Report a road problem</h2><p>Your existing report flow keeps its AI evidence analysis, location routing and priority logic.</p><button class="civic-work-primary" data-action="report">Open report flow</button></div></div>';
-else if(key==="ai")html='<div class="civic-empty-page"><div><span class="civic-entry-badge">PWD-02 · CIVIC AI</span><h2>Ask Civic AI</h2><p>Describe what is happening naturally. Civic AI helps identify the issue, location, urgency and reporting path.</p><button class="civic-work-primary" data-action="ai">Open Civic AI</button></div></div>';
-else if(key==="reports")html='<div class="civic-reports-page"><div class="civic-ai-page-head"><div><span class="civic-entry-badge">YOUR CIVIC ACTIVITY</span><h1>Know what happened to your reports.</h1><p>Follow every report from evidence submission to PWD review and resolution.</p></div><div class="civic-ai-live"><i data-lucide="activity"></i><span>3 active records</span></div></div><div class="civic-report-history"><article class="civic-history-card civic-history-visual"><img src="https://commons.wikimedia.org/wiki/Special:Redirect/file/Sturdy%20Mahindra%20Jeeps%20are%20the%20only%20vehicles%20that%20can%20stand%20up%20to%20those%20potholed%20roads%21.jpg" alt="Illustrative road damage evidence"><div class="civic-history-content"><div class="civic-history-top"><div><span class="civic-status-pill critical">Needs inspection</span><h3>Large pothole near Kangla Road</h3><small>Imphal East · Report #RD-104</small></div><strong>94</strong></div><div class="civic-history-line"><span class="is-done"><i>✓</i>Submitted</span><span class="is-done"><i>✓</i>AI analysed</span><span class="is-active"><i>3</i>PWD inspection</span><span><i>4</i>Resolution</span></div><p>AI identified a high-priority road defect. The case is in the PWD inspection queue.</p></div></article><article class="civic-history-card civic-history-visual"><img src="https://commons.wikimedia.org/wiki/Special:Redirect/file/Thoubal%20bazar.jpg" alt="Illustrative road evidence"><div class="civic-history-content"><div class="civic-history-top"><div><span class="civic-status-pill review">Under review</span><h3>Cracked road surface near Thoubal market</h3><small>Thoubal · Report #RD-087</small></div><strong>87</strong></div><div class="civic-history-line"><span class="is-done"><i>✓</i>Submitted</span><span class="is-done"><i>✓</i>AI analysed</span><span class="is-active"><i>3</i>PWD review</span><span><i>4</i>Resolution</span></div><p>Evidence has been structured and routed for government review.</p></div></article><article class="civic-history-card civic-history-visual resolved"><img src="https://commons.wikimedia.org/wiki/Special:Redirect/file/Toubul%20Patmang%20Road%20Diversion%20on%20a%20rainy%20day.jpg" alt="Illustrative road scene after rain"><div class="civic-history-content"><div class="civic-history-top"><div><span class="civic-status-pill resolved">Resolved</span><h3>Road edge damage at Bishnupur bypass</h3><small>Bishnupur · Report #RD-061</small></div><strong>76</strong></div><div class="civic-history-line"><span class="is-done"><i>✓</i>Submitted</span><span class="is-done"><i>✓</i>AI analysed</span><span class="is-done"><i>✓</i>Inspected</span><span class="is-done"><i>✓</i>Resolved</span></div><p>Maintenance evidence was reviewed and the report was closed by an authorized official.</p></div></article></div></div>';
-else html='<div class="civic-account-page"><div class="civic-ai-page-head"><div><span class="civic-entry-badge">MY ACCOUNT</span><h1>Your Civic profile.</h1><p>Manage your identity, notifications and how Civic OS uses your submitted evidence.</p></div></div><div class="civic-account-grid"><section class="civic-work-card"><div class="civic-profile-card"><div class="civic-profile-avatar">BP</div><div><h3>Citizen profile</h3><p>Verified citizen account</p></div><button><i data-lucide="pencil"></i></button></div><div class="civic-account-fields"><div><span>Name</span><b>Basanta Pukh</b></div><div><span>Preferred district</span><b>Imphal East</b></div><div><span>Reports submitted</span><b>3</b></div></div></section><section class="civic-work-card"><h3>Settings</h3><button class="civic-setting-row"><span><i data-lucide="bell"></i>Notifications</span><b>On</b></button><button class="civic-setting-row"><span><i data-lucide="shield"></i>Privacy & evidence</span><b>›</b></button><button class="civic-setting-row"><span><i data-lucide="sparkles"></i>How Civic AI works</span><b>›</b></button></section></div></div>';}
-else {if(key==="overview")html='<div class="civic-welcome civic-welcome-visual civic-gov-hero"><div><span class="civic-entry-badge">PWD COMMAND CENTER · PWD-03</span><h1>Know which roads need attention first.</h1><p>See the evidence, risk signals and inspection priorities in one operational workspace.</p><div class="civic-home-actions"><button class="civic-work-primary" data-action="intelligence"><i data-lucide="brain-circuit"></i><span>Open intelligence</span></button><button class="civic-work-secondary" data-action="open-inspections"><i data-lucide="clipboard-check"></i><span>Field inspections</span></button></div></div><div class="civic-home-visual"><img src="'+CIVIC_DEMO_IMAGES.road+'" alt="Road scene in Manipur"><div class="civic-image-overlay"><span>PWD · VISUAL COMMAND</span><b>Road condition evidence</b><small>Illustrative reference image</small></div></div></div><div class="civic-stat-grid"><div class="civic-stat"><strong>18</strong><span>Critical</span></div><div class="civic-stat"><strong>42</strong><span>Needs inspection</span></div><div class="civic-stat"><strong>126</strong><span>Stable</span></div></div><div class="civic-work-grid" style="margin-top:18px"><section class="civic-work-card"><h3>🧠 AI priority queue</h3><p>Inspection candidates ranked by safety risk, impact, recurrence and evidence quality.</p><div class="civic-hero-action"><div><strong>View PWD intelligence</strong><span>Explainable priority · Road Passport · field brief</span></div><div class="civic-command-orbit" aria-hidden="true"><span></span><i>AI</i><b></b></div><button class="civic-work-primary" data-action="intelligence">Open intelligence →</button></div></section><aside class="civic-work-card"><h3>Inspection focus</h3><div class="civic-quick-grid"><div class="civic-quick"><i data-lucide="triangle-alert"></i><span>High-risk corridors<small>Safety and repeat-failure signals</small></span></div><div class="civic-quick"><i data-lucide="map-pin"></i><span>Active zones<small>District-level concentration</small></span></div></div></aside></div><section class="civic-work-card civic-ai-trust-panel"><div class="civic-section-head"><div><h3>🔎 AI evidence health</h3><p>Separate confidence from evidence quality so officials can see where human review matters.</p></div><span class="civic-demo-chip">Prototype decision layer</span></div><div class="civic-trust-metrics"><div><span>Model confidence</span><b>91%</b><small>Issue classification</small></div><div><span>Evidence quality</span><b>86%</b><small>Photo + location + description</small></div><div><span>Routing confidence</span><b>92%</b><small>District-to-division match</small></div><div><span>Decision certainty</span><b>78%</b><small>Prioritisation remains advisory</small></div></div><div class="civic-ai-boundary"><i data-lucide="shield-alert"></i><span><b>Human review required</b> · Confidence is not proof. Low-quality or ambiguous evidence should be inspected before action.</span></div></section>';
-else if(key==="intelligence")html='<div class="civic-empty-page"><div><span class="civic-entry-badge">PWD-03 · DECISION INTELLIGENCE</span><h2>Prioritise with evidence.</h2><p>Your existing Road Passport and explainable priority layer stays at the centre of this workspace.</p><button class="civic-work-primary" data-action="intelligence">Open PWD intelligence</button></div></div>';
-else if(key==="inspections")html='<div class="civic-empty-page"><div><span class="civic-entry-badge">FIELD WORKFLOW · PWD-03</span><h2>Inspection queue</h2><p>Verify AI-prioritised road cases in the field, capture observations and move verified cases toward maintenance.</p><div class="civic-empty-actions"><button class="civic-work-primary" data-action="open-inspections">Open inspection queue →</button><button class="civic-work-secondary" data-action="open-verification"><i data-lucide="scan-search"></i>Repair verification</button></div></div></div>';
-else if(key==="roads")html='<div class="civic-empty-page"><div><span class="civic-entry-badge">ROAD PASSPORTS</span><h2>Browse the road asset network.</h2><p>Open a road segment to inspect its health, recurrence, evidence and maintenance lifecycle.</p><button class="civic-work-primary" data-action="intelligence">Open road intelligence →</button></div></div>';else if(key==="architecture")html='<div class="civic-empty-page"><div><span class="civic-entry-badge">TECHNICAL METHOD</span><h2>Understand the Civic OS pipeline.</h2><p>See how evidence becomes explainable road-maintenance intelligence and where human verification remains mandatory.</p><button class="civic-work-primary" data-action="architecture">Open architecture →</button></div></div>';
-else html='<div class="civic-account-page"><div class="civic-ai-page-head"><div><span class="civic-entry-badge">PWD OFFICER ACCOUNT</span><h1>Government workspace.</h1><p>Keep officer identity, division access and operational activity in one place.</p></div><div class="civic-ai-live"><i data-lucide="badge-check"></i><span>Verified access</span></div></div><div class="civic-account-grid"><section class="civic-work-card"><div class="civic-profile-card"><div class="civic-profile-avatar">PW</div><div><h3>PWD Operations Officer</h3><p>Manipur Public Works Department</p></div><button><i data-lucide="pencil"></i></button></div><div class="civic-account-fields"><div><span>Designation</span><b>Infrastructure Review</b></div><div><span>Division</span><b>Imphal East</b></div><div><span>Active inspections</span><b>12</b></div><div><span>Reviewed cases</span><b>48</b></div></div></section><section class="civic-work-card"><h3>Permissions & settings</h3><button class="civic-setting-row"><span><i data-lucide="shield-check"></i>Decision permissions</span><b>Officer</b></button><button class="civic-setting-row"><span><i data-lucide="bell"></i>Operational alerts</span><b>On</b></button><button class="civic-setting-row"><span><i data-lucide="history"></i>Activity log</span><b>›</b></button><button class="civic-setting-row"><span><i data-lucide="settings-2"></i>System settings</span><b>›</b></button></section></div><section class="civic-work-card civic-account-log"><h3>Recent activity</h3><div class="civic-officer-event"><i data-lucide="badge-check"></i><span><b>Verified RD-104</b><small>Kangla Road corridor · today</small></span></div><div class="civic-officer-event"><i data-lucide="clipboard-check"></i><span><b>Reviewed RD-087</b><small>Thoubal market approach · yesterday</small></span></div><div class="civic-officer-event"><i data-lucide="scan-search"></i><span><b>Recorded repair evidence</b><small>Bishnupur bypass · 2 days ago</small></span></div></section></div>';}
-main.innerHTML=html;main.className="civic-workspace-main "+(portal==="government"?"civic-government":"civic-citizen");main.querySelectorAll("[data-action]").forEach(b=>b.onclick=()=>action(b.dataset.action));document.getElementById("civicPortalLabel").textContent=configs[portal].label;document.getElementById("civicPortalSub").textContent=configs[portal].sub;refresh();}
-function renderNav(){const n=document.getElementById("civicWorkspaceNav");n.innerHTML=configs[portal].nav.map(x=>'<button type="button" class="civic-nav-btn '+(x[0]===current?"is-active":"")+'" data-work-nav="'+x[0]+'"><i data-lucide="'+x[2]+'"></i><span>'+x[1]+"</span></button>").join("");n.querySelectorAll("[data-work-nav]").forEach(b=>b.onclick=()=>{current=b.dataset.workNav;renderNav();renderPage(current)});}
-function refresh(){if(window.lucide&&window.lucide.createIcons)window.lucide.createIcons()}
-function openApp(p){portal=p;current=p==="government"?"overview":"home";shell.classList.add("is-hidden");workspace.classList.add("is-active");document.body.dataset.portal=p;renderNav();renderPage(current)}
-function closeWorkspace(){workspace.classList.remove("is-active")}
-show("splash");setTimeout(()=>show("auth"),1300);
-document.addEventListener("DOMContentLoaded",()=>{refresh();document.querySelectorAll("[data-portal]").forEach(b=>b.addEventListener("click",()=>openApp(b.dataset.portal)));document.getElementById("civicDemoEntry")?.addEventListener("click",()=>show("portal"));document.getElementById("civicBackToAuth")?.addEventListener("click",()=>show("auth"));document.getElementById("civicWorkspaceBrand")?.addEventListener("click",()=>{current=portal==="government"?"overview":"home";renderNav();renderPage(current)});document.getElementById("civicAccountButton")?.addEventListener("click",()=>{current="account";renderNav();renderPage(current)});document.getElementById("civicLoginForm")?.addEventListener("submit",e=>{e.preventDefault();show("portal")});document.querySelectorAll("[data-auth-tab]").forEach(t=>t.addEventListener("click",()=>{document.querySelectorAll("[data-auth-tab]").forEach(x=>x.classList.remove("is-active"));t.classList.add("is-active")}))});
-document.addEventListener("pointermove",e=>{const b=shell.querySelector(".civic-portal-beam");if(b&&!shell.classList.contains("is-hidden")){b.style.left=e.clientX+"px";b.style.top=e.clientY+"px"}});
-})();
+
+const EXAMPLES = [
+  {
+    category: "roads",
+    location:
+      "Near the school entrance, Main Road",
+    description:
+      "There is a large pothole near the school entrance. Cars swerve around it and it is dangerous for children crossing."
+  },
+
+  {
+    category: "garbage",
+    location:
+      "Market Street, Block C",
+    description:
+      "Garbage has not been collected for five days and bins are overflowing onto the footpath. The smell is very bad."
+  },
+
+  {
+    category: "streetlights",
+    location:
+      "Canal Walk, Ward 3",
+    description:
+      "Three streetlights are not working on this stretch. It is completely dark at night and feels unsafe walking home."
+  },
+
+  {
+    category: "other",
+    location:
+      "Station Road, near the bus depot",
+    description:
+      "A water pipe has burst and water is flooding the road since this morning."
+  }
+];
+
+
+/* =========================================================
+   4. APP STATE & HELPERS
+   ========================================================= */
+
+const state = {
+  screen: "homeScreen",
+
+  draftPhotoUrl: null,
+
+  draft: null,
+
+  analysis: null,
+
+  analyzing: false,
+
+  exampleIndex: 0,
+
+  filters: {
+    status: "All",
+    category: "all",
+    priority: "all",
+    sort: "newest",
+    query: ""
+  },
+
+  mySkills: new Set(),
+
+  joinedMissions: new Set(),
+
+  supported: new Set(),
+
+  openIssueId: null,
+
+  civicAiOpen: false,
+
+  civicAiContext: null,
+
+  civicAiMessages: [],
+
+  civicActionId: null
+};
+
+const $ = (
+  selector,
+  root = document
+) => root.querySelector(selector);
+
+const $$ = (
+  selector,
+  root = document
+) => [
+  ...root.querySelectorAll(selector)
+];
+
+function escapeHtml(value) {
+  return String(value).replace(
+    /[&<>"']/g,
+    (ch) =>
+      ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+      })[ch]
+  );
+}
+
+function escapeRegExp(value) {
+  return value.replace(
+    /[.*+?^${}()|[\]\\]/g,
+    "\\$&"
+  );
+}
+
+function refreshIcons() {
+  if (
+    window.lucide &&
+    typeof window.lucide.createIcons ===
+      "function"
+  ) {
+    window.lucide.createIcons();
+  }
+}
+
+function firstSentence(text) {
+  const clean = text
+    .trim()
+    .replace(/\s+/g, " ");
+
+  const match = clean.match(
+    /^.*?[.!?](\s|$)/
+  );
+
+  let sentence = (
+    match ? match[0] : clean
+  ).trim();
+
+  if (sentence.length > 160) {
+    sentence =
+      sentence.slice(0, 157).trimEnd() +
+      "…";
+  }
+
+  if (!/[.!?…]$/.test(sentence)) {
+    sentence += ".";
+  }
+
+  return (
+    sentence.charAt(0).toUpperCase() +
+    sentence.slice(1)
+  );
+}
+
+function makeTitle(description) {
+  let title = firstSentence(description)
+    .replace(/[.!?…]$/, "")
+    .replace(
+      /^(there is|there are|there's|i saw|i noticed|we have|we've got)\s+(a|an|the|some)?\s*/i,
+      ""
+    );
+
+  if (title.length > 64) {
+    title =
+      title.slice(0, 61).trimEnd() +
+      "…";
+  }
+
+  return (
+    title.charAt(0).toUpperCase() +
+    title.slice(1)
+  );
+}
+
+function timeAgo(timestamp) {
+  const minutes = Math.round(
+    (Date.now() - timestamp) / 60000
+  );
+
+  if (minutes < 1) return "just now";
+
+  if (minutes < 60) {
+    return `${minutes}m ago`;
+  }
+
+  const hours = Math.round(
+    minutes / 60
+  );
+
+  if (hours < 24) {
+    return `${hours}h ago`;
+  }
+
+  const days = Math.round(
+    hours / 24
+  );
+
+  return `${days}d ago`;
+}
+
+function slug(value) {
+  return String(value)
+    .toLowerCase()
+    .replace(/\s+/g, "-");
+}
+
+function initials(name) {
+  return name
+    .split(" ")
+    .map((w) => w[0])
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
+}
+
+function statusPill(status) {
+  return `
+    <span class="pill status-${slug(status)}">
+      <span class="dot"></span>
+      ${escapeHtml(status)}
+    </span>
+  `;
+}
+
+function priorityPill(priority) {
+  return `
+    <span class="pill pill-${priority.toLowerCase()}">
+      ${escapeHtml(priority)} priority
+    </span>
+  `;
+}
+
+let toastTimer;
+
+function toast(
+  message,
+  icon = "circle-check"
+) {
+  const el = $("#toast");
+
+  if (!el) return;
+
+  el.innerHTML = `
+    <i data-lucide="${icon}"></i>
+    <span>${escapeHtml(message)}</span>
+  `;
+
+  refreshIcons();
+
+  el.classList.add("show");
+
+  clearTimeout(toastTimer);
+
+  toastTimer = setTimeout(
+    () => el.classList.remove("show"),
+    2800
+  );
+}
+
+function buildUpdates(
+  status,
+  reportedAt,
+  department
+) {
+  const notes = {
+    Reported:
+      `Report received. Civic AI categorised it and routed it to ${department}.`,
+
+    Verified:
+      "Verified by the ward officer after a site check.",
+
+    "In Progress":
+      `${department} team assigned and work scheduled.`,
+
+    Resolved:
+      "Work completed and issue closed. Supporters were notified."
+  };
+
+  const lastIndex =
+    STATUSES.indexOf(status);
+
+  const elapsed =
+    Date.now() - reportedAt;
+
+  return STATUSES.slice(
+    0,
+    lastIndex + 1
+  ).map((s, i) => ({
+    status: s,
+    note: notes[s],
+    time:
+      reportedAt +
+      (elapsed * i) /
+        (lastIndex + 1)
+  }));
+}
+
+function createIssue(seed) {
+  const analysis =
+    analyzeReport({
+      categoryKey: seed.category,
+      description: seed.description,
+      location: seed.location,
+      hasPhoto: Boolean(seed.photo)
+    });
+
+  const reportedAt =
+    seed.reportedAt ??
+    NOW - seed.hoursAgo * HOUR;
+
+  const department =
+    CATEGORIES[seed.category]?.department ||
+    "Municipal Helpdesk";
+
+  return {
+    id: seed.id,
+
+    title: seed.title,
+
+    category: seed.category,
+
+    description: seed.description,
+
+    location: seed.location,
+
+    area: seed.area,
+
+    priority:
+      seed.priority ??
+      analysis.priority,
+
+    status:
+      seed.status ??
+      "Reported",
+
+    supporters:
+      seed.supporters ?? 1,
+
+    photo:
+      seed.photo ?? null,
+
+    reportedAt,
+
+    department,
+
+    summary: analysis.summary,
+
+    recommendation:
+      seed.priority === "High" ||
+      analysis.priority === "High"
+        ? analysis.recommendation
+        : CATEGORIES[
+            seed.category
+          ]?.action ||
+          CATEGORIES.other.action,
+
+    updates: buildUpdates(
+      seed.status ?? "Reported",
+      reportedAt,
+      department
+    )
+  };
+}
+
+function getIssue(id) {
+  return issues.find(
+    (i) => i.id === id
+  );
+}
+
+function statusCounts() {
+  const counts = Object.fromEntries(
+    STATUSES.map((s) => [s, 0])
+  );
+
+  issues.forEach(
+    (i) => counts[i.status]++
+  );
+
+  return counts;
+}
+
+
+/* =========================================================
+   5. SCREEN SWITCHING
+   ========================================================= */
+
+const SCREEN_HASH = {
+  homeScreen: "home",
+  reportScreen: "report",
+  issuesScreen: "issues",
+  communityScreen: "community",
+  actionsScreen: "actions",
+  createActivityScreen: "create-activity",
+  actionDetailScreen: "action-detail",
+  dashboardScreen: "dashboard"
+};
+
+const SCREEN_TITLE = {
+  homeScreen:
+    "Civic OS — Report. Connect. Resolve.",
+
+  reportScreen:
+    "Report a problem · Civic OS",
+
+  issuesScreen:
+    "Civic issues · Civic OS",
+
+  communityScreen:
+    "Civic community · Civic OS",
+
+  actionsScreen:
+    "Civic Actions · Civic OS",
+
+  createActivityScreen: 
+    "Civic OS — Create Activity",
+
+  actionDetailScreen:
+    "Civic Action · Civic OS",
+
+  dashboardScreen:
+    "Civic dashboard · Civic OS"
+};
+
+function screenFromHash() {
+  const hash =
+    location.hash.replace("#", "");
+
+  return (
+    Object.keys(SCREEN_HASH).find(
+      (id) =>
+        SCREEN_HASH[id] === hash
+    ) || "homeScreen"
+  );
+}
+
+function showScreen(
+  id,
+  { push = true } = {}
+) {
+  if (!document.getElementById(id)) {
+    id = "homeScreen";
+  }
+
+  const dialog =
+    $("#issueDialog");
+
+  if (
+    dialog &&
+    dialog.open
+  ) {
+    dialog.close();
+  }
+
+  state.screen = id;
+
+  $$(".screen").forEach(
+    (screen) => {
+      screen.classList.toggle(
+        "active",
+        screen.id === id
+      );
+    }
+  );
+
+  $$("[data-nav]").forEach(
+    (btn) => {
+      const isActive =
+        btn.dataset.goto === id;
+
+      btn.classList.toggle(
+        "active",
+        isActive
+      );
+
+      if (isActive) {
+        btn.setAttribute(
+          "aria-current",
+          "page"
+        );
+      } else {
+        btn.removeAttribute(
+          "aria-current"
+        );
+      }
+    }
+  );
+
+  renderScreen(id);
+
+  document.title =
+    SCREEN_TITLE[id] ||
+    "Civic OS — Report. Connect. Resolve.";
+
+  window.scrollTo({
+    top: 0,
+    behavior: "instant"
+  });
+
+  const hashName =
+    SCREEN_HASH[id];
+
+  if (hashName) {
+    const hash =
+      "#" + hashName;
+
+    if (
+      push &&
+      location.hash !== hash
+    ) {
+      history.pushState(
+        { screen: id },
+        "",
+        hash
+      );
+    }
+  }
+}
+
+function renderScreen(id) {
+  if (id === "homeScreen") {
+    renderHome();
+  }
+
+  if (id === "reportScreen") {
+    updateStepper();
+  }
+
+  if (id === "issuesScreen") {
+    renderIssues();
+  }
+
+  if (id === "dashboardScreen") {
+    renderDashboard();
+  }
+
+  if (id === "communityScreen") {
+    renderCommunity();
+  }
+
+  if (id === "actionsScreen") {
+    renderCivicActions();
+  }
+
+  refreshIcons();
+}
+
+
+/* =========================================================
+   6. HOME
+   ========================================================= */
+
+function renderHome() {
+  const latest =
+    [...issues].sort(
+      (a, b) =>
+        b.reportedAt -
+        a.reportedAt
+    )[0];
+
+  if (!latest) return;
+
+  const cat =
+    CATEGORIES[latest.category] ||
+    CATEGORIES.other;
+
+  const stepIndex =
+    STATUSES.indexOf(
+      latest.status
+    );
+
+  const heroSignal =
+    $("#heroSignal");
+
+  if (heroSignal) {
+    heroSignal.innerHTML = `
+      <div class="signal-head">
+        <span class="signal-live">
+          <span
+            class="pulse-dot"
+            aria-hidden="true"
+          ></span>
+          Live civic signal
+        </span>
+
+        <span class="signal-id">
+          ${escapeHtml(latest.id)}
+        </span>
+      </div>
+
+      <p class="kicker">
+        ${escapeHtml(cat.aiLabel)}
+        ·
+        ${timeAgo(latest.reportedAt)}
+      </p>
+
+      <h3 class="signal-title">
+        ${escapeHtml(latest.title)}
+      </h3>
+
+      <p class="signal-loc">
+        <i data-lucide="map-pin"></i>
+        ${escapeHtml(latest.location)}
+      </p>
+
+      <div class="tag-row">
+        ${priorityPill(latest.priority)}
+        ${statusPill(latest.status)}
+      </div>
+
+      <div class="signal-ai">
+        <span class="signal-ai-label">
+          <i data-lucide="sparkles"></i>
+          Civic AI recommendation
+        </span>
+
+        <p>
+          ${escapeHtml(
+            latest.recommendation
+          )}
+        </p>
+      </div>
+
+      <ol
+        class="pipeline"
+        aria-label="Issue progress"
+      >
+        ${STATUSES.map(
+          (s, i) => `
+            <li
+              class="pipeline-step
+              ${i <= stepIndex ? "done" : ""}
+              ${i === stepIndex ? "current" : ""}"
+            >
+              ${escapeHtml(s)}
+            </li>
+          `
+        ).join("")}
+      </ol>
+
+      <div class="signal-foot">
+        <span class="signal-dept">
+          <i data-lucide="building-2"></i>
+          ${escapeHtml(
+            latest.department
+          )}
+        </span>
+
+        <button
+          type="button"
+          class="link-btn"
+          data-issue="${escapeHtml(
+            latest.id
+          )}"
+        >
+          View report
+          <i data-lucide="arrow-right"></i>
+        </button>
+      </div>
+    `;
+  }
+
+  const counts =
+    statusCounts();
+
+  const awaiting =
+    counts.Reported +
+    counts.Verified;
+
+  const homeStats =
+    $("#homeStats");
+
+  if (homeStats) {
+    homeStats.innerHTML = [
+      {
+        value: issues.length,
+        label: "Total reports"
+      },
+      {
+        value: counts.Resolved,
+        label: "Issues resolved",
+        accent: true
+      },
+      {
+        value:
+          counts["In Progress"],
+        label: "In progress"
+      },
+      {
+        value: awaiting,
+        label: "Awaiting action"
+      }
+    ]
+      .map(
+        (s) => `
+          <div
+            class="stat glass ${
+              s.accent
+                ? "stat-accent"
+                : ""
+            }"
+          >
+            <div class="stat-value">
+              ${s.value}
+            </div>
+
+            <div class="stat-label">
+              ${escapeHtml(s.label)}
+            </div>
+          </div>
+        `
+      )
+      .join("");
+  }
+
+  const recent =
+    $("#recentIssues");
+
+  if (recent) {
+    recent.innerHTML =
+      [...issues]
+        .sort(
+          (a, b) =>
+            b.reportedAt -
+            a.reportedAt
+        )
+        .slice(0, 3)
+        .map(issueCard)
+        .join("");
+  }
+
+  const openMissions =
+    MISSIONS.filter(
+      (m) =>
+        m.joined < m.needed
+    ).length;
+
+  const teaser =
+    $("#communityTeaser");
+
+  if (teaser) {
+    teaser.innerHTML = `
+      <div>
+        <p class="kicker">
+          Connect
+        </p>
+
+        <h2
+          id="teaserTitle"
+          class="teaser-title"
+        >
+          Your skills can fix your city.
+        </h2>
+
+        <p class="teaser-sub">
+          Students, designers, technicians
+          and volunteers matched to real
+          civic problems.
+        </p>
+      </div>
+
+      <div class="teaser-meta">
+        <div
+          class="avatar-stack"
+          aria-hidden="true"
+        >
+          ${PEOPLE.slice(0, 5)
+            .map(
+              (p, i) => `
+                <span
+                  class="avatar tone-${i % 4}"
+                >
+                  ${initials(p.name)}
+                </span>
+              `
+            )
+            .join("")}
+        </div>
+
+        <span class="muted-text">
+          ${PEOPLE.length}
+          contributors ·
+          ${openMissions}
+          open missions
+        </span>
+
+        <button
+          type="button"
+          class="btn btn-ghost"
+          data-goto="communityScreen"
+        >
+          Find a mission
+          <i data-lucide="arrow-right"></i>
+        </button>
+      </div>
+    `;
+  }
+
+  refreshIcons();
+}
+
+function issueCard(issue) {
+  const cat =
+    CATEGORIES[issue.category] ||
+    CATEGORIES.other;
+
+  const iconTone =
+    issue.status === "Resolved"
+      ? "is-resolved"
+      : issue.priority === "High"
+        ? "is-high"
+        : "";
+
+  return `
+    <button
+      type="button"
+      class="issue-card glass"
+      data-issue="${escapeHtml(issue.id)}"
+    >
+      <span
+        class="issue-icon ${iconTone}"
+        aria-hidden="true"
+      >
+        <i data-lucide="${cat.icon}"></i>
+      </span>
+
+      <span class="issue-main">
+
+        <span class="issue-top">
+          <span>${escapeHtml(issue.id)}</span>
+          <span aria-hidden="true">·</span>
+          <span>${timeAgo(issue.reportedAt)}</span>
+          <span aria-hidden="true">·</span>
+          <span>${escapeHtml(cat.label)}</span>
+        </span>
+
+        <span class="issue-title">
+          ${escapeHtml(issue.title)}
+        </span>
+
+        <span class="issue-meta">
+          <span>
+            <i data-lucide="map-pin"></i>
+            ${escapeHtml(issue.location)}
+          </span>
+
+          <span>
+            <i data-lucide="building-2"></i>
+            ${escapeHtml(issue.department)}
+          </span>
+        </span>
+
+        <span class="issue-tags">
+          ${statusPill(issue.status)}
+          ${priorityPill(issue.priority)}
+
+          <span class="pill">
+            <i data-lucide="users"></i>
+            ${issue.supporters}
+            <span class="sr-only">
+              supporters
+            </span>
+          </span>
+        </span>
+
+      </span>
+
+      <i
+        data-lucide="chevron-right"
+        class="issue-chevron"
+      ></i>
+    </button>
+  `;
+}
+
+
+/* =========================================================
+   7. REPORT FLOW
+   ========================================================= */
+
+function renderCategoryOptions() {
+  const grid =
+    $("#categoryGrid");
+
+  if (!grid) return;
+
+  grid.innerHTML =
+    Object.entries(CATEGORIES)
+      .map(
+        ([key, cat]) => `
+          <div class="cat-option">
+
+            <input
+              type="radio"
+              name="category"
+              id="cat-${key}"
+              value="${key}"
+            />
+
+            <label
+              for="cat-${key}"
+              class="cat-card"
+            >
+              <i data-lucide="${cat.icon}"></i>
+              ${escapeHtml(cat.label)}
+            </label>
+
+          </div>
+        `
+      )
+      .join("");
+
+  refreshIcons();
+}
+
+function getDraft() {
+  const form =
+    $("#reportForm");
+
+  if (!form) {
+    return {
+      categoryKey: null,
+      description: "",
+      location: "",
+      hasPhoto: false
+    };
+  }
+
+  const checked =
+    form.querySelector(
+      'input[name="category"]:checked'
+    );
+
+  return {
+    categoryKey:
+      checked
+        ? checked.value
+        : null,
+
+    description:
+      $("#description")?.value.trim() ||
+      "",
+
+    location:
+      $("#location")?.value.trim() ||
+      "",
+
+    hasPhoto:
+      Boolean(
+        state.draftPhotoUrl
+      )
+  };
+}
+
+function updateStepper() {
+  const form =
+    $("#reportForm");
+
+  const stepper =
+    $("#reportStepper");
+
+  if (!form || !stepper) return;
+
+  const draft =
+    getDraft();
+
+  const submitted =
+    form.hidden;
+
+  const done = {
+    category:
+      Boolean(
+        draft.categoryKey
+      ) || submitted,
+
+    details:
+      (
+        draft.description.length >=
+          10 &&
+        draft.location.length >=
+          3
+      ) || submitted,
+
+    analyze:
+      Boolean(
+        state.analysis
+      ) || submitted,
+
+    submit:
+      submitted
+  };
+
+  let currentMarked =
+    false;
+
+  $$("#reportStepper li")
+    .forEach((li) => {
+      const isDone =
+        done[li.dataset.step];
+
+      li.classList.toggle(
+        "done",
+        isDone
+      );
+
+      const isCurrent =
+        !isDone &&
+        !currentMarked;
+
+      li.classList.toggle(
+        "current",
+        isCurrent
+      );
+
+      if (isCurrent) {
+        currentMarked = true;
+
+        li.setAttribute(
+          "aria-current",
+          "step"
+        );
+      } else {
+        li.removeAttribute(
+          "aria-current"
+        );
+      }
+    });
+}
+
+function showFormError(
+  message
+) {
+  const el =
+    $("#formError");
+
+  if (!el) return;
+
+  if (!message) {
+    el.hidden = true;
+    el.textContent = "";
+    return;
+  }
+
+  el.innerHTML = `
+    <i data-lucide="triangle-alert"></i>
+    <span>
+      ${escapeHtml(message)}
+    </span>
+  `;
+
+  el.hidden = false;
+
+  refreshIcons();
+}
+
+function invalidateAnalysis() {
+  if (
+    !state.analysis &&
+    !state.analyzing
+  ) {
+    return;
+  }
+
+  state.analysis = null;
+
+  const panel =
+    $("#aiPanel");
+
+  if (panel) {
+    panel.innerHTML = "";
+  }
+}
+
+function handleAnalyze(event) {
+  event.preventDefault();
+
+  if (state.analyzing) return;
+
+  const draft =
+    getDraft();
+
+  const descEl =
+    $("#description");
+
+  const locEl =
+    $("#location");
+
+  if (!descEl || !locEl) return;
+
+  descEl.removeAttribute(
+    "aria-invalid"
+  );
+
+  locEl.removeAttribute(
+    "aria-invalid"
+  );
+
+  if (
+    draft.description.length <
+    10
+  ) {
+    descEl.setAttribute(
+      "aria-invalid",
+      "true"
+    );
+
+    showFormError(
+      "Please describe the problem in at least a few words."
+    );
+
+    descEl.focus();
+
+    return;
+  }
+
+  if (
+    draft.location.length <
+    3
+  ) {
+    locEl.setAttribute(
+      "aria-invalid",
+      "true"
+    );
+
+    showFormError(
+      "Please add a location so the right team can find it."
+    );
+
+    locEl.focus();
+
+    return;
+  }
+
+  showFormError(null);
+
+  state.draft = draft;
+  state.analyzing = true;
+
+  const analyzeBtn =
+    $("#analyzeBtn");
+
+  if (analyzeBtn) {
+    analyzeBtn.disabled = true;
+  }
+
+  const steps = [
+    "Reading your description",
+    "Detecting the issue category",
+    "Assessing priority and risk",
+    "Routing to a department",
+    "Checking for duplicate reports"
+  ];
+
+  const panel =
+    $("#aiPanel");
+
+  if (!panel) return;
+
+  panel.innerHTML = `
+    <div class="ai-card is-loading">
+
+      <div class="ai-head">
+        <span class="ai-title">
+          <i data-lucide="brain-circuit"></i>
+          Civic AI is analyzing…
+        </span>
+
+        <span class="demo-badge">
+          Demo AI
+        </span>
+      </div>
+
+      <ol class="ai-steps">
+        ${steps
+          .map(
+            (s) => `
+              <li class="ai-step">
+                <span class="ai-step-icon">
+                  <i data-lucide="loader-circle"></i>
+                </span>
+                ${escapeHtml(s)}
+              </li>
+            `
+          )
+          .join("")}
+      </ol>
+
+    </div>
+  `;
+
+  refreshIcons();
+
+  panel.scrollIntoView({
+    behavior: "smooth",
+    block: "start"
+  });
+
+  const stepEls =
+    $$(".ai-step", panel);
+
+  let index = 0;
+
+  const tick = () => {
+    stepEls.forEach(
+      (el, i) => {
+        el.classList.toggle(
+          "done",
+          i < index
+        );
+
+        el.classList.toggle(
+          "active",
+          i === index
+        );
+      }
+    );
+
+    if (
+      index <
+      stepEls.length
+    ) {
+      index++;
+
+      setTimeout(
+        tick,
+        380
+      );
+
+      return;
+    }
+
+    state.analysis =
+      analyzeReport(draft);
+
+    state.analyzing = false;
+
+    if (analyzeBtn) {
+      analyzeBtn.disabled =
+        false;
+    }
+
+    renderAnalysis();
+  };
+
+  tick();
+}
+
+function renderAnalysis() {
+  const a =
+    state.analysis;
+
+  const d =
+    state.draft;
+
+  const panel =
+    $("#aiPanel");
+
+  if (!a || !d || !panel) {
+    return;
+  }
+
+  const note =
+    a.autoDetected
+      ? `
+        <div class="ai-note">
+          <i data-lucide="sparkles"></i>
+          <span>
+            Civic AI detected the category
+            <strong>
+              ${escapeHtml(
+                a.categoryLabel
+              )}
+            </strong>
+            from your description.
+          </span>
+        </div>
+      `
+      : a.suggestion
+        ? `
+          <div class="ai-note">
+            <i data-lucide="sparkles"></i>
+            <span>
+              Your description sounds more like
+              <strong>
+                ${escapeHtml(
+                  CATEGORIES[
+                    a.suggestion
+                  ].label
+                )}
+              </strong>.
+
+              <button
+                type="button"
+                class="link-btn"
+                data-action="use-suggestion"
+                data-key="${escapeHtml(
+                  a.suggestion
+                )}"
+              >
+                Switch category
+              </button>
+            </span>
+          </div>
+        `
+        : "";
+
+  const duplicate =
+    a.duplicate
+      ? `
+        <div class="ai-warning">
+
+          <i data-lucide="copy-check"></i>
+
+          <div class="ai-warning-body">
+
+            <span>
+              <strong>
+                Possible duplicate:
+              </strong>
+
+              ${escapeHtml(
+                a.duplicate.id
+              )}
+
+              ·
+
+              ${escapeHtml(
+                a.duplicate.title
+              )}
+
+              (${a.duplicate.supporters}
+              supporters,
+              ${escapeHtml(
+                a.duplicate.status.toLowerCase()
+              )}).
+            </span>
+
+            <span>
+
+              <button
+                type="button"
+                class="link-btn"
+                data-action="support-duplicate"
+                data-id="${escapeHtml(
+                  a.duplicate.id
+                )}"
+              >
+                Support existing report instead
+                <i data-lucide="arrow-right"></i>
+              </button>
+
+            </span>
+
+          </div>
+        </div>
+      `
+      : "";
+
+  const signals =
+    a.signals.length
+      ? `
+        <div class="ai-cell wide">
+
+          <span class="ai-label">
+            Risk signals detected
+          </span>
+
+          <div class="signal-list">
+
+            ${a.signals
+              .map(
+                (s) => `
+                  <span class="pill pill-high">
+                    ${escapeHtml(s)}
+                  </span>
+                `
+              )
+              .join("")}
+
+          </div>
+        </div>
+      `
+      : "";
+
+  panel.innerHTML = `
+    <div class="ai-card">
+
+      <div class="ai-head">
+
+        <span class="ai-title">
+          <i data-lucide="brain-circuit"></i>
+          Civic AI analysis
+        </span>
+
+        <span class="demo-badge">
+          Demo AI
+        </span>
+
+      </div>
+
+      ${note}
+
+      <div class="ai-grid">
+
+        <div class="ai-cell">
+          <span class="ai-label">
+            Issue category
+          </span>
+
+          <span class="ai-value">
+            ${escapeHtml(
+              a.categoryLabel
+            )}
+          </span>
+        </div>
+
+        <div class="ai-cell">
+          <span class="ai-label">
+            Priority
+          </span>
+
+          <span
+            class="ai-value is-${a.priority.toLowerCase()}"
+          >
+            ${escapeHtml(
+              a.priority
+            )}
+          </span>
+        </div>
+
+        <div class="ai-cell">
+          <span class="ai-label">
+            Suggested department
+          </span>
+
+          <span class="ai-value">
+            ${escapeHtml(
+              a.department
+            )}
+          </span>
+        </div>
+
+        <div class="ai-cell">
+          <span class="ai-label">
+            Location
+          </span>
+
+          <span class="ai-value">
+            ${escapeHtml(
+              d.location
+            )}
+          </span>
+        </div>
+
+        <div class="ai-cell">
+          <span class="ai-label">
+            Target response
+          </span>
+
+          <span class="ai-value">
+            ${escapeHtml(
+              a.responseTime
+            )}
+          </span>
+        </div>
+
+        <div class="ai-cell">
+
+          <span class="ai-label">
+            Confidence
+          </span>
+
+          <div class="confidence">
+
+            <span class="ai-value">
+              ${a.confidence}%
+            </span>
+
+            <span class="confidence-track">
+
+              <span
+                class="confidence-fill"
+                style="display:block;width:${a.confidence}%"
+              ></span>
+
+            </span>
+
+          </div>
+
+        </div>
+
+        <div class="ai-cell wide">
+
+          <span class="ai-label">
+            AI summary
+          </span>
+
+          <p class="ai-text">
+            ${escapeHtml(
+              a.summary
+            )}
+          </p>
+
+        </div>
+
+        ${signals}
+
+      </div>
+
+      <div class="ai-reco">
+
+        <span class="ai-label">
+          <i data-lucide="sparkles"></i>
+          AI recommendation
+        </span>
+
+        <p class="ai-text">
+          ${escapeHtml(
+            a.recommendation
+          )}
+        </p>
+
+      </div>
+
+      ${duplicate}
+
+      <div class="ai-actions">
+
+        <button
+          type="button"
+          class="btn btn-primary btn-lg"
+          data-action="submit-report"
+        >
+          <i data-lucide="send"></i>
+          Submit report
+        </button>
+
+        <button
+          type="button"
+          class="btn btn-ghost btn-lg"
+          data-action="edit-report"
+        >
+          Edit details
+        </button>
+
+      </div>
+
+    </div>
+  `;
+
+  refreshIcons();
+
+  updateStepper();
+}
+
+function submitReport() {
+  const a =
+    state.analysis;
+
+  const d =
+    state.draft;
+
+  if (!a || !d) return;
+
+  const id =
+    `CIV-${nextIssueNumber++}`;
+
+  const issue =
+    createIssue({
+      id,
+
+      title:
+        makeTitle(
+          d.description
+        ),
+
+      category:
+        a.categoryKey,
+
+      description:
+        d.description,
+
+      location:
+        d.location,
+
+      area:
+        "Citizen report",
+
+      priority:
+        a.priority,
+
+      status:
+        "Reported",
+
+      supporters:
+        1,
+
+      photo:
+        state.draftPhotoUrl,
+
+      reportedAt:
+        Date.now()
+    });
+
+  issue.summary =
+    a.summary;
+
+  issue.recommendation =
+    a.recommendation;
+
+  issues.unshift(issue);
+
+  state.supported.add(id);
+
+  const oldPhoto =
+    state.draftPhotoUrl;
+
+  state.draftPhotoUrl =
+    null;
+
+  resetReportForm();
+
+  if (oldPhoto) {
+    try {
+      URL.revokeObjectURL(
+        oldPhoto
+      );
+    } catch {}
+  }
+
+  const reportForm =
+    $("#reportForm");
+
+  if (reportForm) {
+    reportForm.hidden =
+      true;
+  }
+
+  state.analysis =
+    null;
+
+  const panel =
+    $("#aiPanel");
+
+  if (panel) {
+    panel.innerHTML = `
+      <div class="ai-card success-card">
+
+        <span class="success-icon">
+          <i data-lucide="check"></i>
+        </span>
+
+        <p class="kicker">
+          ${escapeHtml(id)}
+          ·
+          ${escapeHtml(
+            issue.department
+          )}
+        </p>
+
+        <h3 class="success-title">
+          Report submitted
+        </h3>
+
+        <p class="success-sub">
+          Your report is now live.
+          ${escapeHtml(
+            issue.department
+          )}
+          has been notified and
+          you will see every status
+          update here.
+        </p>
+
+        <div class="success-actions">
+
+          <button
+            type="button"
+            class="btn btn-primary"
+            data-issue="${escapeHtml(id)}"
+          >
+            <i data-lucide="activity"></i>
+            Track this issue
+          </button>
+
+          <button
+            type="button"
+            class="btn btn-ghost"
+            data-action="report-another"
+          >
+            Report another
+          </button>
+
+        </div>
+
+      </div>
+    `;
+
+    refreshIcons();
+  }
+
+  updateStepper();
+
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
+  });
+
+  toast(
+    `${id} submitted to ${issue.department}`
+  );
+}
+
+function resetReportForm() {
+  const form =
+    $("#reportForm");
+
+  if (!form) return;
+
+  form.reset();
+
+  clearPhoto({
+    revoke: Boolean(
+      state.draftPhotoUrl
+    )
+  });
+
+  const count =
+    $("#descCount");
+
+  if (count) {
+    count.textContent =
+      "0 / 500";
+  }
+
+  showFormError(null);
+}
+
+function setPhoto(file) {
+  if (!file) return;
+
+  if (
+    !file.type.startsWith(
+      "image/"
+    )
+  ) {
+    toast(
+      "Please choose an image file",
+      "triangle-alert"
+    );
+
+    return;
+  }
+
+  clearPhoto({
+    revoke: true
+  });
+
+  state.draftPhotoUrl =
+    URL.createObjectURL(file);
+
+  const photoImg =
+    $("#photoImg");
+
+  const preview =
+    $("#photoPreview");
+
+  const dropzone =
+    $("#dropzone");
+
+  if (photoImg) {
+    photoImg.src =
+      state.draftPhotoUrl;
+  }
+
+  if (preview) {
+    preview.hidden = false;
+  }
+
+  if (dropzone) {
+    dropzone.hidden = true;
+  }
+
+  invalidateAnalysis();
+}
+
+function clearPhoto({
+  revoke
+}) {
+  if (
+    revoke &&
+    state.draftPhotoUrl
+  ) {
+    try {
+      URL.revokeObjectURL(
+        state.draftPhotoUrl
+      );
+    } catch {}
+  }
+
+  state.draftPhotoUrl =
+    null;
+
+  const photo =
+    $("#photo");
+
+  const photoImg =
+    $("#photoImg");
+
+  const preview =
+    $("#photoPreview");
+
+  const dropzone =
+    $("#dropzone");
+
+  if (photo) {
+    photo.value = "";
+  }
+
+  if (photoImg) {
+    photoImg.removeAttribute(
+      "src"
+    );
+  }
+
+  if (preview) {
+    preview.hidden = true;
+  }
+
+  if (dropzone) {
+    dropzone.hidden = false;
+  }
+}
+
+function fillExample() {
+  const example =
+    EXAMPLES[
+      state.exampleIndex %
+        EXAMPLES.length
+    ];
+
+  state.exampleIndex++;
+
+  const radio =
+    document.getElementById(
+      `cat-${example.category}`
+    );
+
+  if (radio) {
+    radio.checked = true;
+  }
+
+  const description =
+    $("#description");
+
+  const location =
+    $("#location");
+
+  const count =
+    $("#descCount");
+
+  if (description) {
+    description.value =
+      example.description;
+  }
+
+  if (location) {
+    location.value =
+      example.location;
+  }
+
+  if (count) {
+    count.textContent =
+      `${example.description.length} / 500`;
+  }
+
+  invalidateAnalysis();
+
+  showFormError(null);
+
+  updateStepper();
+}
+
+function useCurrentLocation() {
+  const btn =
+    $("#locateBtn");
+
+  if (
+    !("geolocation" in navigator)
+  ) {
+    toast(
+      "Location is not available on this device",
+      "triangle-alert"
+    );
+
+    return;
+  }
+
+  if (btn) {
+    btn.disabled = true;
+
+    const span =
+      btn.querySelector("span");
+
+    if (span) {
+      span.textContent =
+        "Locating…";
+    }
+  }
+
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      const location =
+        $("#location");
+
+      if (location) {
+        location.value =
+          `GPS ${pos.coords.latitude.toFixed(
+            5
+          )}, ${pos.coords.longitude.toFixed(
+            5
+          )}`;
+      }
+
+      if (btn) {
+        btn.disabled = false;
+
+        const span =
+          btn.querySelector(
+            "span"
+          );
+
+        if (span) {
+          span.textContent =
+            "Use my current location";
+        }
+      }
+
+      invalidateAnalysis();
+
+      updateStepper();
+
+      toast(
+        "Location added"
+      );
+    },
+
+    () => {
+      if (btn) {
+        btn.disabled = false;
+
+        const span =
+          btn.querySelector(
+            "span"
+          );
+
+        if (span) {
+          span.textContent =
+            "Use my current location";
+        }
+      }
+
+      toast(
+        "Couldn't get your location — please type it",
+        "triangle-alert"
+      );
+    },
+
+    {
+      enableHighAccuracy: true,
+      timeout: 8000
+    }
+  );
+}
+
+
+/* =========================================================
+   8. ISSUE EXPLORER + DETAIL SHEET
+   ========================================================= */
+
+function setupIssueFilters() {
+  const category =
+    $("#filterCategory");
+
+  const chips =
+    $("#statusChips");
+
+  if (category) {
+    category.innerHTML =
+      `<option value="all">All categories</option>` +
+      Object.entries(CATEGORIES)
+        .map(
+          ([key, cat]) =>
+            `<option value="${key}">${escapeHtml(
+              cat.label
+            )}</option>`
+        )
+        .join("");
+  }
+
+  if (chips) {
+    chips.innerHTML =
+      ["All", ...STATUSES]
+        .map(
+          (s) => `
+            <button
+              type="button"
+              class="chip"
+              data-status-filter="${escapeHtml(s)}"
+              aria-pressed="false"
+            >
+              ${escapeHtml(s)}
+              <span class="chip-count"></span>
+            </button>
+          `
+        )
+        .join("");
+  }
+}
+
+function syncFilterControls() {
+  const f =
+    state.filters;
+
+  const category =
+    $("#filterCategory");
+
+  const priority =
+    $("#filterPriority");
+
+  const sort =
+    $("#sortIssues");
+
+  const search =
+    $("#issueSearch");
+
+  if (category) {
+    category.value =
+      f.category;
+  }
+
+  if (priority) {
+    priority.value =
+      f.priority;
+  }
+
+  if (sort) {
+    sort.value =
+      f.sort;
+  }
+
+  if (search) {
+    search.value =
+      f.query;
+  }
+
+  const counts =
+    statusCounts();
+
+  $$(
+    "[data-status-filter]"
+  ).forEach((chip) => {
+    const s =
+      chip.dataset.statusFilter;
+
+    chip.setAttribute(
+      "aria-pressed",
+      String(
+        s === f.status
+      )
+    );
+
+    const count =
+      chip.querySelector(
+        ".chip-count"
+      );
+
+    if (count) {
+      count.textContent =
+        s === "All"
+          ? issues.length
+          : counts[s] || 0;
+    }
+  });
+}
+
+function getFilteredIssues() {
+  const {
+    status,
+    category,
+    priority,
+    sort,
+    query
+  } = state.filters;
+
+  const q =
+    query.trim().toLowerCase();
+
+  const list =
+    issues.filter((i) => {
+      if (
+        status !== "All" &&
+        i.status !== status
+      ) {
+        return false;
+      }
+
+      if (
+        category !== "all" &&
+        i.category !== category
+      ) {
+        return false;
+      }
+
+      if (
+        priority !== "all" &&
+        i.priority !== priority
+      ) {
+        return false;
+      }
+
+      if (!q) {
+        return true;
+      }
+
+      const cat =
+        CATEGORIES[i.category] ||
+        CATEGORIES.other;
+
+      return [
+        i.id,
+        i.title,
+        i.location,
+        i.area,
+        i.department,
+        i.description,
+        cat.label
+      ]
+        .join(" ")
+        .toLowerCase()
+        .includes(q);
+    });
+
+  if (sort === "priority") {
+    list.sort(
+      (a, b) =>
+        PRIORITY_RANK[
+          b.priority
+        ] -
+          PRIORITY_RANK[
+            a.priority
+          ] ||
+        b.reportedAt -
+          a.reportedAt
+    );
+  } else if (
+    sort === "supported"
+  ) {
+    list.sort(
+      (a, b) =>
+        b.supporters -
+        a.supporters
+    );
+  } else {
+    list.sort(
+      (a, b) =>
+        b.reportedAt -
+        a.reportedAt
+    );
+  }
+
+  return list;
+}
+
+function renderIssues() {
+  syncFilterControls();
+
+  renderIssueList();
+}
+
+function renderIssueList() {
+  const list =
+    getFilteredIssues();
+
+  const count =
+    $("#issuesCount");
+
+  const container =
+    $("#issuesList");
+
+  if (count) {
+    count.textContent =
+      `Showing ${list.length} of ${issues.length} reports. Tap any issue to see its AI analysis and progress.`;
+  }
+
+  if (!container) return;
+
+  container.innerHTML =
+    list.length
+      ? list
+          .map(issueCard)
+          .join("")
+      : `
+        <div class="empty-state glass">
+
+          <i data-lucide="scan-search"></i>
+
+          <strong>
+            No issues match these filters
+          </strong>
+
+          <span>
+            Try a different status,
+            category or search term.
+          </span>
+
+          <button
+            type="button"
+            class="btn btn-ghost btn-sm"
+            data-action="clear-filters"
+          >
+            Clear filters
+          </button>
+
+        </div>
+      `;
+
+  refreshIcons();
+}
+
+function matchedHelpers(issue) {
+  const skills =
+    (
+      CATEGORIES[
+        issue.category
+      ] ||
+      CATEGORIES.other
+    ).skills;
+
+  return PEOPLE
+    .map((p) => ({
+      person: p,
+
+      overlap:
+        p.skills.filter(
+          (s) =>
+            skills.includes(s)
+        )
+    }))
+    .filter(
+      (m) =>
+        m.overlap.length
+    )
+    .sort(
+      (a, b) =>
+        b.overlap.length -
+        a.overlap.length
+    )
+    .slice(0, 3);
+}
+
+function openIssue(id) {
+  const issue =
+    getIssue(id);
+
+  if (!issue) return;
+
+  state.openIssueId =
+    id;
+
+  renderIssueSheet(issue);
+
+  const dialog =
+    $("#issueDialog");
+
+  if (!dialog) return;
+
+  if (!dialog.open) {
+    dialog.showModal();
+  }
+
+  const inner =
+    $(".sheet-inner");
+
+  if (inner) {
+    inner.scrollTop = 0;
+  }
+}
+
+function renderIssueSheet(issue) {
+  const cat =
+    CATEGORIES[
+      issue.category
+    ] ||
+    CATEGORIES.other;
+
+  const stepIndex =
+    STATUSES.indexOf(
+      issue.status
+    );
+
+  const supported =
+    state.supported.has(
+      issue.id
+    );
+
+  const helpers =
+    matchedHelpers(issue);
+
+  const nextStatus =
+    STATUSES[
+      stepIndex + 1
+    ];
+
+  const body =
+    $("#sheetBody");
+
+  if (!body) return;
+
+  body.innerHTML = `
+    <div class="sheet-top">
+      <span>${escapeHtml(issue.id)}</span>
+      <span aria-hidden="true">·</span>
+      <span>${timeAgo(issue.reportedAt)}</span>
+      <span aria-hidden="true">·</span>
+      <span>${escapeHtml(issue.area)}</span>
+    </div>
+
+    <h3
+      id="sheetTitle"
+      class="sheet-title"
+    >
+      ${escapeHtml(issue.title)}
+    </h3>
+
+    <div class="sheet-meta">
+
+      <span>
+        <i data-lucide="${cat.icon}"></i>
+        ${escapeHtml(cat.label)}
+      </span>
+
+      <span>
+        <i data-lucide="map-pin"></i>
+        ${escapeHtml(issue.location)}
+      </span>
+
+    </div>
+
+    <div
+      class="tag-row"
+      style="margin:0 0 18px"
+    >
+      ${statusPill(issue.status)}
+      ${priorityPill(issue.priority)}
+    </div>
+
+    ${
+      issue.photo
+        ? `
+          <img
+            class="sheet-photo"
+            src="${issue.photo}"
+            alt="Evidence photo for ${escapeHtml(
+              issue.title
+            )}"
+          />
+        `
+        : ""
+    }
+
+    <p class="sheet-desc">
+      ${escapeHtml(
+        issue.description
+      )}
+    </p>
+
+    <div class="sheet-section">
+
+      <div class="sheet-section-title">
+        <span>Progress</span>
+        <span>
+          ${stepIndex + 1}
+          /
+          ${STATUSES.length}
+        </span>
+      </div>
+
+      <ol class="timeline">
+
+        ${STATUSES.map(
+          (s, i) => `
+            <li
+              class="tl-step
+              ${i <= stepIndex ? "done" : ""}
+              ${i === stepIndex ? "current" : ""}"
+            >
+              ${escapeHtml(s)}
+            </li>
+          `
+        ).join("")}
+
+      </ol>
+
+    </div>
+
+    <div class="sheet-section">
+
+      <div class="sheet-section-title">
+
+        <span>
+          Civic AI analysis
+        </span>
+
+        <span class="demo-badge">
+          Demo AI
+        </span>
+
+      </div>
+
+      <div class="ai-grid">
+
+        <div class="ai-cell">
+
+          <span class="ai-label">
+            Category
+          </span>
+
+          <span class="ai-value">
+            ${escapeHtml(
+              cat.aiLabel
+            )}
+          </span>
+
+        </div>
+
+        <div class="ai-cell">
+
+          <span class="ai-label">
+            Priority
+          </span>
+
+          <span
+            class="ai-value is-${issue.priority.toLowerCase()}"
+          >
+            ${escapeHtml(
+              issue.priority
+            )}
+          </span>
+
+        </div>
+
+        <div class="ai-cell wide">
+
+          <span class="ai-label">
+            Department
+          </span>
+
+          <span class="ai-value">
+            ${escapeHtml(
+              issue.department
+            )}
+          </span>
+
+        </div>
+
+        <div class="ai-cell wide">
+
+          <span class="ai-label">
+            Summary
+          </span>
+
+          <p class="ai-text">
+            ${escapeHtml(
+              issue.summary
+            )}
+          </p>
+
+        </div>
+
+      </div>
+
+      <div class="ai-reco">
+
+        <span class="ai-label">
+          <i data-lucide="sparkles"></i>
+          Recommendation
+        </span>
+
+        <p class="ai-text">
+          ${escapeHtml(
+            issue.recommendation
+          )}
+        </p>
+
+      </div>
+
+    </div>
+
+    <div class="sheet-section">
+
+      <div class="sheet-section-title">
+        <span>
+          Community activity
+        </span>
+      </div>
+
+      <div class="support-box">
+
+        <div>
+
+          <div class="support-count">
+            ${issue.supporters}
+          </div>
+
+          <div class="support-label">
+            ${
+              issue.supporters === 1
+                ? "citizen is"
+                : "citizens are"
+            }
+            affected by this
+          </div>
+
+        </div>
+
+        <button
+          type="button"
+          class="btn ${
+            supported
+              ? "btn-ghost"
+              : "btn-primary"
+          } btn-sm"
+          data-action="support"
+          data-id="${escapeHtml(
+            issue.id
+          )}"
+          aria-pressed="${supported}"
+        >
+          <i
+            data-lucide="${
+              supported
+                ? "check"
+                : "thumbs-up"
+            }"
+          ></i>
+
+          ${
+            supported
+              ? "Supported"
+              : "I'm affected too"
+          }
+
+        </button>
+
+      </div>
+
+    </div>
+
+    ${
+      helpers.length
+        ? `
+          <div class="sheet-section">
+
+            <div class="sheet-section-title">
+
+              <span>
+                People who could help
+              </span>
+
+              <button
+                type="button"
+                class="link-btn"
+                data-goto="communityScreen"
+              >
+                Community
+                <i data-lucide="arrow-right"></i>
+              </button>
+
+            </div>
+
+            <div class="helpers">
+
+              ${helpers
+                .map(
+                  (h, i) => `
+                    <div class="helper">
+
+                      <span
+                        class="avatar tone-${i % 4}
+                        ${
+                          h.person.org
+                            ? "is-org"
+                            : ""
+                        }"
+                        aria-hidden="true"
+                      >
+                        ${initials(
+                          h.person.name
+                        )}
+                      </span>
+
+                      <span class="helper-text">
+
+                        <span>
+                          ${escapeHtml(
+                            h.person.name
+                          )}
+                        </span>
+
+                        <small>
+                          ${h.overlap
+                            .map(
+                              escapeHtml
+                            )
+                            .join(
+                              " · "
+                            )}
+                        </small>
+
+                      </span>
+
+                    </div>
+                  `
+                )
+                .join("")}
+
+            </div>
+          </div>
+        `
+        : ""
+    }
+
+    <div class="sheet-section">
+
+      <div class="sheet-section-title">
+        <span>Updates</span>
+      </div>
+
+      <ol class="updates">
+
+        ${[
+          ...issue.updates
+        ]
+          .reverse()
+          .map(
+            (u) => `
+              <li class="update">
+
+                <span
+                  class="update-dot"
+                  aria-hidden="true"
+                ></span>
+
+                <div>
+
+                  <div class="update-head">
+                    ${escapeHtml(
+                      u.status
+                    )}
+
+                    <span class="update-time">
+                      ${timeAgo(
+                        u.time
+                      )}
+                    </span>
+                  </div>
+
+                  <p class="update-note">
+                    ${escapeHtml(
+                      u.note
+                    )}
+                  </p>
+
+                </div>
+
+              </li>
+            `
+          )
+          .join("")}
+
+      </ol>
+
+    </div>
+
+    <div class="sheet-section">
+
+      <div class="official-box">
+
+        <div class="sheet-section-title">
+          <span>
+            Governance demo control
+          </span>
+        </div>
+
+        <p>
+          For the presentation:
+          act as
+          ${escapeHtml(
+            issue.department
+          )}
+          and move this issue
+          through its lifecycle.
+        </p>
+
+        ${
+          nextStatus
+            ? `
+              <button
+                type="button"
+                class="btn btn-ghost btn-sm"
+                data-action="advance"
+                data-id="${escapeHtml(
+                  issue.id
+                )}"
+              >
+                <i data-lucide="arrow-right"></i>
+                Mark as
+                ${escapeHtml(
+                  nextStatus
+                )}
+              </button>
+            `
+            : `
+              <span class="pill status-resolved">
+                <i data-lucide="badge-check"></i>
+                Fully resolved
+              </span>
+            `
+        }
+
+      </div>
+
+    </div>
+  `;
+
+  refreshIcons();
+}
+
+function advanceIssue(id) {
+  const issue =
+    getIssue(id);
+
+  if (!issue) return;
+
+  const index =
+    STATUSES.indexOf(
+      issue.status
+    );
+
+  if (
+    index <
+      0 ||
+    index >=
+      STATUSES.length - 1
+  ) {
+    return;
+  }
+
+  const next =
+    STATUSES[index + 1];
+
+  const notes = {
+    Verified:
+      "Verified by the ward officer after a site check.",
+
+    "In Progress":
+      `${issue.department} team assigned and work scheduled.`,
+
+    Resolved:
+      "Work completed and issue closed."
+  };
+
+  issue.status =
+    next;
+
+  issue.updates.push({
+    status: next,
+    note: notes[next],
+    time: Date.now()
+  });
+
+  renderIssueSheet(issue);
+
+  renderScreen(
+    state.screen
+  );
+
+  toast(
+    next === "Resolved"
+      ? `${issue.id} resolved`
+      : `${issue.id} marked as ${next}`,
+    next === "Resolved"
+      ? "badge-check"
+      : "circle-check"
+  );
+}
+
+function toggleSupport(id) {
+  const issue =
+    getIssue(id);
+
+  if (!issue) return;
+
+  if (
+    state.supported.has(id)
+  ) {
+    state.supported.delete(id);
+
+    issue.supporters =
+      Math.max(
+        0,
+        issue.supporters - 1
+      );
+  } else {
+    state.supported.add(id);
+
+    issue.supporters++;
+
+    toast(
+      "Thanks — your support raises this issue's visibility"
+    );
+  }
+
+  renderIssueSheet(issue);
+
+  renderScreen(
+    state.screen
+  );
+}
+
+
+/* =========================================================
+   9. DASHBOARD
+   ========================================================= */
+
+function renderDashboard() {
+  const body =
+    $("#dashboardBody");
+
+  if (!body) return;
+
+  const total =
+    issues.length;
+
+  const counts =
+    statusCounts();
+
+  const open =
+    issues.filter(
+      (i) =>
+        i.status !== "Resolved"
+    );
+
+  const awaiting =
+    counts.Reported +
+    counts.Verified;
+
+  const highOpen =
+    open.filter(
+      (i) =>
+        i.priority === "High"
+    );
+
+  const resolutionRate =
+    total
+      ? Math.round(
+          (counts.Resolved /
+            total) *
+            100
+        )
+      : 0;
+
+  const byCategory =
+    Object.keys(CATEGORIES)
+      .map((key) => ({
+        key,
+        count:
+          issues.filter(
+            (i) =>
+              i.category ===
+              key
+          ).length
+      }))
+      .filter(
+        (c) => c.count
+      )
+      .sort(
+        (a, b) =>
+          b.count -
+          a.count
+      );
+
+  const maxCategory =
+    byCategory[0]?.count ||
+    1;
+
+  const byDepartment = {};
+
+  open.forEach((i) => {
+    byDepartment[
+      i.department
+    ] =
+      (byDepartment[
+        i.department
+      ] || 0) + 1;
+  });
+
+  const departments =
+    Object.entries(
+      byDepartment
+    ).sort(
+      (a, b) =>
+        b[1] - a[1]
+    );
+
+  const maxDept =
+    departments[0]?.[1] ||
+    1;
+
+  const byArea = {};
+
+  open.forEach((i) => {
+    byArea[i.area] =
+      byArea[i.area] || {
+        count: 0,
+        high: 0
+      };
+
+    byArea[i.area].count++;
+
+    if (
+      i.priority === "High"
+    ) {
+      byArea[i.area].high++;
+    }
+  });
+
+  const hotspots =
+    Object.entries(
+      byArea
+    )
+      .sort(
+        (a, b) =>
+          b[1].count -
+            a[1].count ||
+          b[1].high -
+            a[1].high
+      )
+      .slice(0, 4);
+
+  const days = [];
+
+  const today =
+    new Date();
+
+  today.setHours(
+    0,
+    0,
+    0,
+    0
+  );
+
+  for (
+    let d = 6;
+    d >= 0;
+    d--
+  ) {
+    const start =
+      today.getTime() -
+      d * 24 * HOUR;
+
+    const end =
+      start + 24 * HOUR;
+
+    const idx =
+      6 - d;
+
+    const reported =
+      WEEKLY_BASELINE
+        .reported[idx] +
+      issues.filter(
+        (i) =>
+          i.reportedAt >=
+            start &&
+          i.reportedAt <
+            end
+      ).length;
+
+    const resolved =
+      WEEKLY_BASELINE
+        .resolved[idx] +
+      issues.filter(
+        (i) =>
+          i.updates.some(
+            (u) =>
+              u.status ===
+                "Resolved" &&
+              u.time >=
+                start &&
+              u.time <
+                end
+          )
+      ).length;
+
+    days.push({
+      label:
+        new Date(
+          start
+        )
+          .toLocaleDateString(
+            "en",
+            {
+              weekday:
+                "short"
+            }
+          )
+          .slice(0, 2),
+
+      reported,
+
+      resolved
+    });
+  }
+
+  const maxDay =
+    Math.max(
+      ...days.map(
+        (d) =>
+          Math.max(
+            d.reported,
+            d.resolved
+          )
+      ),
+      1
+    );
+
+  const topCategory =
+    byCategory[0];
+
+  const topShare =
+    topCategory
+      ? Math.round(
+          (topCategory.count /
+            total) *
+            100
+        )
+      : 0;
+
+  const topDept =
+    departments[0];
+
+  const topArea =
+    hotspots[0];
+
+  const statusColors = {
+    Reported:
+      "var(--st-reported)",
+
+    Verified:
+      "var(--st-verified)",
+
+    "In Progress":
+      "var(--st-progress)",
+
+    Resolved:
+      "var(--st-resolved)"
+  };
+
+  let cursor = 0;
+
+  const donutStops =
+    STATUSES.map(
+      (s) => {
+        const share =
+          total
+            ? (counts[s] /
+                total) *
+              100
+            : 0;
+
+        const stop =
+          `${statusColors[s]} ${cursor}% ${
+            cursor + share
+          }%`;
+
+        cursor += share;
+
+        return stop;
+      }
+    ).join(", ");
+
+  body.innerHTML = `
+    <div class="kpi-grid">
+
+      <button
+        type="button"
+        class="kpi glass"
+        data-goto="issuesScreen"
+        data-status="All"
+      >
+        <span class="kpi-label">
+          <i data-lucide="flag"></i>
+          Total reports
+        </span>
+
+        <span class="kpi-value">
+          ${total}
+        </span>
+
+        <span class="kpi-sub">
+          ${resolutionRate}% resolution rate
+        </span>
+      </button>
+
+      <button
+        type="button"
+        class="kpi glass kpi-resolved"
+        data-goto="issuesScreen"
+        data-status="Resolved"
+      >
+        <span class="kpi-label">
+          <i data-lucide="badge-check"></i>
+          Resolved
+        </span>
+
+        <span class="kpi-value">
+          ${counts.Resolved}
+        </span>
+
+        <span class="kpi-sub">
+          Closed by departments
+        </span>
+      </button>
+
+      <button
+        type="button"
+        class="kpi glass kpi-progress"
+        data-goto="issuesScreen"
+        data-status="In Progress"
+      >
+        <span class="kpi-label">
+          <i data-lucide="activity"></i>
+          In progress
+        </span>
+
+        <span class="kpi-value">
+          ${counts["In Progress"]}
+        </span>
+
+        <span class="kpi-sub">
+          Teams on site
+        </span>
+      </button>
+
+      <button
+        type="button"
+        class="kpi glass"
+        data-goto="issuesScreen"
+        data-status="Reported"
+      >
+        <span class="kpi-label">
+          <i data-lucide="clock"></i>
+          Awaiting action
+        </span>
+
+        <span class="kpi-value">
+          ${awaiting}
+        </span>
+
+        <span class="kpi-sub">
+          Reported or verified
+        </span>
+      </button>
+
+      <button
+        type="button"
+        class="kpi glass kpi-high"
+        data-goto="issuesScreen"
+        data-priority="High"
+      >
+        <span class="kpi-label">
+          <i data-lucide="siren"></i>
+          High priority
+        </span>
+
+        <span class="kpi-value">
+          ${highOpen.length}
+        </span>
+
+        <span class="kpi-sub">
+          Open and urgent
+        </span>
+      </button>
+
+    </div>
+
+    <div class="insight-card">
+
+      <span class="action-icon">
+        <i data-lucide="brain-circuit"></i>
+      </span>
+
+      <div>
+
+        <p class="insight-title">
+          Civic AI governance summary
+          <span class="demo-badge">
+            Demo AI
+          </span>
+        </p>
+
+        <p class="insight-text">
+
+          ${
+            topCategory
+              ? `
+                <strong>
+                  ${escapeHtml(
+                    CATEGORIES[
+                      topCategory.key
+                    ].label
+                  )}
+                </strong>
+                is the most reported category
+                (${topShare}% of reports).
+              `
+              : ""
+          }
+
+          ${
+            topDept
+              ? `
+                <strong>
+                  ${escapeHtml(
+                    topDept[0]
+                  )}
+                </strong>
+                carries the largest open workload
+                with ${topDept[1]} active issues.
+              `
+              : ""
+          }
+
+          ${
+            topArea
+              ? `
+                <strong>
+                  ${escapeHtml(
+                    topArea[0]
+                  )}
+                </strong>
+                is the current hotspot with
+                ${topArea[1].count}
+                open reports
+                ${
+                  topArea[1].high
+                    ? `, ${topArea[1].high} of them high priority`
+                    : ""
+                }.
+              `
+              : ""
+          }
+
+          ${
+            highOpen.length
+              ? `
+                Recommend prioritising the
+                ${highOpen.length}
+                high-priority issues within
+                24 hours.
+              `
+              : "No urgent issues are open right now."
+          }
+
+        </p>
+
+      </div>
+
+    </div>
+
+    <div class="dash-grid">
+
+      <section
+        class="panel glass"
+        aria-labelledby="statusPanelTitle"
+      >
+
+        <div class="panel-head">
+
+          <div>
+            <h3
+              id="statusPanelTitle"
+              class="panel-title"
+            >
+              Status breakdown
+            </h3>
+
+            <p class="panel-sub">
+              Where every report stands
+            </p>
+          </div>
+
+        </div>
+
+        <div class="donut-wrap">
+
+          <div
+            class="donut"
+            style="background:conic-gradient(${donutStops})"
+            role="img"
+            aria-label="${STATUSES.map(
+              (s) =>
+                `${s}: ${counts[s]}`
+            ).join(", ")}"
+          >
+
+            <div class="donut-center">
+
+              <span class="donut-value">
+                ${total}
+              </span>
+
+              <span class="donut-label">
+                reports
+              </span>
+
+            </div>
+
+          </div>
+
+          <ul class="legend">
+
+            ${STATUSES.map(
+              (s) => `
+                <li class="legend-item">
+
+                  <span
+                    class="legend-swatch"
+                    style="background:${statusColors[s]}"
+                  ></span>
+
+                  ${escapeHtml(s)}
+
+                  <span class="legend-value">
+                    ${counts[s]}
+                  </span>
+
+                </li>
+              `
+            ).join("")}
+
+          </ul>
+
+        </div>
+
+      </section>
+
+      <section
+        class="panel glass"
+        aria-labelledby="weeklyPanelTitle"
+      >
+
+        <div class="panel-head">
+
+          <div>
+
+            <h3
+              id="weeklyPanelTitle"
+              class="panel-title"
+            >
+              Resolution activity
+            </h3>
+
+            <p class="panel-sub">
+              City-wide, last 7 days
+              (simulated baseline + live)
+            </p>
+
+          </div>
+
+        </div>
+
+        <div
+          class="columns"
+          role="img"
+          aria-label="Reported versus resolved issues over the last 7 days"
+        >
+
+          ${days
+            .map(
+              (d) => `
+                <div class="column">
+
+                  <div class="column-bars">
+
+                    <span
+                      class="column-bar reported"
+                      style="height:${
+                        (d.reported /
+                          maxDay) *
+                        100
+                      }%"
+                    ></span>
+
+                    <span
+                      class="column-bar resolved"
+                      style="height:${
+                        (d.resolved /
+                          maxDay) *
+                        100
+                      }%"
+                    ></span>
+
+                  </div>
+
+                  <span class="column-label">
+                    ${escapeHtml(
+                      d.label
+                    )}
+                  </span>
+
+                </div>
+              `
+            )
+            .join("")}
+
+        </div>
+
+        <div
+          class="chart-legend"
+          style="margin-top:14px"
+        >
+
+          <span>
+            <span
+              class="legend-swatch"
+              style="background:rgba(255,255,255,.2)"
+            ></span>
+            Reported
+          </span>
+
+          <span>
+            <span
+              class="legend-swatch"
+              style="background:var(--accent)"
+            ></span>
+            Resolved
+          </span>
+
+        </div>
+
+      </section>
+
+      <section
+        class="panel glass"
+        aria-labelledby="catPanelTitle"
+      >
+
+        <div class="panel-head">
+
+          <div>
+
+            <h3
+              id="catPanelTitle"
+              class="panel-title"
+            >
+              Most common categories
+            </h3>
+
+            <p class="panel-sub">
+              All reports by type
+            </p>
+
+          </div>
+
+        </div>
+
+        <div class="hbars">
+
+          ${byCategory
+            .map(
+              (c) => `
+                <div class="hbar-row">
+
+                  <span class="hbar-label">
+
+                    <i
+                      data-lucide="${
+                        CATEGORIES[
+                          c.key
+                        ].icon
+                      }"
+                    ></i>
+
+                    ${escapeHtml(
+                      CATEGORIES[
+                        c.key
+                      ].label
+                    )}
+
+                  </span>
+
+                  <span class="hbar-value">
+                    ${c.count}
+                  </span>
+
+                  <span class="hbar-track">
+
+                    <span
+                      class="hbar-fill"
+                      style="display:block;width:${
+                        (c.count /
+                          maxCategory) *
+                        100
+                      }%"
+                    ></span>
+
+                  </span>
+
+                </div>
+              `
+            )
+            .join("")}
+
+        </div>
+
+      </section>
+
+      <section
+        class="panel glass"
+        aria-labelledby="deptPanelTitle"
+      >
+
+        <div class="panel-head">
+
+          <div>
+
+            <h3
+              id="deptPanelTitle"
+              class="panel-title"
+            >
+              Department workload
+            </h3>
+
+            <p class="panel-sub">
+              Open issues routed by Civic AI
+            </p>
+
+          </div>
+
+        </div>
+
+        <div class="hbars">
+
+          ${departments
+            .map(
+              ([name, count]) => `
+                <div class="hbar-row">
+
+                  <span class="hbar-label">
+
+                    <i data-lucide="building-2"></i>
+
+                    ${escapeHtml(
+                      name
+                    )}
+
+                  </span>
+
+                  <span class="hbar-value">
+                    ${count}
+                  </span>
+
+                  <span class="hbar-track">
+
+                    <span
+                      class="hbar-fill is-amber"
+                      style="display:block;width:${
+                        (count /
+                          maxDept) *
+                        100
+                      }%"
+                    ></span>
+
+                  </span>
+
+                </div>
+              `
+            )
+            .join("")}
+
+        </div>
+
+      </section>
+
+      <section
+        class="panel glass"
+        aria-labelledby="hotspotPanelTitle"
+      >
+
+        <div class="panel-head">
+
+          <div>
+
+            <h3
+              id="hotspotPanelTitle"
+              class="panel-title"
+            >
+              Civic hotspots
+            </h3>
+
+            <p class="panel-sub">
+              Areas with the most open reports
+            </p>
+
+          </div>
+
+          <i
+            data-lucide="radar"
+            style="color:var(--accent)"
+          ></i>
+
+        </div>
+
+        <ol class="hotspots">
+
+          ${hotspots
+            .map(
+              ([area, info], i) => `
+                <li class="hotspot">
+
+                  <span class="hotspot-rank">
+                    0${i + 1}
+                  </span>
+
+                  <span class="hotspot-name">
+
+                    ${escapeHtml(
+                      area
+                    )}
+
+                    <small>
+                      ${info.count}
+                      open ·
+                      ${info.high}
+                      high priority
+                    </small>
+
+                  </span>
+
+                  ${
+                    info.high
+                      ? `
+                        <span class="pill pill-high">
+                          Watch
+                        </span>
+                      `
+                      : `
+                        <span class="pill">
+                          Stable
+                        </span>
+                      `
+                  }
+
+                </li>
+              `
+            )
+            .join("")}
+
+        </ol>
+
+      </section>
+
+      <section
+        class="panel glass"
+        aria-labelledby="urgentPanelTitle"
+      >
+
+        <div class="panel-head">
+
+          <div>
+
+            <h3
+              id="urgentPanelTitle"
+              class="panel-title"
+            >
+              Needs attention
+            </h3>
+
+            <p class="panel-sub">
+              Open high-priority issues
+            </p>
+
+          </div>
+
+        </div>
+
+        <div class="priority-list">
+
+          ${
+            highOpen.length
+              ? highOpen
+                  .sort(
+                    (a, b) =>
+                      b.supporters -
+                      a.supporters
+                  )
+                  .slice(0, 4)
+                  .map(issueCard)
+                  .join("")
+              : `
+                <div class="empty-state">
+
+                  <i data-lucide="shield-check"></i>
+
+                  <span>
+                    No urgent issues open.
+                  </span>
+
+                </div>
+              `
+          }
+
+        </div>
+
+      </section>
+
+    </div>
+  `;
+
+  refreshIcons();
+}
+
+
+/* =========================================================
+   10. COMMUNITY MATCHING
+   ========================================================= */
+
+function renderSkillPicker() {
+  const picker =
+    $("#skillPicker");
+
+  if (!picker) return;
+
+  picker.innerHTML =
+    SKILLS.map(
+      (s) => `
+        <button
+          type="button"
+          class="chip"
+          data-skill="${escapeHtml(s)}"
+          aria-pressed="${state.mySkills.has(s)}"
+        >
+          ${escapeHtml(s)}
+        </button>
+      `
+    ).join("");
+}
+
+function syncSkillPicker() {
+  $$("[data-skill]")
+    .forEach(
+      (chip) => {
+        chip.setAttribute(
+          "aria-pressed",
+          String(
+            state.mySkills.has(
+              chip.dataset.skill
+            )
+          )
+        );
+      }
+    );
+
+  const count =
+    $("#skillCount");
+
+  if (count) {
+    count.textContent =
+      `${state.mySkills.size} selected`;
+  }
+}
+
+function myMatch(mission) {
+  if (
+    !state.mySkills.size
+  ) {
+    return null;
+  }
+
+  const overlap =
+    mission.skills.filter(
+      (s) =>
+        state.mySkills.has(s)
+    ).length;
+
+  return Math.round(
+    (overlap /
+      mission.skills.length) *
+      100
+  );
+}
+
+function topContributors(
+  mission
+) {
+  return PEOPLE
+    .map((p) => ({
+      person: p,
+
+      score:
+        Math.round(
+          (p.skills.filter(
+            (s) =>
+              mission.skills.includes(
+                s
+              )
+          ).length /
+            mission.skills.length) *
+            100
+        )
+    }))
+    .filter(
+      (m) => m.score > 0
+    )
+    .sort(
+      (a, b) =>
+        b.score -
+        a.score
+    )
+    .slice(0, 3);
+}
+
+function renderMissions() {
+  const list =
+    $("#missionList");
+
+  if (!list) return;
+
+  const missions =
+    [...MISSIONS].sort(
+      (a, b) =>
+        (myMatch(b) ?? 0) -
+        (myMatch(a) ?? 0)
+    );
+
+  list.innerHTML =
+    missions
+      .map(
+        (m, index) => {
+          const match =
+            myMatch(m);
+
+          const joined =
+            state.joinedMissions.has(
+              m.id
+            );
+
+          const contributors =
+            topContributors(
+              m
+            );
+
+          const badgeClass =
+            match === null
+              ? ""
+              : match >= 67
+                ? "is-strong"
+                : match > 0
+                  ? "is-partial"
+                  : "";
+
+          return `
+            <article
+              class="mission-card glass ${
+                match &&
+                index === 0
+                  ? "is-top"
+                  : ""
+              }"
+            >
+
+              <div class="mission-head">
+
+                <div>
+
+                  <p class="mission-linked">
+
+                    <i data-lucide="flag"></i>
+
+                    Linked issue
+
+                    <button
+                      type="button"
+                      class="link-btn"
+                      data-issue="${escapeHtml(
+                        m.issueId
+                      )}"
+                    >
+                      ${escapeHtml(
+                        m.issueId
+                      )}
+                    </button>
+
+                  </p>
+
+                  <h4 class="mission-title">
+                    ${escapeHtml(
+                      m.title
+                    )}
+                  </h4>
+
+                </div>
+
+                ${
+                  match !== null
+                    ? `
+                      <span
+                        class="match-badge ${badgeClass}"
+                      >
+                        ${match}% match
+                      </span>
+                    `
+                    : ""
+                }
+
+              </div>
+
+              <p class="mission-desc">
+                ${escapeHtml(
+                  m.description
+                )}
+              </p>
+
+              <div
+                class="skill-list"
+                aria-label="Skills needed"
+              >
+
+                ${m.skills
+                  .map(
+                    (s) => `
+                      <span
+                        class="skill-chip ${
+                          state.mySkills.has(
+                            s
+                          )
+                            ? "have"
+                            : ""
+                        }"
+                      >
+                        ${
+                          state.mySkills.has(
+                            s
+                          )
+                            ? '<i data-lucide="check"></i>'
+                            : ""
+                        }
+
+                        ${escapeHtml(s)}
+
+                      </span>
+                    `
+                  )
+                  .join("")}
+
+              </div>
+
+              <div class="mission-progress">
+
+                <span
+                  class="progress"
+                  role="progressbar"
+                  aria-valuemin="0"
+                  aria-valuemax="${m.needed}"
+                  aria-valuenow="${m.joined}"
+                  aria-label="Volunteers joined"
+                >
+                  <span
+                    style="width:${Math.min(
+                      100,
+                      (m.joined /
+                        m.needed) *
+                        100
+                    )}%"
+                  ></span>
+                </span>
+
+                <span>
+                  ${m.joined}/${m.needed}
+                  volunteers
+                </span>
+
+              </div>
+
+              <div class="mission-foot">
+
+                <div class="mission-matches">
+
+                  <span
+                    class="avatar-stack"
+                    aria-hidden="true"
+                  >
+
+                    ${contributors
+                      .map(
+                        (c, i) => `
+                          <span
+                            class="avatar tone-${i % 4} ${
+                              c.person.org
+                                ? "is-org"
+                                : ""
+                            }"
+                          >
+                            ${initials(
+                              c.person.name
+                            )}
+                          </span>
+                        `
+                      )
+                      .join("")}
+
+                  </span>
+
+                  <span>
+                    Matched:
+                    ${contributors
+                      .map(
+                        (c) =>
+                          `${escapeHtml(
+                            c.person.name.split(
+                              " "
+                            )[0]
+                          )} ${c.score}%`
+                      )
+                      .join(", ")}
+                  </span>
+
+                </div>
+
+                <button
+                  type="button"
+                  class="btn btn-sm ${
+                    joined
+                      ? "btn-ghost"
+                      : "btn-primary"
+                  }"
+                  data-action="join"
+                  data-id="${escapeHtml(
+                    m.id
+                  )}"
+                  aria-pressed="${joined}"
+                >
+
+                  <i
+                    data-lucide="${
+                      joined
+                        ? "check"
+                        : "user-plus"
+                    }"
+                  ></i>
+
+                  ${
+                    joined
+                      ? "Joined"
+                      : "Join mission"
+                  }
+
+                </button>
+
+              </div>
+
+            </article>
+          `;
+        }
+      )
+      .join("");
+
+  refreshIcons();
+}
+
+function renderPeople() {
+  const grid =
+    $("#peopleGrid");
+
+  if (!grid) return;
+
+  grid.innerHTML =
+    PEOPLE.map(
+      (p, i) => `
+        <article class="person-card glass">
+
+          <span
+            class="avatar tone-${i % 4} ${
+              p.org
+                ? "is-org"
+                : ""
+            }"
+            aria-hidden="true"
+          >
+            ${initials(p.name)}
+          </span>
+
+          <div class="person-body">
+
+            <span class="person-name">
+
+              ${escapeHtml(
+                p.name
+              )}
+
+              ${
+                p.org
+                  ? '<span class="org-badge">Org</span>'
+                  : ""
+              }
+
+            </span>
+
+            <span class="person-role">
+
+              ${escapeHtml(
+                p.role
+              )}
+
+              ·
+
+              ${escapeHtml(
+                p.area
+              )}
+
+            </span>
+
+            <div class="skill-list">
+
+              ${p.skills
+                .map(
+                  (s) => `
+                    <span
+                      class="skill-chip ${
+                        state.mySkills.has(
+                          s
+                        )
+                          ? "have"
+                          : ""
+                      }"
+                    >
+                      ${escapeHtml(s)}
+                    </span>
+                  `
+                )
+                .join("")}
+
+            </div>
+
+          </div>
+
+        </article>
+      `
+    ).join("");
+}
+
+function renderCommunity() {
+  syncSkillPicker();
+
+  renderMissions();
+
+  renderPeople();
+}
+
+function toggleSkill(skill) {
+  if (
+    state.mySkills.has(
+      skill
+    )
+  ) {
+    state.mySkills.delete(
+      skill
+    );
+  } else {
+    state.mySkills.add(
+      skill
+    );
+  }
+
+  renderCommunity();
+
+  refreshIcons();
+}
+
+function toggleMission(id) {
+  const mission =
+    MISSIONS.find(
+      (m) => m.id === id
+    );
+
+  if (!mission) return;
+
+  if (
+    state.joinedMissions.has(
+      id
+    )
+  ) {
+    state.joinedMissions.delete(
+      id
+    );
+
+    mission.joined =
+      Math.max(
+        0,
+        mission.joined - 1
+      );
+  } else {
+    state.joinedMissions.add(
+      id
+    );
+
+    mission.joined++;
+
+    toast(
+      `You joined "${mission.title}"`,
+      "hand-heart"
+    );
+  }
+
+  renderMissions();
+}
+
+
+/* =========================================================
+   11. CIVIC AI
+   ========================================================= */
+
+function getCivicAiContext() {
+  if (state.openIssueId) {
+    const issue =
+      issues.find(
+        (item) =>
+          item.id ===
+          state.openIssueId
+      );
+
+    if (issue) {
+      return {
+        title: issue.title,
+
+        category:
+          issue.category,
+
+        description:
+          issue.description,
+
+        priority:
+          issue.priority,
+
+        status:
+          issue.status,
+
+        location:
+          issue.location
+      };
+    }
+  }
+
+  if (state.draft) {
+    return {
+      title:
+        state.draft.description?.slice(
+          0,
+          60
+        ) ||
+        "Current civic report",
+
+      category:
+        state.draft.categoryKey ||
+        "other",
+
+      description:
+        state.draft.description ||
+        "",
+
+      location:
+        state.draft.location ||
+        ""
+    };
+  }
+
+  return null;
+}
+
+function openCivicAi(
+  context = null
+) {
+  state.civicAiOpen =
+    true;
+
+  state.civicAiContext =
+    context ||
+    getCivicAiContext();
+
+  const panel =
+    document.getElementById(
+      "civicAiPanel"
+    );
+
+  const fab =
+    document.getElementById(
+      "civicAiFab"
+    );
+
+  if (!panel || !fab) {
+    return;
+  }
+
+  panel.classList.add(
+    "is-open"
+  );
+
+  panel.setAttribute(
+    "aria-hidden",
+    "false"
+  );
+
+  fab.setAttribute(
+    "aria-expanded",
+    "true"
+  );
+
+  refreshIcons();
+
+  const input =
+    document.getElementById(
+      "civicAiInput"
+    );
+
+  if (input) {
+    setTimeout(
+      () => input.focus(),
+      100
+    );
+  }
+}
+
+function closeCivicAi() {
+  state.civicAiOpen =
+    false;
+
+  const panel =
+    document.getElementById(
+      "civicAiPanel"
+    );
+
+  const fab =
+    document.getElementById(
+      "civicAiFab"
+    );
+
+  if (!panel || !fab) {
+    return;
+  }
+
+  panel.classList.remove(
+    "is-open"
+  );
+
+  panel.setAttribute(
+    "aria-hidden",
+    "true"
+  );
+
+  fab.setAttribute(
+    "aria-expanded",
+    "false"
+  );
+}
+
+function addCivicAiMessage(
+  role,
+  text
+) {
+  const container =
+    document.getElementById(
+      "civicAiMessages"
+    );
+
+  if (!container) return;
+
+  state.civicAiMessages.push({
+    role,
+    text
+  });
+
+  const message =
+    document.createElement(
+      "div"
+    );
+
+  message.className =
+    `civic-ai-message ${role}`;
+
+  if (role === "ai") {
+    message.innerHTML = `
+      <div class="civic-ai-message-avatar">
+        <i data-lucide="sparkles"></i>
+      </div>
+
+      <div class="civic-ai-bubble">
+        ${text}
+      </div>
+    `;
+  } else {
+    message.innerHTML = `
+      <div class="civic-ai-bubble">
+        ${text}
+      </div>
+    `;
+  }
+
+  container.appendChild(
+    message
+  );
+
+  container.scrollTop =
+    container.scrollHeight;
+
+  refreshIcons();
+}
+
+function civicAiText(value) {
+  return String(value || "")
+    .replace(
+      /&/g,
+      "&amp;"
+    )
+    .replace(
+      /</g,
+      "&lt;"
+    )
+    .replace(
+      />/g,
+      "&gt;"
+    )
+    .replace(
+      /"/g,
+      "&quot;"
+    )
+    .replace(
+      /'/g,
+      "&#039;"
+    );
+}
+
+function detectCivicCategory(
+  text
+) {
+  const question =
+    String(text || "")
+      .toLowerCase();
+
+  const keywords = {
+    roads: [
+      "road",
+      "pothole",
+      "street",
+      "traffic",
+      "bridge",
+      "footpath",
+      "sidewalk",
+      "road damage"
+    ],
+
+    garbage: [
+      "garbage",
+      "trash",
+      "waste",
+      "dump",
+      "dumping",
+      "litter",
+      "rubbish",
+      "dirty"
+    ],
+
+    streetlights: [
+      "streetlight",
+      "street light",
+      "lamp",
+      "lights are off",
+      "dark street",
+      "dark road"
+    ],
+
+    water: [
+      "water",
+      "pipeline",
+      "pipe",
+      "leak",
+      "leaking",
+      "water supply",
+      "drinking water",
+      "flood"
+    ],
+
+    health: [
+      "hospital",
+      "clinic",
+      "health",
+      "medicine",
+      "sanitation",
+      "disease"
+    ],
+
+    education: [
+      "school",
+      "college",
+      "classroom",
+      "teacher",
+      "education",
+      "student"
+    ],
+
+    environment: [
+      "pollution",
+      "environment",
+      "river",
+      "lake",
+      "forest",
+      "tree",
+      "air quality"
+    ],
+
+    safety: [
+      "unsafe",
+      "danger",
+      "accident",
+      "crime",
+      "security",
+      "hazard",
+      "warning"
+    ]
+  };
+
+  for (
+    const [category, words]
+    of Object.entries(
+      keywords
+    )
+  ) {
+    if (
+      words.some(
+        (word) =>
+          question.includes(
+            word
+          )
+      )
+    ) {
+      return category;
+    }
+  }
+
+  return null;
+}
+
+function generateCivicAiResponse(
+  prompt
+) {
+  const question =
+    String(prompt || "")
+      .toLowerCase();
+
+  const context =
+    state.civicAiContext ||
+    getCivicAiContext();
+
+  const description =
+    context?.description ||
+    "";
+
+  const detectedCategory =
+    detectCivicCategory(
+      prompt
+    ) ||
+    context?.category ||
+    null;
+
+  const category =
+    detectedCategory;
+
+  let response = "";
+
+  if (
+    question.includes(
+      "caus"
+    ) ||
+    question.includes(
+      "why"
+    ) ||
+    question.includes(
+      "problem"
+    )
+  ) {
+    const causes = {
+      roads:
+        "Possible causes include poor drainage, road wear, overloaded traffic, weak maintenance, or construction damage.",
+
+      garbage:
+        "Possible causes include irregular collection, insufficient bins, illegal dumping, poor waste segregation, or limited collection capacity.",
+
+      streetlights:
+        "Possible causes include damaged equipment, electrical faults, aging infrastructure, or delayed maintenance.",
+
+      water:
+        "Possible causes include pipe damage, leakage, low supply capacity, contamination, or infrastructure maintenance issues.",
+
+      health:
+        "Possible causes may include sanitation problems, environmental conditions, service gaps, or limited access to public-health facilities.",
+
+      education:
+        "Possible causes may include infrastructure gaps, limited resources, overcrowding, maintenance issues, or access problems.",
+
+      environment:
+        "Possible causes may include waste accumulation, pollution, land-use changes, drainage problems, or environmental damage.",
+
+      safety:
+        "Possible causes may include poor lighting, damaged infrastructure, unsafe road conditions, insufficient signage, or limited monitoring.",
+
+      other:
+        "The exact cause depends on the situation. Useful possibilities can usually be identified by examining the location, timing, visible conditions, and available evidence."
+    };
+
+    response = `
+      <strong>
+        Possible causes
+      </strong>
+
+      <p>
+        ${
+          causes[
+            category || "other"
+          ]
+        }
+      </p>
+
+      <p>
+        I would treat these as possibilities,
+        not confirmed causes. Photos,
+        location details and repeated reports
+        can help determine what is actually
+        happening.
+      </p>
+    `;
+  }
+
+  else if (
+    question.includes(
+      "prevent"
+    ) ||
+    question.includes(
+      "avoid"
+    ) ||
+    question.includes(
+      "solution"
+    )
+  ) {
+    const prevention = {
+      roads:
+        "Regular road inspections, drainage maintenance, timely repairs and better reporting of damaged sections can help prevent recurring problems.",
+
+      garbage:
+        "Regular collection, adequate bins, waste segregation, public awareness and monitoring of dumping hotspots can reduce the problem.",
+
+      streetlights:
+        "Routine inspections, faster fault reporting and preventive maintenance can reduce prolonged streetlight outages.",
+
+      water:
+        "Regular infrastructure inspections, leak detection, maintenance and water-quality monitoring can help prevent recurring issues.",
+
+      health:
+        "Focus on sanitation, clean surroundings, public-health monitoring and timely reporting. Health-related concerns should be handled by qualified authorities or professionals.",
+
+      education:
+        "Regular maintenance, infrastructure checks, resource planning and clear reporting channels can help prevent recurring education-related problems.",
+
+      environment:
+        "Monitoring, waste management, protection of vulnerable areas and early reporting can help reduce environmental damage.",
+
+      safety:
+        "Better lighting, infrastructure maintenance, visible warnings and timely reporting can help reduce safety risks.",
+
+      other:
+        "Prevention depends on the specific problem. First identify the likely cause, then target maintenance, monitoring, infrastructure or public awareness accordingly."
+    };
+
+    response = `
+      <strong>
+        Possible prevention
+      </strong>
+
+      <p>
+        ${
+          prevention[
+            category || "other"
+          ]
+        }
+      </p>
+    `;
+  }
+
+  else if (
+    question.includes(
+      "evidence"
+    ) ||
+    question.includes(
+      "measure"
+    ) ||
+    question.includes(
+      "proof"
+    ) ||
+    question.includes(
+      "collect"
+    )
+  ) {
+    response = `
+      <strong>
+        Useful evidence
+      </strong>
+
+      <p>
+        For a strong civic report,
+        consider collecting:
+      </p>
+
+      <ul>
+        <li>
+          Clear photos or videos
+        </li>
+
+        <li>
+          Exact location
+        </li>
+
+        <li>
+          Date and approximate time
+        </li>
+
+        <li>
+          How often the problem occurs
+        </li>
+
+        <li>
+          Visible impact on people
+          or infrastructure
+        </li>
+
+        <li>
+          Measurements when they
+          can be collected safely
+        </li>
+      </ul>
+
+      <p>
+        Multiple independent reports
+        from the same area can also
+        strengthen the signal that an
+        issue needs attention.
+      </p>
+    `;
+  }
+
+  else if (
+    question.includes(
+      "department"
+    ) ||
+    question.includes(
+      "authority"
+    ) ||
+    question.includes(
+      "who should"
+    )
+  ) {
+    const departments = {
+      roads:
+        "Public Works / Roads and infrastructure authority",
+
+      garbage:
+        "Municipal waste-management authority",
+
+      streetlights:
+        "Municipal electrical or street-lighting department",
+
+      water:
+        "Water-supply / Public Health Engineering authority",
+
+      health:
+        "Public-health or health department",
+
+      education:
+        "Education department or local education authority",
+
+      environment:
+        "Environment / pollution-control authority",
+
+      safety:
+        "Local administration, public-safety or relevant emergency authority",
+
+      other:
+        "The responsible authority depends on the location and type of issue."
+    };
+
+    response = `
+      <strong>
+        Likely responsible authority
+      </strong>
+
+      <p>
+        ${
+          departments[
+            category || "other"
+          ]
+        }.
+      </p>
+
+      <p>
+        Civic OS can use the report
+        category and location to help
+        route an issue to the appropriate
+        authority.
+      </p>
+    `;
+  }
+
+  else if (
+    detectedCategory
+  ) {
+    const detectedResponses = {
+      roads: `
+        <strong>
+          Road issue detected
+        </strong>
+
+        <p>
+          This sounds like a road or
+          infrastructure problem.
+        </p>
+
+        <p>
+          <strong>
+            Possible next step:
+          </strong>
+          Record the exact location
+          and take a clear photo of
+          the problem. Civic OS can
+          use this information to help
+          route the report to the
+          appropriate road authority.
+        </p>
+      `,
+
+      garbage: `
+        <strong>
+          Waste issue detected
+        </strong>
+
+        <p>
+          This sounds like a garbage
+          or waste-management problem.
+        </p>
+
+        <p>
+          <strong>
+            Possible next step:
+          </strong>
+          Record the location,
+          take a clear photo and
+          note whether the waste
+          is regularly accumulating.
+        </p>
+      `,
+
+      streetlights: `
+        <strong>
+          Streetlight issue detected
+        </strong>
+
+        <p>
+          This sounds like a
+          street-lighting problem.
+        </p>
+
+        <p>
+          <strong>
+            Possible next step:
+          </strong>
+          Record the location and,
+          if possible, note when the
+          lights stop working.
+        </p>
+      `,
+
+      water: `
+        <strong>
+          Water issue detected
+        </strong>
+
+        <p>
+          This sounds like a
+          water-supply or infrastructure
+          problem.
+        </p>
+
+        <p>
+          <strong>
+            Possible next step:
+          </strong>
+          Record the location,
+          describe the issue and
+          note how frequently it occurs.
+        </p>
+      `,
+
+      education: `
+        <strong>
+          Education issue detected
+        </strong>
+
+        <p>
+          This sounds like an
+          education or school-
+          infrastructure concern.
+        </p>
+
+        <p>
+          <strong>
+            Possible next step:
+          </strong>
+          Describe the specific
+          problem and identify the
+          affected facility or location.
+        </p>
+      `,
+
+      health: `
+        <strong>
+          Public health issue detected
+        </strong>
+
+        <p>
+          This sounds like a
+          public-health or sanitation
+          concern.
+        </p>
+
+        <p>
+          <strong>
+            Possible next step:
+          </strong>
+          Document the location
+          and describe the issue
+          clearly. Health concerns
+          should be handled by the
+          appropriate authority or
+          qualified professional.
+        </p>
+      `,
+
+      environment: `
+        <strong>
+          Environmental issue detected
+        </strong>
+
+        <p>
+          This sounds like an
+          environmental concern.
+        </p>
+
+        <p>
+          <strong>
+            Possible next step:
+          </strong>
+          Record the location,
+          visible impact and supporting
+          evidence such as photos.
+        </p>
+      `,
+
+      safety: `
+        <strong>
+          Safety issue detected
+        </strong>
+
+        <p>
+          This sounds like a
+          public-safety concern.
+        </p>
+
+        <p>
+          <strong>
+            Possible next step:
+          </strong>
+          Record the location and
+          describe the visible hazard
+          clearly. For immediate danger,
+          contact the appropriate
+          emergency service.
+        </p>
+      `
+    };
+
+    response =
+      detectedResponses[
+        detectedCategory
+      ] || "";
+  }
+
+  else {
+    response = `
+      <strong>
+        Here's how I can help
+      </strong>
+
+      <p>
+        I can help you understand
+        this civic problem, explore
+        possible causes, suggest
+        prevention ideas, identify
+        useful evidence, and think
+        about the likely responsible
+        authority.
+      </p>
+
+      ${
+        description
+          ? `
+            <p>
+              <strong>
+                Current context:
+              </strong>
+
+              ${civicAiText(
+                description.slice(
+                  0,
+                  180
+                )
+              )}
+            </p>
+          `
+          : ""
+      }
+
+      <p>
+        Try asking:
+        <em>
+          "What could be causing this?"
+        </em>,
+        <em>
+          "How can it be prevented?"
+        </em>,
+        or
+        <em>
+          "What evidence should I collect?"
+        </em>
+      </p>
+    `;
+  }
+
+  return response;
+}
+
+
+/* =========================================================
+   12. EVENT BINDING
+   ========================================================= */
+
+function bindEvents() {
+
+  /* ---------- Global click handling ---------- */
+
+  document.addEventListener(
+    "click",
+    (event) => {
+
+      const goto =
+        event.target.closest(
+          "[data-goto]"
+        );
+
+      if (goto) {
+
+        if (
+          goto.dataset.status ||
+          goto.dataset.priority
+        ) {
+          state.filters = {
+            status:
+              goto.dataset.status ||
+              "All",
+
+            category:
+              "all",
+
+            priority:
+              goto.dataset.priority ||
+              "all",
+
+            sort:
+              "newest",
+
+            query:
+              ""
+          };
+        }
+
+        showScreen(
+          goto.dataset.goto
+        );
+
+        return;
+      }
+
+
+      const issueBtn =
+        event.target.closest(
+          "[data-issue]"
+        );
+
+      if (issueBtn) {
+        openIssue(
+          issueBtn.dataset.issue
+        );
+
+        return;
+      }
+
+
+      const statusChip =
+        event.target.closest(
+          "[data-status-filter]"
+        );
+
+      if (statusChip) {
+        state.filters.status =
+          statusChip.dataset
+            .statusFilter;
+
+        renderIssues();
+
+        return;
+      }
+
+
+      const skillChip =
+        event.target.closest(
+          "[data-skill]"
+        );
+
+      if (skillChip) {
+        toggleSkill(
+          skillChip.dataset.skill
+        );
+
+        return;
+      }
+
+      const civicActionCard =
+        event.target.closest(
+          "[data-civic-action]"
+        );
+
+      if (civicActionCard) {
+        openCivicAction(
+          civicActionCard.dataset.civicAction
+        );
+
+        return;
+      }
+
+
+      const createActionButton =
+        event.target.closest(
+          "#createActionBtn"
+        );
+
+      if (createActionButton) {
+        openCreateActivity();
+
+        return;
+      }
+      const actionBtn =
+        event.target.closest(
+          "[data-action]"
+        );
+
+      if (!actionBtn) {
+        return;
+      }
+
+      const {
+        action,
+        id
+      } =
+        actionBtn.dataset;
+
+
+      if (
+        action ===
+        "submit-report"
+      ) {
+        submitReport();
+      }
+
+
+      if (
+        action ===
+        "edit-report"
+      ) {
+        const description =
+          $("#description");
+
+        if (description) {
+          description.focus();
+        }
+
+        const form =
+          $("#reportForm");
+
+        if (form) {
+          form.scrollIntoView({
+            behavior: "smooth",
+            block: "start"
+          });
+        }
+      }
+
+
+      if (
+        action ===
+        "report-another"
+      ) {
+        const form =
+          $("#reportForm");
+
+        const panel =
+          $("#aiPanel");
+
+        if (form) {
+          form.hidden =
+            false;
+        }
+
+        if (panel) {
+          panel.innerHTML =
+            "";
+        }
+
+        state.analysis =
+          null;
+
+        state.draft =
+          null;
+
+        updateStepper();
+      }
+
+
+      if (
+        action ===
+        "use-suggestion"
+      ) {
+        const key =
+          actionBtn.dataset.key;
+
+        const radio =
+          document.getElementById(
+            `cat-${key}`
+          );
+
+        if (radio) {
+          radio.checked =
+            true;
+        }
+
+        if (state.draft) {
+          state.analysis =
+            analyzeReport({
+              ...state.draft,
+              categoryKey:
+                key
+            });
+
+          state.draft.categoryKey =
+            key;
+
+          renderAnalysis();
+        }
+      }
+
+
+      if (
+        action ===
+        "support-duplicate"
+      ) {
+        const issue =
+          getIssue(id);
+
+        if (!issue) {
+          return;
+        }
+
+        if (
+          !state.supported.has(
+            id
+          )
+        ) {
+          state.supported.add(
+            id
+          );
+
+          issue.supporters++;
+        }
+
+        resetReportForm();
+
+        invalidateAnalysis();
+
+        updateStepper();
+
+        toast(
+          `Added your support to ${id}`
+        );
+
+        openIssue(id);
+      }
+
+
+      if (
+        action ===
+        "support"
+      ) {
+        toggleSupport(id);
+      }
+
+
+      if (
+        action ===
+        "advance"
+      ) {
+        advanceIssue(id);
+      }
+
+
+      if (
+        action ===
+        "join"
+      ) {
+        toggleMission(id);
+      }
+
+
+      if (
+        action ===
+        "clear-filters"
+      ) {
+        state.filters = {
+          status: "All",
+          category: "all",
+          priority: "all",
+          sort: "newest",
+          query: ""
+        };
+
+        renderIssues();
+      }
+
+    }
+  );
+
+
+  /* ---------- Browser back / forward ---------- */
+
+  window.addEventListener(
+    "popstate",
+    () => {
+      showScreen(
+        screenFromHash(),
+        {
+          push: false
+        }
+      );
+    }
+  );
+
+
+  /* ---------- Report form ---------- */
+
+  const form =
+    $("#reportForm");
+
+  if (form) {
+
+    form.addEventListener(
+      "submit",
+      handleAnalyze
+    );
+
+    form.addEventListener(
+      "input",
+      (event) => {
+
+        if (
+          event.target.id ===
+          "description"
+        ) {
+          const count =
+            $("#descCount");
+
+          if (count) {
+            count.textContent =
+              `${event.target.value.length} / 500`;
+          }
+        }
+
+        if (
+          event.target.matches(
+            "[aria-invalid]"
+          )
+        ) {
+          event.target.removeAttribute(
+            "aria-invalid"
+          );
+        }
+
+        if (
+          event.target.type !==
+          "file"
+        ) {
+          invalidateAnalysis();
+        }
+
+        updateStepper();
+      }
+    );
+  }
+
+
+  /* ---------- Report photo ---------- */
+
+  const photo =
+    $("#photo");
+
+  if (photo) {
+    photo.addEventListener(
+      "change",
+      (event) =>
+        setPhoto(
+          event.target.files[0]
+        )
+    );
+  }
+
+
+  const removePhoto =
+    $("#removePhoto");
+
+  if (removePhoto) {
+    removePhoto.addEventListener(
+      "click",
+      () => {
+        clearPhoto({
+          revoke: true
+        });
+
+        invalidateAnalysis();
+      }
+    );
+  }
+
+
+  /* ---------- Example report ---------- */
+
+  const exampleBtn =
+    $("#exampleBtn");
+
+  if (exampleBtn) {
+    exampleBtn.addEventListener(
+      "click",
+      fillExample
+    );
+  }
+
+
+  /* ---------- Location ---------- */
+
+  const locateBtn =
+    $("#locateBtn");
+
+  if (locateBtn) {
+    locateBtn.addEventListener(
+      "click",
+      useCurrentLocation
+    );
+  }
+
+
+  /* ---------- Issue search ---------- */
+
+  const issueSearch =
+    $("#issueSearch");
+
+  if (issueSearch) {
+    issueSearch.addEventListener(
+      "input",
+      (event) => {
+        state.filters.query =
+          event.target.value;
+
+        renderIssueList();
+      }
+    );
+  }
+
+
+  const filterCategory =
+    $("#filterCategory");
+
+  if (filterCategory) {
+    filterCategory.addEventListener(
+      "change",
+      (event) => {
+        state.filters.category =
+          event.target.value;
+
+        renderIssueList();
+      }
+    );
+  }
+
+
+  const filterPriority =
+    $("#filterPriority");
+
+  if (filterPriority) {
+    filterPriority.addEventListener(
+      "change",
+      (event) => {
+        state.filters.priority =
+          event.target.value;
+
+        renderIssueList();
+      }
+    );
+  }
+
+
+  const sortIssues =
+    $("#sortIssues");
+
+  if (sortIssues) {
+    sortIssues.addEventListener(
+      "change",
+      (event) => {
+        state.filters.sort =
+          event.target.value;
+
+        renderIssueList();
+      }
+    );
+  }
+
+
+  /* ---------- Issue dialog ---------- */
+
+  const dialog =
+    $("#issueDialog");
+
+  const closeSheet =
+    $("#closeSheet");
+
+  if (
+    dialog &&
+    closeSheet
+  ) {
+    closeSheet.addEventListener(
+      "click",
+      () => dialog.close()
+    );
+
+    dialog.addEventListener(
+      "click",
+      (event) => {
+        if (
+          event.target ===
+          dialog
+        ) {
+          dialog.close();
+        }
+      }
+    );
+
+    dialog.addEventListener(
+      "close",
+      () => {
+        state.openIssueId =
+          null;
+      }
+    );
+  }
+
+
+  /* =======================================================
+     CIVIC AI FILE UPLOAD
+     ======================================================= */
+
+  const civicAiFileInput =
+    document.getElementById(
+      "civicAiFileInput"
+    );
+
+  const civicAiFilePreview =
+    document.getElementById(
+      "civicAiFilePreview"
+    );
+
+  if (
+    civicAiFileInput &&
+    civicAiFilePreview
+  ) {
+
+    civicAiFileInput.addEventListener(
+      "change",
+      () => {
+
+        const file =
+          civicAiFileInput.files[0];
+
+        if (!file) return;
+
+        const isImage =
+          file.type.startsWith(
+            "image/"
+          );
+
+        const previewUrl =
+          isImage
+            ? URL.createObjectURL(
+                file
+              )
+            : "";
+
+        civicAiFilePreview.innerHTML = `
+          <div class="civic-ai-file">
+
+            ${
+              isImage
+                ? `
+                  <img
+                    src="${previewUrl}"
+                    class="civic-ai-file-image"
+                    alt="Uploaded civic evidence"
+                  />
+                `
+                : `
+                  <i data-lucide="file"></i>
+                `
+            }
+
+            <span>
+              ${civicAiText(
+                file.name
+              )}
+            </span>
+
+            <button
+              type="button"
+              id="removeCivicAiFile"
+              aria-label="Remove file"
+            >
+              <i data-lucide="x"></i>
+            </button>
+
+          </div>
+        `;
+
+        refreshIcons();
+
+        const removeButton =
+          document.getElementById(
+            "removeCivicAiFile"
+          );
+
+        if (removeButton) {
+
+          removeButton.addEventListener(
+            "click",
+            () => {
+
+              if (
+                previewUrl
+              ) {
+                try {
+                  URL.revokeObjectURL(
+                    previewUrl
+                  );
+                } catch {}
+              }
+
+              civicAiFileInput.value =
+                "";
+
+              civicAiFilePreview.innerHTML =
+                "";
+            }
+          );
+        }
+
+      }
+    );
+  }
+
+
+  /* =======================================================
+     CIVIC AI CHAT
+     ======================================================= */
+
+  const civicAiFab =
+    document.getElementById(
+      "civicAiFab"
+    );
+
+  const closeCivicAiButton =
+    document.getElementById(
+      "closeCivicAi"
+    );
+
+  const civicAiForm =
+    document.getElementById(
+      "civicAiForm"
+    );
+
+  const civicAiInput =
+    document.getElementById(
+      "civicAiInput"
+    );
+
+
+  if (civicAiFab) {
+    civicAiFab.addEventListener(
+      "click",
+      () => {
+        openCivicAi();
+      }
+    );
+  }
+
+
+  if (
+    closeCivicAiButton
+  ) {
+    closeCivicAiButton.addEventListener(
+      "click",
+      () => {
+        closeCivicAi();
+      }
+    );
+  }
+
+
+  if (
+    civicAiForm &&
+    civicAiInput
+  ) {
+
+    civicAiForm.addEventListener(
+      "submit",
+      (event) => {
+
+        event.preventDefault();
+
+        const prompt =
+          civicAiInput.value.trim();
+
+        const fileInput =
+          document.getElementById(
+            "civicAiFileInput"
+          );
+
+        const file =
+          fileInput?.files[0];
+
+        if (
+          !prompt &&
+          !file
+        ) {
+          return;
+        }
+
+        if (file) {
+
+          addCivicAiMessage(
+            "user",
+            `${civicAiText(
+              prompt ||
+                "Please check this file."
+            )}<br>
+            <small>
+              📎 Attached:
+              ${civicAiText(
+                file.name
+              )}
+            </small>`
+          );
+
+        } else {
+
+          addCivicAiMessage(
+            "user",
+            civicAiText(
+              prompt
+            )
+          );
+        }
+
+        civicAiInput.value =
+          "";
+
+        setTimeout(
+          () => {
+
+            const response =
+              generateCivicAiResponse(
+                prompt
+              );
+
+            addCivicAiMessage(
+              "ai",
+              response
+            );
+
+          },
+          350
+        );
+      }
+    );
+  }
+
+
+  /* ---------- Civic AI suggestions ---------- */
+
+  document
+    .querySelectorAll(
+      ".ai-suggestion"
+    )
+    .forEach(
+      (button) => {
+
+        button.addEventListener(
+          "click",
+          () => {
+
+            const prompt =
+              button.dataset
+                .aiPrompt;
+
+            if (!prompt) {
+              return;
+            }
+
+            addCivicAiMessage(
+              "user",
+              civicAiText(
+                prompt
+              )
+            );
+
+            setTimeout(
+              () => {
+
+                const response =
+                  generateCivicAiResponse(
+                    prompt
+                  );
+
+                addCivicAiMessage(
+                  "ai",
+                  response
+                );
+
+              },
+              350
+            );
+          }
+        );
+      }
+    );
+  /* =======================================================
+     CREATE CIVIC ACTIVITY
+     ======================================================= */
+
+  const cancelCreateActivity =
+    document.getElementById(
+      "cancelCreateActivity"
+    );
+
+  if (cancelCreateActivity) {
+    cancelCreateActivity.addEventListener(
+      "click",
+      () => {
+        const form = document.getElementById(
+          "createActivityForm"
+        );
+
+        if (form) {
+          form.reset();
+        }
+
+        showScreen("actionsScreen");
+      }
+    );
+  }
+
+
+  const createActivityForm =
+    document.getElementById(
+      "createActivityForm"
+    );
+
+  if (createActivityForm) {
+
+    createActivityForm.addEventListener(
+      "submit",
+      (event) => {
+
+        event.preventDefault();
+
+        const title =
+          document.getElementById(
+            "activityTitle"
+          )?.value.trim();
+
+        const type =
+          document.getElementById(
+            "activityType"
+          )?.value;
+
+        const participants =
+          document.getElementById(
+            "activityParticipants"
+          )?.value;
+
+        const location =
+          document.getElementById(
+            "activityLocation"
+          )?.value.trim();
+
+        const date =
+          document.getElementById(
+            "activityDate"
+          )?.value;
+
+        const time =
+          document.getElementById(
+            "activityTime"
+          )?.value;
+
+        const description =
+          document.getElementById(
+            "activityDescription"
+          )?.value.trim();
+
+        const support =
+          document.getElementById(
+            "activitySupport"
+          )?.value.trim();
+
+
+        if (
+          !title ||
+          !type ||
+          !participants ||
+          !location ||
+          !date ||
+          !time ||
+          !description
+        ) {
+          toast(
+            "Please complete all required fields."
+          );
+
+          return;
+        }
+
+
+        const newActivity = {
+
+          id:
+            "activity-" +
+            Date.now(),
+
+          title,
+
+          type,
+
+          participants:
+            Number(participants),
+
+          location,
+
+          date,
+
+          time,
+
+          description,
+
+          support:
+            support ||
+            "No additional support requested.",
+
+          image:
+            type === "Tree planting"
+              ? "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=1400&q=85"
+              : type === "Clean-up"
+              ? "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&w=1400&q=85"
+              : type === "Flood preparedness"
+              ? "https://images.unsplash.com/photo-1547683905-f686c993aae5?auto=format&fit=crop&w=1400&q=85"
+              : "",
+
+          organizer:
+            "Community Member",
+
+          icon:
+            type === "Clean-up"
+              ? "sparkles"
+              : type === "Tree planting"
+              ? "trees"
+              : type === "Flood preparedness"
+              ? "waves"
+              : type === "Community support"
+              ? "users"
+              : "megaphone"
+        };
+
+
+        if (
+          !Array.isArray(
+            window.civicUserActivities
+          )
+        ) {
+
+          window.civicUserActivities =
+            [];
+
+        }
+
+
+        window.civicUserActivities.push(
+          newActivity
+        );
+
+
+        createActivityForm.reset();
+
+
+        toast(
+          "Activity created successfully!"
+        );
+
+
+        showScreen(
+          "actionsScreen"
+        );
+
+
+        if (
+          typeof renderCivicActions ===
+          "function"
+        ) {
+
+          renderCivicActions();
+
+        }
+
+      }
+    );
+
+  }
+}
+/* =========================================================
+   CIVIC ACTION DETAILS
+   ========================================================= */
+
+const civicActionData = {
+
+  flood: {
+    title: "Flood Preparedness & Awareness Drive",
+    icon: "waves",
+    image: "https://images.unsplash.com/photo-1547683905-f686c993aae5?auto=format&fit=crop&w=1600&q=90",
+    location: "Imphal",
+    date: "12 October 2026",
+    time: "9:00 AM – 12:00 PM",
+    organizer: "Local Youth Civic Group",
+    participants: 24,
+    description:
+      "A community-led awareness activity focused on helping residents understand flood preparedness, emergency planning and basic safety measures.",
+    support:
+      "Government support requested for awareness materials and coordination."
+  },
+
+  cleanup: {
+    title: "Community Clean-Up Drive",
+    icon: "sparkles",
+    image: "https://images.unsplash.com/photo-1618477461853-cf6ed80faba5?auto=format&fit=crop&w=1600&q=90",
+    location: "Khurai",
+    date: "10 October 2026",
+    time: "7:00 AM – 10:00 AM",
+    organizer: "Khurai Community Volunteers",
+    participants: 18,
+    description:
+      "Residents and volunteers will work together to clean a shared public area and improve the surrounding neighbourhood.",
+    support:
+      "Government support requested for waste collection after the activity."
+  },
+
+  planting: {
+    title: "Tree Plantation & Green Space Drive",
+    icon: "trees",
+    image: "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=1600&q=90",
+    location: "Lamphel",
+    date: "18 October 2026",
+    time: "8:00 AM – 11:00 AM",
+    organizer: "Green Manipur Community",
+    participants: 31,
+    description:
+      "A community activity to plant trees and improve a shared green space while encouraging residents to take part in local environmental action.",
+    support:
+      "Government support requested for saplings, equipment and coordination."
+  }
+
+};
+
+
+function openCivicAction(actionId) {
+
+  const action =
+    civicActionData[actionId];
+
+  if (!action) {
+    return;
+  }
+
+  state.civicActionId = actionId;
+
+  const detail =
+    document.getElementById(
+      "actionDetailContent"
+    );
+
+  if (!detail) {
+    return;
+  }
+
+  detail.innerHTML = `
+    <div class="action-detail-content">
+
+      <div class="action-detail-hero" style="${action.image ? "--action-image: url('" + action.image + "')" : ""}">
+        <div class="action-detail-hero-image" aria-hidden="true"></div>
+
+        <div class="action-detail-hero-copy">
+
+          <span class="action-detail-category">
+            <i data-lucide="hand-heart"></i>
+            Civic Action
+          </span>
+
+          <h2
+            id="actionDetailTitle"
+            class="action-detail-title"
+          >
+            ${escapeHtml(action.title)}
+          </h2>
+
+          <p class="action-detail-description">
+            ${escapeHtml(action.description)}
+          </p>
+
+        </div>
+
+        <div class="action-detail-hero-icon">
+          <i data-lucide="${action.icon}"></i>
+        </div>
+      </div>
+
+      <div class="action-detail-stats">
+
+        <div class="action-detail-stat">
+          <span class="action-stat-icon location">
+            <i data-lucide="map-pin"></i>
+          </span>
+          <span class="action-stat-label">Location</span>
+          <strong>${escapeHtml(action.location)}</strong>
+        </div>
+
+        <div class="action-detail-stat">
+          <span class="action-stat-icon date">
+            <i data-lucide="calendar-days"></i>
+          </span>
+          <span class="action-stat-label">Date</span>
+          <strong>${escapeHtml(action.date)}</strong>
+        </div>
+
+        <div class="action-detail-stat">
+          <span class="action-stat-icon time">
+            <i data-lucide="clock-3"></i>
+          </span>
+          <span class="action-stat-label">Time</span>
+          <strong>${escapeHtml(action.time)}</strong>
+        </div>
+
+        <div class="action-detail-stat">
+          <span class="action-stat-icon people">
+            <i data-lucide="users"></i>
+          </span>
+          <span class="action-stat-label">Participants</span>
+          <strong id="actionParticipantCount">${action.participants} joined</strong>
+        </div>
+
+      </div>
+
+      <div class="action-detail-organizer">
+        <span class="action-organizer-icon">
+          <i data-lucide="users-round"></i>
+        </span>
+        <span>
+          <small>Organized by</small>
+          <strong>${escapeHtml(action.organizer)}</strong>
+          <em>Community Group</em>
+        </span>
+      </div>
+
+      <div class="action-detail-support">
+        <span class="action-support-icon">
+          <i data-lucide="landmark"></i>
+        </span>
+        <span>
+          <strong>Government Support</strong>
+          <p>${escapeHtml(action.support)}</p>
+        </span>
+      </div>
+
+      <div class="action-detail-about">
+        <span class="action-about-icon">
+          <i data-lucide="leaf"></i>
+        </span>
+        <span>
+          <strong>About the Activity</strong>
+          <p>${escapeHtml(action.description)}</p>
+        </span>
+      </div>
+
+      <button
+        type="button"
+        class="btn btn-primary btn-lg btn-block action-detail-join"
+        id="joinCivicActionBtn"
+        onclick="joinCivicAction('${actionId}')"
+      >
+        <i data-lucide="user-plus"></i>
+        Join Activity
+      </button>
+
+    </div>
+  `;
+
+  showScreen(
+    "actionDetailScreen"
+  );
+
+  refreshIcons();
+}
+
+function joinCivicAction(actionId) {
+
+  const action =
+    civicActionData[actionId];
+
+  if (!action) {
+    return;
+  }
+
+
+  action.participants += 1;
+
+
+  const count =
+    document.getElementById(
+      "actionParticipantCount"
+    );
+
+  if (count) {
+    count.textContent =
+      action.participants;
+  }
+
+
+  const button =
+    document.getElementById(
+      "joinCivicActionBtn"
+    );
+
+  if (button) {
+
+    button.disabled = true;
+
+    button.innerHTML = `
+      <i data-lucide="check"></i>
+      Joined Activity
+    `;
+
+    refreshIcons();
+
+  }
+
+
+  toast(
+    "You joined this civic activity!"
+  );
+
+}
+
+
+/* =========================================================
+   CIVIC ACTIONS RENDERING
+   ========================================================= */
+
+function renderCivicActions() {
+  const list = document.getElementById("civicActionsList");
+  if (!list) return;
+
+  if (!Array.isArray(window.civicUserActivities)) {
+    window.civicUserActivities = [];
+  }
+
+  const builtInActions = [
+    {
+      id: "flood",
+      title: "Flood Preparedness & Awareness Drive",
+      icon: "waves",
+      location: "Imphal",
+      participants: 24,
+      description: "Help residents learn basic flood preparedness and emergency safety measures."
+    },
+    {
+      id: "cleanup",
+      title: "Community Clean-Up Drive",
+      icon: "sparkles",
+      location: "Khurai",
+      participants: 18,
+      description: "Volunteers come together to clean a shared public area and improve the neighbourhood."
+    },
+    {
+      id: "planting",
+      title: "Tree Plantation & Green Space Drive",
+      icon: "trees",
+      location: "Lamphel",
+      participants: 31,
+      description: "Help create greener community spaces through a local tree plantation activity."
+    }
+  ];
+
+  const userActions = window.civicUserActivities.map((activity) => {
+    civicActionData[activity.id] = activity;
+    return activity;
+  });
+
+  const builtInMarkup = builtInActions.map((item) => {
+    const action = civicActionData[item.id];
+
+    return `
+      <button
+        type="button"
+        class="action-card glass civic-action-card"
+        data-civic-action="${item.id}"
+      >
+        <span
+          class="action-card-image"
+          style="background-image: linear-gradient(90deg, rgba(4,12,9,.08), rgba(4,12,9,.18)), url('${action.image || ""}')"
+          aria-hidden="true"
+        ></span>
+
+        <span class="action-icon">
+          <i data-lucide="${item.icon}"></i>
+        </span>
+
+        <span class="action-text">
+          <span class="action-title">${escapeHtml(item.title)}</span>
+
+          <span class="action-desc">
+            ${escapeHtml(item.description)}
+          </span>
+
+          <span class="action-meta">
+            <span>
+              <i data-lucide="map-pin"></i>
+              ${escapeHtml(action.location)}
+            </span>
+
+            <span>
+              <i data-lucide="users"></i>
+              ${action.participants} joined
+            </span>
+          </span>
+        </span>
+
+        <i
+          data-lucide="arrow-up-right"
+          class="action-arrow"
+        ></i>
+      </button>
+    `;
+  }).join("");
+
+  const userMarkup = userActions.map((activity) => `
+    <button
+      type="button"
+      class="action-card glass civic-action-card user-civic-action-card"
+      data-civic-action="${activity.id}"
+    >
+      <span
+        class="action-card-image"
+        style="background-image: linear-gradient(90deg, rgba(4,12,9,.08), rgba(4,12,9,.18)), url('${activity.image || ""}')"
+        aria-hidden="true"
+      ></span>
+
+      <span class="action-icon">
+        <i data-lucide="${activity.icon || "megaphone"}"></i>
+      </span>
+
+      <span class="action-text">
+        <span class="action-title">
+          ${escapeHtml(activity.title)}
+        </span>
+
+        <span class="action-desc">
+          ${escapeHtml(activity.description)}
+        </span>
+
+        <span class="action-meta">
+          <span>
+            <i data-lucide="map-pin"></i>
+            ${escapeHtml(activity.location)}
+          </span>
+
+          <span>
+            <i data-lucide="users"></i>
+            ${Number(activity.participants) || 0} expected
+          </span>
+        </span>
+      </span>
+
+      <i
+        data-lucide="arrow-up-right"
+        class="action-arrow"
+      ></i>
+    </button>
+  `).join("");
+
+  list.innerHTML =
+    builtInMarkup +
+    userMarkup;
+
+  refreshIcons();
+}
+
+
+/* =========================================================
+   CREATE ACTIVITY SCREEN
+   ========================================================= */
+
+function openCreateActivity() {
+
+  showScreen(
+    "createActivityScreen"
+  );
+
+}
+
+/* =========================================================
+   13. INIT
+   ========================================================= */
+
+function init() {
+
+  issues =
+    SEED_ISSUES.map(
+      createIssue
+    );
+
+  renderCategoryOptions();
+
+  setupIssueFilters();
+
+  renderSkillPicker();
+
+  bindEvents();
+
+  renderCivicActions();
+
+  showScreen(
+    screenFromHash(),
+    {
+      push: false
+    }
+  );
+
+  refreshIcons();
+}
+
+init();
