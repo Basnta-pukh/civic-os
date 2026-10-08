@@ -77,3 +77,116 @@
  .civic-report-layout{grid-template-columns:1fr}
  .civic-report-top{align-items:flex-start;flex-direction:column}
 }
+
+
+/* =====================================================
+   DRIBBBLE-INSPIRED PRODUCT POLISH + LEGACY SCREEN ISOLATION
+   ===================================================== */
+html,body{
+  background:#08090f !important;
+  min-height:100%;
+}
+body{
+  overflow-x:hidden !important;
+}
+body:has(#civicWorkspace.is-active) > .bg-grid,
+body:has(#civicWorkspace.is-active) > .topbar,
+body:has(#civicWorkspace.is-active) > #app,
+body:has(#civicWorkspace.is-active) > .bottom-nav{
+  visibility:hidden !important;
+  pointer-events:none !important;
+}
+.civic-portal-shell.is-hidden{display:none !important}
+.civic-workspace.is-active{
+  position:fixed !important;
+  inset:0 !important;
+  width:100% !important;
+  height:100dvh !important;
+  min-height:100dvh !important;
+  overflow:hidden !important;
+  z-index:99999 !important;
+  background:
+    radial-gradient(circle at 85% -10%,rgba(124,92,255,.12),transparent 32%),
+    radial-gradient(circle at 15% 100%,rgba(45,120,255,.07),transparent 28%),
+    #08090f !important;
+}
+.civic-workspace-main{
+  overflow-y:auto !important;
+  overscroll-behavior:contain !important;
+  scrollbar-width:thin;
+  scrollbar-color:rgba(255,255,255,.12) transparent;
+}
+.civic-workspace-main::-webkit-scrollbar{width:6px}
+.civic-workspace-main::-webkit-scrollbar-thumb{
+  background:rgba(255,255,255,.12);
+  border-radius:99px;
+}
+
+/* Real product dashboard hierarchy */
+.civic-citizen .civic-welcome,
+.civic-government .civic-welcome{max-width:1180px}
+.civic-welcome h1{
+  font-weight:650 !important;
+  line-height:1.08 !important;
+}
+.civic-work-card{
+  border:1px solid rgba(255,255,255,.065) !important;
+  background:linear-gradient(145deg,rgba(20,22,32,.92),rgba(13,15,23,.88)) !important;
+  box-shadow:0 14px 42px rgba(0,0,0,.16) !important;
+}
+.civic-work-card:hover{
+  border-color:rgba(139,92,246,.20) !important;
+}
+.civic-stat{
+  background:rgba(16,18,27,.82) !important;
+  border:1px solid rgba(255,255,255,.055) !important;
+}
+.civic-hero-action{
+  background:linear-gradient(110deg,rgba(139,92,246,.14),rgba(59,130,246,.08)) !important;
+  border:1px solid rgba(139,92,246,.16) !important;
+}
+.civic-work-primary{
+  background:linear-gradient(135deg,#8b5cf6,#3b82f6) !important;
+  color:#fff !important;
+  box-shadow:0 8px 24px rgba(91,76,190,.22) !important;
+}
+
+/* AI should feel like a real assistant, not a form */
+.civic-ai-page{
+  max-width:1180px !important;
+  margin:0 auto !important;
+}
+.civic-ai-chat{
+  min-height:58vh !important;
+  background:rgba(10,12,18,.72) !important;
+  border:1px solid rgba(255,255,255,.07) !important;
+  box-shadow:0 20px 60px rgba(0,0,0,.20) !important;
+}
+.civic-ai-message.assistant>div:last-child{
+  background:rgba(255,255,255,.035);
+  border:1px solid rgba(255,255,255,.055);
+  border-radius:16px;
+  padding:11px 14px;
+}
+.civic-ai-message.user>div:last-child{
+  background:linear-gradient(135deg,rgba(124,92,246,.88),rgba(59,130,246,.88));
+  border-radius:16px;
+  padding:11px 14px;
+}
+.civic-ai-composer{
+  position:sticky !important;
+  bottom:10px;
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+  background:rgba(12,14,21,.88) !important;
+  border:1px solid rgba(255,255,255,.08) !important;
+  box-shadow:0 15px 45px rgba(0,0,0,.28);
+}
+.civic-ai-send{
+  background:linear-gradient(135deg,#8b5cf6,#3b82f6) !important;
+}
+@media(max-width:720px){
+  .civic-workspace.is-active{height:100svh !important}
+  .civic-workspace-main{padding-bottom:96px !important}
+  .civic-ai-chat{min-height:62vh !important}
+}
