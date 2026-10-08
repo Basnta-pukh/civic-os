@@ -7884,21 +7884,27 @@ function init() {
 
 init();
 /* =========================================================
-   PUBLIC MVP BRIDGE FOR HACKATHON DEMOS
+   CIVIC OS PUBLIC MVP BRIDGE
+   Shared runtime API for enhancement layers and demos.
    ========================================================= */
 window.CivicOS = window.CivicOS || {};
-Object.defineProperty(window.CivicOS, "issues", { get: () => issues });
+
+if (!Object.getOwnPropertyDescriptor(window.CivicOS, "issues")) {
+  Object.defineProperty(window.CivicOS, "issues", {
+    get: () => issues,
+    configurable: true
+  });
+}
+
 window.CivicOS.calculateRoadPriority = calculateRoadPriority;
 window.CivicOS.getRoadPriorityReason = getRoadPriorityReason;
 
-/* =========================================================
-   HACKATHON DEMO BRIDGE
-   Exposes read-only runtime state to the presentation layer.
-   ========================================================= */
-window.CivicOS = window.CivicOS || {};
-Object.defineProperties(window.CivicOS, {
-  issues: { get: () => issues },
-  state: { get: () => state },
-  analyzeReport: { value: analyzeReport },
-  refreshIcons: { value: refreshIcons }
-});
+if (!Object.getOwnPropertyDescriptor(window.CivicOS, "state")) {
+  Object.defineProperty(window.CivicOS, "state", {
+    get: () => state,
+    configurable: true
+  });
+}
+
+window.CivicOS.analyzeReport = analyzeReport;
+window.CivicOS.refreshIcons = refreshIcons;
