@@ -489,3 +489,52 @@
     init();
   }
 })();
+
+/* =========================================================
+   REPORT ANALYSIS — JUDGE PROOF LAYER
+   ========================================================= */
+(() => {
+  "use strict";
+  const esc = (v) => String(v ?? "")
+    .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;").replaceAll("'","&#039;");
+  const evidenceQuality = (d) => {
+    const p = !!d?.hasPhoto, l = !!String(d?.location||"").trim();
+    const detail = String(d?.description||"").trim().length >= 30;
+    const score = (p?40:0) + (l?35:0) + (detail?25:0);
+    return {score,label:score>=90?"Strong":score>=65?"Good":score>=35?"Partial":"Weak"};
+  };
+  function mountAudit() {
+    const panel = document.getElementById("aiPanel");
+    const state = window.CivicOS?.state;
+    if (!panel || !state?.analysis || !state?.draft || panel.querySelector(".civic-ai-audit") || panel.querySelector(".ai-card.is-loading")) return;
+    const a = state.analysis, d = state.draft, e = evidenceQuality(d);
+    const score = a.priority === "High" ? 80 : a.priority === "Low" ? 35 : 60;
+    const wrap = document.createElement("div");
+    wrap.className = "civic-ai-audit";
+    wrap.innerHTML = \`
+      <div class="civic-ai-audit-head">
+        <div><span class="civic-eyebrow">AI EVIDENCE REPORT · MVP</span><h3>What the system actually decided</h3></div>
+        <span class="civic-demo-chip">Advisory output</span>
+      </div>
+      <div class="civic-ai-audit-grid">
+        <div class="civic-audit-cell"><span>Classification</span><strong>\${esc(a.categoryLabel)}</strong><small>\${a.autoDetected ? "Detected from description" : "Citizen-selected category"}</small></div>
+        <div class="civic-audit-cell"><span>AI confidence</span><strong>\${Number(a.confidence||0)}%</strong><div class="civic-meter"><i style="width:\${Math.min(100,Number(a.confidence||0))}%"></i></div></div>
+        <div class="civic-audit-cell"><span>Evidence quality</span><strong>\${e.label}</strong><small>\${e.score}/100 · photo \${d.hasPhoto ? "available" : "missing"}</small></div>
+        <div class="civic-audit-cell"><span>Priority recommendation</span><strong>\${esc(a.priority)}</strong><small>\${score}/100 · target \${esc(a.responseTime)}</small></div>
+        <div class="civic-audit-cell civic-audit-wide"><span>Routing</span><strong>\${esc(a.authority||a.department)}</strong><small>\${esc(a.division||"Department routing")} · routing confidence \${Number(a.routingConfidence||0)}%</small></div>
+        \${a.roadIntelligence ? \`<div class="civic-audit-cell civic-audit-wide civic-road-audit"><span>Road-specific intelligence</span><div class="civic-road-audit-row"><b>\${esc(a.roadIntelligence.issueType||"Road condition")}</b><span>\${esc(a.roadIntelligence.severity||a.priority)}</span><span>\${a.roadIntelligence.recurrence ? "Recurring signal" : "No recurrence signal"}</span></div></div>\` : ""}
+        <div class="civic-audit-explain"><span class="civic-panel-kicker">WHY?</span><p>\${esc((a.signals||[]).length ? (a.signals||[]).join(" · ") : "Recommendation uses category, description, evidence and impact signals.")}</p></div>
+      </div>
+      <div class="civic-ai-governance"><span>✓</span><div><strong>Human verification required</strong><p>AI organizes evidence and recommends priority. It does not make the final government decision.</p></div></div>
+    \`;
+    panel.appendChild(wrap);
+  }
+  function initAudit() {
+    const panel = document.getElementById("aiPanel");
+    if (!panel) return;
+    new MutationObserver(mountAudit).observe(panel,{childList:true,subtree:true});
+    mountAudit();
+  }
+  if (document.readyState==="loading") document.addEventListener("DOMContentLoaded",initAudit,{once:true}); else initAudit();
+})();
