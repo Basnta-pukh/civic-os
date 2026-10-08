@@ -7883,3 +7883,10 @@ function init() {
 }
 
 init();
+/* =========================================================
+   PUBLIC MVP BRIDGE FOR HACKATHON DEMOS
+   ========================================================= */
+window.CivicOS = window.CivicOS || {};
+Object.defineProperty(window.CivicOS, "issues", { get: () => issues });
+window.CivicOS.calculateRoadPriority = calculateRoadPriority;
+window.CivicOS.getRoadPriorityReason = getRoadPriorityReason;
