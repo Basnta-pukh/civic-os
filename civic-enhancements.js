@@ -20,8 +20,12 @@
       .replaceAll("'", "&#039;");
   };
 
-  const getIssues = () =>
-    Array.isArray(window.issues) ? window.issues : [];
+  const getIssues = () => {
+    if (Array.isArray(window.CivicOS?.issues)) {
+      return window.CivicOS.issues;
+    }
+    return Array.isArray(window.issues) ? window.issues : [];
+  };
 
   const roadIssues = () =>
     getIssues().filter((i) => i && i.category === "roads");
