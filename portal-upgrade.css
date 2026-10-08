@@ -294,3 +294,521 @@ body{
     touch-action:pan-y !important;
   }
 }
+
+
+/* =========================================================
+   CIVIC OS — DISTINCTIVE VISUAL SYSTEM / ROUND 2
+   Editorial infrastructure UI. Less glass, less gradient,
+   stronger hierarchy, sharper colour roles.
+   ========================================================= */
+:root{
+  --ink:#0b0d12;
+  --canvas:#f2f4f7;
+  --surface:#ffffff;
+  --surface-2:#e9edf2;
+  --line:#d8dee7;
+  --text:#111827;
+  --muted:#647083;
+  --soft:#8a95a6;
+  --citizen:#6d4aff;
+  --citizen-2:#f06b5f;
+  --gov:#087f73;
+  --gov-2:#e2a72d;
+  --ai:#7b4ce2;
+  --danger:#c83d4f;
+  --shadow:0 18px 50px rgba(18,27,40,.10);
+}
+
+/* 01 — Replace the old black/gradient-first canvas with a
+   calm editorial background and deliberate colour fields. */
+html,body{
+  background:var(--canvas) !important;
+  color:var(--text) !important;
+}
+.civic-portal-shell,
+.civic-workspace{
+  background:var(--canvas) !important;
+  color:var(--text) !important;
+  background-image:none !important;
+}
+.civic-portal-grain,
+.civic-portal-beam{display:none !important}
+
+/* 02 — Typography hierarchy: one family, fewer tiny labels,
+   stronger titles and readable body copy. */
+.civic-portal-shell,
+.civic-workspace,
+.civic-workspace input,
+.civic-workspace textarea,
+.civic-workspace button{
+  font-family:Inter,ui-sans-serif,system-ui,sans-serif !important;
+}
+.civic-portal-heading h2,
+.civic-splash-mark~h1,
+.civic-auth-card h2,
+.civic-welcome h1,
+.civic-report-top h1,
+.civic-ai-page-head h1,
+.civic-empty-page h2{
+  color:var(--text) !important;
+  background:none !important;
+  -webkit-text-fill-color:initial !important;
+}
+.civic-portal-heading h2 span,
+.civic-splash-mark~h1 span{
+  color:var(--citizen) !important;
+  background:none !important;
+  -webkit-text-fill-color:initial !important;
+}
+.civic-entry-kicker,
+.civic-portal-meta{
+  color:var(--muted) !important;
+  letter-spacing:.12em !important;
+}
+.civic-portal-heading>p:last-child,
+.civic-auth-copy,
+.civic-welcome p,
+.civic-report-top p,
+.civic-ai-page-head p,
+.civic-empty-page p{
+  color:var(--muted) !important;
+  font-size:14px !important;
+  line-height:1.65 !important;
+}
+
+/* 03 — Remove the "everything is a pill" language. */
+.civic-entry-badge,
+.civic-ai-status,
+.civic-ai-live,
+.civic-result-pill,
+.civic-live-count,
+.civic-detail-badge,
+.civic-demo-chip,
+.civic-cluster-badge,
+.civic-status-pill,
+.civic-civic-chip{
+  border-radius:7px !important;
+  padding:6px 8px !important;
+}
+.civic-entry-badge{
+  background:#e8e2ff !important;
+  border:0 !important;
+  color:#5534b8 !important;
+}
+.civic-ai-status,
+.civic-ai-live{
+  background:#e5f7f3 !important;
+  border:0 !important;
+  color:#087f73 !important;
+}
+
+/* 04 — Splash: recognizable brand moment without a gradient. */
+.civic-splash-mark{
+  width:64px !important;
+  height:64px !important;
+  border-radius:18px !important;
+  background:#151827 !important;
+  box-shadow:0 16px 38px rgba(21,24,39,.18) !important;
+}
+.civic-splash-symbol{color:#fff !important}
+.civic-loading-line{background:#d7dce4 !important;height:3px !important}
+.civic-loading-line i{background:var(--citizen) !important}
+
+/* 05 — Authentication: fewer nested surfaces, clearer CTA. */
+.civic-auth-card{
+  max-width:500px !important;
+  padding:38px !important;
+  border:1px solid var(--line) !important;
+  border-radius:18px !important;
+  background:var(--surface) !important;
+  box-shadow:var(--shadow) !important;
+  backdrop-filter:none !important;
+}
+.civic-auth-brand{color:var(--text) !important}
+.civic-mini-mark{
+  background:#151827 !important;
+  border-radius:9px !important;
+}
+.civic-auth-tabs{
+  padding:0 !important;
+  gap:0 !important;
+  background:none !important;
+  border-bottom:1px solid var(--line) !important;
+  border-radius:0 !important;
+}
+.civic-auth-tabs button{
+  padding:12px 4px !important;
+  color:var(--soft) !important;
+  border-radius:0 !important;
+  border-bottom:2px solid transparent !important;
+}
+.civic-auth-tabs button.is-active{
+  color:var(--text) !important;
+  background:none !important;
+  border-bottom-color:var(--citizen) !important;
+}
+.civic-auth-form{gap:16px !important}
+.civic-auth-form label{color:#3f4b5c !important;font-size:12px !important}
+.civic-auth-form input{
+  box-sizing:border-box !important;
+  padding:14px !important;
+  border:1px solid var(--line) !important;
+  border-radius:9px !important;
+  background:#f8fafc !important;
+  color:var(--text) !important;
+}
+.civic-entry-primary{
+  min-height:48px !important;
+  border-radius:9px !important;
+  background:#151827 !important;
+  box-shadow:0 8px 20px rgba(21,24,39,.16) !important;
+}
+.civic-demo-entry,.civic-back-entry{color:var(--muted) !important}
+
+/* 06 — Portal selection: two clear product choices, not two
+   floating glass cards. Each gets its own colour language. */
+.civic-portal-grid{gap:14px !important}
+.civic-portal-card{
+  padding:28px !important;
+  min-height:300px !important;
+  border:1px solid var(--line) !important;
+  border-radius:14px !important;
+  background:var(--surface) !important;
+  box-shadow:var(--shadow) !important;
+  color:var(--text) !important;
+}
+.civic-portal-card:hover{
+  transform:translateY(-3px) !important;
+  border-color:#aeb7c5 !important;
+}
+.civic-portal-card.citizen{--role:var(--citizen);--role-soft:#eeeaff}
+.civic-portal-card.government{--role:var(--gov);--role-soft:#e2f4f0}
+.civic-portal-icon{
+  width:48px !important;
+  height:48px !important;
+  border-radius:12px !important;
+  margin-bottom:34px !important;
+  background:var(--role-soft) !important;
+  color:var(--role) !important;
+}
+.civic-portal-card strong{
+  font-size:30px !important;
+  color:var(--text) !important;
+}
+.civic-portal-card p{
+  color:var(--muted) !important;
+  line-height:1.65 !important;
+}
+.civic-portal-actions{
+  margin-top:30px !important;
+  padding-top:16px !important;
+  border-top:1px solid var(--line) !important;
+  color:var(--role) !important;
+}
+.civic-portal-actions b{font-weight:750 !important}
+
+/* 07 — Workspace: top bar and navigation become a product
+   frame, not another translucent layer. */
+.civic-workspace{
+  background:var(--canvas) !important;
+}
+.civic-workspace-top{
+  background:rgba(242,244,247,.96) !important;
+  border-bottom:1px solid var(--line) !important;
+  backdrop-filter:none !important;
+}
+.civic-workspace-brand{color:var(--text) !important}
+.civic-workspace-brand span{
+  background:#151827 !important;
+  border-radius:8px !important;
+}
+.civic-workspace-context span{color:var(--text) !important}
+.civic-workspace-context small{color:var(--muted) !important}
+.civic-workspace-account{
+  background:var(--surface) !important;
+  border:1px solid var(--line) !important;
+  color:var(--muted) !important;
+  border-radius:9px !important;
+}
+.civic-workspace-nav{
+  background:#151827 !important;
+  border-color:#272c3a !important;
+  backdrop-filter:none !important;
+}
+.civic-nav-btn{color:#98a1b2 !important}
+.civic-nav-btn.is-active{
+  color:#fff !important;
+  background:#2a3040 !important;
+}
+.civic-nav-btn.is-active i{color:#9f8aff !important}
+
+/* 08 — Main content: fewer floating boxes and a stronger
+   editorial rhythm. */
+.civic-workspace-main{
+  color:var(--text) !important;
+}
+.civic-work-card{
+  border:1px solid var(--line) !important;
+  border-radius:12px !important;
+  background:var(--surface) !important;
+  box-shadow:0 8px 28px rgba(18,27,40,.06) !important;
+}
+.civic-work-card h3,
+.civic-work-card h2{color:var(--text) !important}
+.civic-work-card>p,
+.civic-section-head p,
+.civic-detail-reason{color:var(--muted) !important}
+
+/* 09 — CTA prominence: one strong action per area. */
+.civic-work-primary,
+.civic-analyze-btn,
+.civic-compare-btn,
+.civic-detail-actions button.primary,
+.civic-detail-actions .primary{
+  background:#151827 !important;
+  color:#fff !important;
+  border-radius:8px !important;
+  box-shadow:0 8px 18px rgba(21,24,39,.14) !important;
+}
+.civic-work-primary:hover,
+.civic-analyze-btn:hover,
+.civic-compare-btn:hover,
+.civic-detail-actions button.primary:hover{
+  background:#272d40 !important;
+}
+.civic-work-secondary{
+  border-radius:8px !important;
+  background:#eef1f5 !important;
+  border:1px solid var(--line) !important;
+  color:#3e4a5b !important;
+}
+
+/* 10 — Give the three major product modes distinct colour
+   combinations instead of one purple/blue wash everywhere. */
+.civic-citizen{
+  --accent:var(--citizen);
+  --accent-soft:#eeeaff;
+  --accent-2:var(--citizen-2);
+}
+.civic-government{
+  --accent:var(--gov);
+  --accent-soft:#e2f4f0;
+  --accent-2:var(--gov-2);
+}
+.civic-citizen .civic-entry-badge{background:var(--accent-soft) !important;color:var(--accent) !important}
+.civic-government .civic-entry-badge{background:#e2f4f0 !important;color:var(--gov) !important}
+.civic-citizen .civic-step>span{
+  background:#eeeaff !important;color:var(--citizen) !important;
+}
+.civic-government .civic-step>span{
+  background:#e2f4f0 !important;color:var(--gov) !important;
+}
+.civic-citizen .civic-ai-avatar,
+.civic-citizen .civic-ai-composer button{
+  background:var(--citizen) !important;
+}
+.civic-government .civic-ai-avatar{
+  background:var(--gov) !important;
+}
+
+/* Citizen home: purple + warm coral. */
+.civic-citizen .civic-hero-action{
+  background:#f0edff !important;
+  border-left:4px solid var(--citizen) !important;
+  border-top:0 !important;
+  border-right:0 !important;
+  border-bottom:0 !important;
+  border-radius:4px !important;
+}
+.civic-citizen .civic-hero-action strong{color:#30205f !important}
+.civic-citizen .civic-quick i{color:var(--citizen) !important}
+.civic-citizen .civic-stat:nth-child(2){border-top:3px solid var(--citizen-2) !important}
+
+/* Government: deep green + amber for operational emphasis. */
+.civic-government .civic-hero-action{
+  background:#e5f4f1 !important;
+  border-left:4px solid var(--gov) !important;
+  border-top:0 !important;
+  border-right:0 !important;
+  border-bottom:0 !important;
+  border-radius:4px !important;
+}
+.civic-government .civic-zone.critical b{color:var(--danger) !important}
+.civic-government .civic-zone.high b{color:#b86b00 !important}
+.civic-government .civic-zone.medium b{color:#947000 !important}
+.civic-government .civic-zone.monitor b{color:var(--gov) !important}
+
+/* Civic AI: violet + mint, but keep the chat mostly neutral. */
+.civic-ai-page .civic-ai-chat{
+  border-left:4px solid var(--ai) !important;
+}
+.civic-ai-page .civic-ai-composer{
+  background:#f7f8fb !important;
+  border:1px solid var(--line) !important;
+  border-radius:10px !important;
+}
+.civic-ai-page .civic-ai-message.user>div{
+  background:#eeeaff !important;
+  border:0 !important;
+  color:#33245f !important;
+  border-radius:12px 12px 3px 12px !important;
+}
+.civic-ai-page .civic-ai-message.user p{color:#4d3b7c !important}
+.civic-ai-page .civic-ai-fields div{
+  background:#f7f8fa !important;
+  border:1px solid #e1e5eb !important;
+  border-radius:9px !important;
+}
+.civic-ai-page .civic-ai-confidence{
+  background:#e6f6f2 !important;
+  color:#476c66 !important;
+  border-radius:8px !important;
+}
+.civic-ai-page .civic-ai-confidence b{color:var(--gov) !important}
+
+/* Report evidence area: make the upload the visual anchor. */
+.civic-upload{
+  min-height:190px !important;
+  border:1px dashed #9aa5b6 !important;
+  border-radius:10px !important;
+  background:#f7f8fa !important;
+  color:#526074 !important;
+}
+.civic-upload i{color:var(--citizen) !important}
+.civic-report-location{
+  background:#f7f8fa !important;
+  border:1px solid var(--line) !important;
+  border-radius:9px !important;
+}
+.civic-report-textarea{
+  background:#f7f8fa !important;
+  border:1px solid var(--line) !important;
+  border-radius:9px !important;
+  color:var(--text) !important;
+}
+
+/* Data cards become rows with accent rails instead of mini cards. */
+.civic-stat{
+  background:transparent !important;
+  border:0 !important;
+  border-left:3px solid #c8ced8 !important;
+  border-radius:0 !important;
+  padding:12px 14px !important;
+}
+.civic-stat strong{color:var(--text) !important}
+.civic-quick{
+  background:#f7f8fa !important;
+  border:1px solid #e1e5eb !important;
+  border-radius:9px !important;
+}
+.civic-quick i{color:var(--citizen) !important}
+
+/* Government filters: compact controls, not pills. */
+.civic-filter-row{gap:4px !important}
+.civic-filter{
+  border-radius:6px !important;
+  background:transparent !important;
+  border:1px solid var(--line) !important;
+  color:#657184 !important;
+}
+.civic-filter.is-active{
+  background:#151827 !important;
+  border-color:#151827 !important;
+  color:#fff !important;
+}
+.civic-gov-sort{border-radius:7px !important;background:#fff !important;border:1px solid var(--line) !important}
+
+/* Risk zone and queue: use hierarchy and colour rails. */
+.civic-risk-map{
+  background:#fff !important;
+  border:1px solid var(--line) !important;
+  border-radius:12px !important;
+}
+.civic-zone{
+  background:#f7f8fa !important;
+  border:0 !important;
+  border-left:3px solid #c9d0da !important;
+  border-radius:5px !important;
+}
+.civic-zone.critical{border-left-color:var(--danger) !important}
+.civic-zone.high{border-left-color:#d47b00 !important}
+.civic-zone.medium{border-left-color:#b39a19 !important}
+.civic-zone.monitor{border-left-color:var(--gov) !important}
+.civic-zone:hover,.civic-zone.is-selected{
+  transform:none !important;
+  background:#eef1f4 !important;
+  border-color:inherit !important;
+}
+.civic-priority-item,
+.civic-inspection-item{
+  background:#fff !important;
+  border:0 !important;
+  border-bottom:1px solid #e4e8ee !important;
+  border-radius:0 !important;
+}
+.civic-priority-item.is-selected,
+.civic-inspection-item.is-selected{
+  background:#f1f0ff !important;
+  box-shadow:inset 3px 0 0 var(--citizen) !important;
+}
+.civic-priority-score{color:var(--gov) !important}
+
+/* Reduce nested surfaces in secondary sections. */
+.civic-formula,
+.civic-formula-card,
+.civic-cluster-card,
+.civic-trust-note,
+.civic-ai-trust-panel,
+.civic-validation-card{
+  background:#f7f8fa !important;
+  border:1px solid #e1e5eb !important;
+  border-radius:9px !important;
+}
+.civic-trust-note{border-left:3px solid var(--gov) !important}
+.civic-ai-trust-panel{box-shadow:none !important}
+
+/* Architecture: make the pipeline a horizontal story, not a
+   row of identical cards. */
+.civic-architecture-flow>div{
+  background:transparent !important;
+  border:0 !important;
+  border-left:3px solid #b9c0cc !important;
+  border-radius:0 !important;
+  min-height:110px !important;
+}
+.civic-architecture-flow>div:nth-of-type(2){border-left-color:var(--ai) !important}
+.civic-architecture-flow>div:nth-of-type(3){border-left-color:var(--gov) !important}
+.civic-architecture-flow>div:nth-of-type(4){border-left-color:var(--citizen-2) !important}
+
+/* Better scale on desktop and mobile. */
+.civic-workspace-main{padding-top:34px !important}
+.civic-welcome{margin-bottom:30px !important}
+.civic-welcome h1,
+.civic-report-top h1,
+.civic-ai-page-head h1{
+  max-width:780px !important;
+  margin-bottom:12px !important;
+}
+.civic-work-grid,
+.civic-report-layout,
+.civic-ai-layout,
+.civic-gov-grid{
+  gap:24px !important;
+}
+.civic-work-card{padding:24px !important}
+@media(max-width:720px){
+  .civic-workspace-main{padding:22px 16px 94px !important}
+  .civic-work-card{padding:18px !important}
+  .civic-welcome h1,
+  .civic-report-top h1,
+  .civic-ai-page-head h1{font-size:32px !important}
+  .civic-portal-heading h2{font-size:44px !important}
+  .civic-portal-card{min-height:260px !important}
+}
+
+/* Fallback: eliminate remaining decorative gradients from this
+   visual system while preserving functional progress indicators. */
+.civic-portal-shell *,
+.civic-workspace *{
+  background-image:none !important;
+}
